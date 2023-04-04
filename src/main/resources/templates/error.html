@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>错误页面</title>
+</head>
+<body>
+    <div>
+<!--      <img th:src="@{/error.jpg}" width="200" height="200">-->
+      <table>
+        <tr>
+          <td>错误发生时请求的URL路径</td>
+          <td th:text="${path}"></td>
+        </tr>
+        <tr>
+          <td>错误发生时间</td>
+          <td th:text="${timestamp}"></td>
+        </tr>
+        <tr>
+          <td>HTTP状态码</td>
+          <td th:text="${status}"></td>
+        </tr>
+        <tr>
+          <td>错误原因</td>
+          <td th:text="${error}"></td>
+        </tr>
+        <tr>
+          <td>异常类名</td>
+          <td th:text="${exception}"></td>
+        </tr>
+        <tr>
+          <td>异常消息</td>
+          <td th:text="${message}"></td>
+        </tr>
+        <tr>
+          <td>BindResult异常里的各种错误</td>
+          <td th:text="${errors}"></td>
+        </tr>
+        <tr>
+          <td>异常栈跟踪信息</td>
+          <td th:text="${trace}"></td>
+        </tr>
+      </table>
+    </div>
+</body>
+</html>
