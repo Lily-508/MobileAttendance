@@ -1,9 +1,9 @@
-package com.as.attendance_springboot.jwt.util;
+package com.as.attendance_springboot.util;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.json.JSONUtil;
-import com.as.attendance_springboot.jwt.dto.PayloadDto;
+import com.as.attendance_springboot.model.PayloadDto;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -12,16 +12,22 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * @author xulili
+ */
 public class JwtUtil {
     private static final String DEFAULT_SECRET = "moblieAttendace";
 
-    public static PayloadDto generatePayloadDto() {
+    public static PayloadDto generatePayloadDto(String userid,String username,String right) {
         Date now = new Date();
         Date exp = DateUtil.offsetSecond(now, 60 * 60);
         PayloadDto payloadDto = PayloadDto.builder()
                 .iat(now.getTime())
                 .exp(exp.getTime())
                 .jti(UUID.randomUUID().toString())
+                .userId(userid)
+                .username(username)
+                .right(right)
                 .build();
         return payloadDto;
     }
@@ -44,7 +50,7 @@ public class JwtUtil {
     public static String generateTokenByHmac(PayloadDto payloadDto, String secret) throws JOSEException {
         String payloadStr = JSONUtil.toJsonStr(payloadDto);
         secret = SecureUtil.md5(secret);
-        JWSHeader jwsheader = new JWSHeader.Builder(JWSAlgorithm.HS512).type(JOSEObjectType.JWT).build();
+        JWSHeader jwsheader = new JWSHeader.Builder(JWSAlgorithm.HS256).type(JOSEObjectType.JWT).build();
         Payload payload = new Payload(payloadStr);
         JWSObject jwsObject = new JWSObject(jwsheader, payload);
         JWSSigner jwsSigner = new MACSigner(secret);

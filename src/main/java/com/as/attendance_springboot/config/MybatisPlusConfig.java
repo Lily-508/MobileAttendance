@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @MapperScan("com.as.attendance_springboot.mapper")
-public class MybatisPlusConfig{
+public class MybatisPlusConfig {
 
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
@@ -27,5 +27,4 @@ public class MybatisPlusConfig{
         interceptor.addInnerInterceptor(optimisticLockerInnerInterceptor);
         return interceptor;
     }
-
 }

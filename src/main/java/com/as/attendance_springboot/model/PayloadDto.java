@@ -1,4 +1,4 @@
-package com.as.attendance_springboot.jwt.dto;
+package com.as.attendance_springboot.model;
 
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +17,6 @@ public class PayloadDto {
     private Long exp;
     private String jti;
     private String username;
-    private String userid;
+    private String userId;
     private String right;
 }

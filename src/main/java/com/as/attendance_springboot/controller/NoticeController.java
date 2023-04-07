@@ -26,10 +26,10 @@ public class NoticeController {
 
     @GetMapping("/page")
     @ApiOperation("分页查询所有公告")
-    @ApiImplicitParams({@ApiImplicitParam(name = "pageCur", value = "当前页数"), @ApiImplicitParam(name = "pageSize",
-            value = "页面大小")})
+    @ApiImplicitParams({@ApiImplicitParam(name = "pageCur", value = "当前页数",dataTypeClass = String.class), @ApiImplicitParam(name = "pageSize",
+            value = "页面大小",dataTypeClass = String.class)})
     @ApiResponse(code = 200, message = "查询成功")
-    public ResponseEntity<PaginationResult> getAllNoticeByPage(@RequestParam int pageCur, @RequestParam int pageSize) {
+    public ResponseEntity<PaginationResult<IPage<Notice>>> getAllNoticeByPage(@RequestParam int pageCur, @RequestParam int pageSize) {
         log.info("传入参数当前页数={},页面大小={}",pageCur,pageSize);
         IPage<Notice> noticeList = noticeService.page(new Page(pageCur, pageSize), null);
         long total = noticeList.getTotal();
@@ -43,7 +43,7 @@ public class NoticeController {
 
     @PostMapping
     @ApiOperation("新建公告")
-    @ApiImplicitParam(name = "notice", value = "对应Notice的JSON数据")
+    @ApiImplicitParam(name = "notice", value = "对应Notice的JSON数据",dataTypeClass = String.class)
     @ApiResponses({@ApiResponse(code = 200, message = "添加Notice成功"), @ApiResponse(code = 500, message = "添加Notice失败")})
     public ResponseEntity<BaseResult> saveNotice(@RequestBody Notice notice) {
         log.info("传入notice={}",notice);
@@ -58,7 +58,7 @@ public class NoticeController {
     }
     @PutMapping
     @ApiOperation("编辑公告")
-    @ApiImplicitParam(name = "notice", value = "对应Notice的JSON数据")
+    @ApiImplicitParam(name = "notice", value = "对应Notice的JSON数据",dataTypeClass = String.class)
     @ApiResponses({@ApiResponse(code = 200, message = "编辑公告成功"), @ApiResponse(code = 500, message = "编辑公告失败")})
     public ResponseEntity<BaseResult> updateNotice(@RequestBody Notice notice){
         log.info("传入notice={}",notice);
@@ -73,7 +73,7 @@ public class NoticeController {
     }
     @DeleteMapping
     @ApiOperation("删除公告")
-    @ApiImplicitParam(name = "nId", value = "对应Notice的n_id")
+    @ApiImplicitParam(name = "nId", value = "对应Notice的n_id",dataTypeClass = String.class)
     @ApiResponses({@ApiResponse(code = 200, message = "删除公告成功"), @ApiResponse(code = 500, message = "删除公告失败")})
     public ResponseEntity<BaseResult> deleteNotice(@RequestParam int nId){
         log.info("传入n_id={}",nId);

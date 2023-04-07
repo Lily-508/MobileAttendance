@@ -25,13 +25,11 @@ public class GlobalErrorController implements ErrorController {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseResult>  handleAllExceptions(Exception e) {
         BaseResult result=new BaseResult(500,e.getMessage());
-        System.out.println("设置路径出现异常");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR.value()).body(result);
     }
 
     @RequestMapping(ERROR_PATH)
     public ResponseEntity<BaseResult> error(HttpServletResponse response){
-        System.out.println("未设置路径出现异常");
         int code = response.getStatus();
         BaseResult result=null;
         switch (code) {
