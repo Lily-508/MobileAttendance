@@ -24,11 +24,9 @@ public final class RedisUtil {
      * @param timeout <=0设置为无限期限
      */
     public  void set(String key, Object value, long timeout) {
-        System.out.println("Redis start");
         ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
         if (timeout > 0) {
             operations.set(key, value, timeout, TimeUnit.SECONDS);
-            System.out.println("Redis");
         }
     }
 

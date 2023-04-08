@@ -32,7 +32,7 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
                 .collect(Collectors.joining(","));
         PayloadDto payloadDto = JwtUtil.generatePayloadDto(userDetails.getSId().toString(),
                 userDetails.getSName(), right);
-        String token= null;
+        String token;
         try {
             token = JwtUtil.generateTokenByHmac(payloadDto);
         } catch (JOSEException e) {

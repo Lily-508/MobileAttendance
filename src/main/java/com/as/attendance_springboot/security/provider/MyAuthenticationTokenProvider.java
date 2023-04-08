@@ -4,6 +4,7 @@ import com.as.attendance_springboot.model.LoginData;
 import com.as.attendance_springboot.model.enum_model.LoginType;
 import com.as.attendance_springboot.security.token.MyAuthenticationToken;
 import com.as.attendance_springboot.service.impl.StaffServiceImpl;
+import com.as.attendance_springboot.util.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -21,7 +22,8 @@ import org.springframework.stereotype.Component;
 public class MyAuthenticationTokenProvider implements AuthenticationProvider {
     @Autowired
     StaffServiceImpl myUserDetailService;
-
+    @Autowired
+    private RedisUtil redisUtil;
 
     /**
      * 认证逻辑
@@ -29,7 +31,7 @@ public class MyAuthenticationTokenProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         MyAuthenticationToken myAuthenticationToken = (MyAuthenticationToken) authentication;
-        log.info("{}", myAuthenticationToken.toString());
+        log.info("MyAuthenticationTokenProvider开始认证{}", myAuthenticationToken.toString());
         LoginData loginData = myAuthenticationToken.getLoginData();
         if (loginData == null) {
             throw new AuthenticationServiceException("未获取到登陆参数");
@@ -42,7 +44,7 @@ public class MyAuthenticationTokenProvider implements AuthenticationProvider {
         if (LoginType.USERNAME_CODE.getCode().equals(loginType)) {
             // 用户名密码登陆
             log.info("尝试以 {} 方式登陆", LoginType.USERNAME_CODE.getRemark());
-//            this.checkUsernameCode(loginData.getUsername(),loginData.getCode());
+            this.checkUsernameCode(loginData.getUuid(),loginData.getCode());
             userDetails = myUserDetailService.loadUserByUsername(loginData.getUsername());
         } else if (LoginType.PHONE_CODE.getCode().equals(loginType)) {
             // 手机号验证码登陆
@@ -81,12 +83,20 @@ public class MyAuthenticationTokenProvider implements AuthenticationProvider {
 //            throw new AuthenticationServiceException("手机验证码错误");
 //        }
     }
-
-    public void checkUsernameCode(String codeId, String code) {
-        // todo 校验用户名密码登陆 示例
-//        if ("222222".equals(code)) {
-//        }else {
-//            throw new AuthenticationServiceException("验证码错误");
-//        }
+    /**
+     * 校验图片登陆验证码
+     * @author xulili
+     * @date 13:56 2023/4/8
+     * @param uuid
+     * @param code
+     **/
+    public void checkUsernameCode(String uuid, String code) {
+        String redisCode = (String) redisUtil.get(uuid);
+        log.info(redisCode);
+        if (redisCode == null || !redisCode.equals(code)) {
+            throw new AuthenticationServiceException("验证码为空或验证码错误");
+        }
+        //确保验证码的一次性
+        redisUtil.remove(uuid);
     }
 }

@@ -2,11 +2,9 @@ package com.as.attendance_springboot.security.filter;
 
 import com.as.attendance_springboot.model.LoginData;
 import com.as.attendance_springboot.security.token.MyAuthenticationToken;
-import com.as.attendance_springboot.util.RedisUtil;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -23,8 +21,7 @@ import java.io.IOException;
  */
 @Slf4j
 public class MyAuthenticationProcessingFilter extends UsernamePasswordAuthenticationFilter {
-    @Autowired
-    private RedisUtil redisUtil;
+
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         log.info("进入认证入口。");
@@ -50,16 +47,7 @@ public class MyAuthenticationProcessingFilter extends UsernamePasswordAuthentica
             throw new AuthenticationServiceException("LoginDataJson to LoginData failed");
         }
         log.info(loginData.toString());
-        // 校验验证码
-        String code = loginData.getCode();
-        String uuid = loginData.getUuid();
-        String redisCode = (String) redisUtil.get(uuid);
-        log.info(redisCode);
-        if (redisCode == null || !redisCode.equals(code)) {
-            throw new AuthenticationServiceException("验证码为空或验证码错误");
-        }
-        //确保验证码的一次性
-        redisUtil.remove(uuid);
+
         // 传递令牌类 UsernamePasswordAuthenticationToken
         String username = loginData.getUsername();
         String password = loginData.getPassword();

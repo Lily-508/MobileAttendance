@@ -18,9 +18,9 @@ import java.util.UUID;
 public class JwtUtil {
     private static final String DEFAULT_SECRET = "moblieAttendace";
 
-    public static PayloadDto generatePayloadDto(String userid,String username,String right) {
+    public static PayloadDto generatePayloadDto(String userid, String username, String right) {
         Date now = new Date();
-        Date exp = DateUtil.offsetSecond(now, 60 * 60);
+        Date exp = DateUtil.offsetSecond(now, 5*60 * 60);
         PayloadDto payloadDto = PayloadDto.builder()
                 .iat(now.getTime())
                 .exp(exp.getTime())
@@ -30,6 +30,12 @@ public class JwtUtil {
                 .right(right)
                 .build();
         return payloadDto;
+    }
+
+    public static PayloadDto getByToken(String token) throws ParseException {
+        JWSObject jwsObject = JWSObject.parse(token);
+        String payload = jwsObject.getPayload().toString();
+        return JSONUtil.toBean(payload, PayloadDto.class);
     }
 
     public static String generateTokenByHmac(PayloadDto payloadDto) throws JOSEException {

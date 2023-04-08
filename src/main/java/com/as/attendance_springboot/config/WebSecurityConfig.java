@@ -5,6 +5,7 @@ import com.as.attendance_springboot.security.filter.MyAuthenticationProcessingFi
 import com.as.attendance_springboot.security.handler.MyAuthenticationFailureHandler;
 import com.as.attendance_springboot.security.handler.MyAuthenticationSuccessHandler;
 import com.as.attendance_springboot.security.handler.MyExceptionHandler;
+import com.as.attendance_springboot.security.handler.MyLogoutSuccessHandler;
 import com.as.attendance_springboot.security.provider.MyAuthenticationTokenProvider;
 import com.as.attendance_springboot.service.impl.StaffServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 /**
  * @author xulili
@@ -35,6 +35,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     MyAuthenticationFailureHandler myAuthenticationFailureHandler;
     @Autowired
     MyExceptionHandler myExceptionHandler;
+    @Autowired
+    MyLogoutSuccessHandler myLogoutSuccessHandler;
     /**
      * UserDetailsService实现
      * AuthenticationProvider实现
@@ -55,10 +57,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // 关闭 session
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         // 添加 jwt解析
-        http.addFilterBefore(new JwtAuthenticationFilter(), BasicAuthenticationFilter.class);
+        http.addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         // 替换原有认证入口 filter
         http.addFilterAt(myAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
-        // 拦截所有请求
+        //测试接口允许所有请求
+//        http.authorizeRequests().anyRequest().permitAll().and();
+        // 角色控制访问
         http.authorizeRequests()
                 .antMatchers("/login","/captcha")
                 .permitAll()
@@ -66,6 +70,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .hasAnyAuthority("normal", "leader", "admin")
                 .anyRequest()
                 .authenticated()
+                .and()
+                .logout()
+                .logoutSuccessHandler(myLogoutSuccessHandler)
                 .and()
                 .csrf()
                 .disable();
