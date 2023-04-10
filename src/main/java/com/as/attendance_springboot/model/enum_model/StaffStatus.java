@@ -17,8 +17,8 @@ public enum StaffStatus {
      * @JsonValue 标记json返回的值
      */
     @EnumValue
-    @JsonValue
     private final Integer code;
+    @JsonValue
     private final String remark;
     StaffStatus(Integer code , String remark) {
         this.code=code;

@@ -12,9 +12,10 @@ import lombok.Getter;
 public enum StaffSex {
     //员工表的性别枚举
     MAN(0,"男"),WOMAN(1,"女");
-    @JsonValue
+
     @EnumValue
-    private final int code;
+    private final Integer code;
+    @JsonValue
     private final String remark;
     StaffSex(int code, String remark){
         this.code = code;

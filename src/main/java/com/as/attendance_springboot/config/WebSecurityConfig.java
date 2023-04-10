@@ -61,21 +61,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // 替换原有认证入口 filter
         http.addFilterAt(myAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
         //测试接口允许所有请求
-//        http.authorizeRequests().anyRequest().permitAll().and();
+        http.authorizeRequests().anyRequest().permitAll().and().csrf().disable();
         // 角色控制访问
-        http.authorizeRequests()
-                .antMatchers("/login","/captcha")
-                .permitAll()
-                .antMatchers("/**")
-                .hasAnyAuthority("normal", "leader", "admin")
-                .anyRequest()
-                .authenticated()
-                .and()
-                .logout()
-                .logoutSuccessHandler(myLogoutSuccessHandler)
-                .and()
-                .csrf()
-                .disable();
+//        http.authorizeRequests()
+//                .antMatchers("/login","/captcha")
+//                .permitAll()
+//                .antMatchers("/**")
+//                .hasAnyAuthority("normal", "leader", "admin")
+//                .anyRequest()
+//                .authenticated()
+//                .and()
+//                .logout()
+//                .logoutSuccessHandler(myLogoutSuccessHandler)
+//                .and()
+//                .csrf()
+//                .disable();
         http.exceptionHandling().authenticationEntryPoint(myExceptionHandler).accessDeniedHandler(myExceptionHandler);
     }
 

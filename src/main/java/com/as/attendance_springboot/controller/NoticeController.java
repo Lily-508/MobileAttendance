@@ -10,7 +10,11 @@ import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * @author xulili
@@ -26,16 +30,18 @@ public class NoticeController {
 
     @GetMapping("/page")
     @ApiOperation("分页查询所有公告")
-    @ApiImplicitParams({@ApiImplicitParam(name = "pageCur", value = "当前页数",dataTypeClass = String.class), @ApiImplicitParam(name = "pageSize",
-            value = "页面大小",dataTypeClass = String.class)})
-    @ApiResponse(code = 200, message = "查询成功")
-    public ResponseEntity<PaginationResult<IPage<Notice>>> getAllNoticeByPage(@RequestParam int pageCur, @RequestParam int pageSize) {
-        log.info("传入参数当前页数={},页面大小={}",pageCur,pageSize);
+    @ApiImplicitParams({@ApiImplicitParam(name = "pageCur", value = "当前页数", dataTypeClass = String.class),
+            @ApiImplicitParam(name = "pageSize",
+            value = "页面大小", dataTypeClass = String.class)})
+    @ApiResponse(code = 200, message = "查询成功", response = PaginationResult.class)
+    public ResponseEntity<PaginationResult<IPage<Notice>>> getAllNoticeByPage(@RequestParam int pageCur,
+                                                                              @RequestParam int pageSize) {
+        log.info("传入参数当前页数={},页面大小={}", pageCur, pageSize);
         IPage<Notice> noticeList = noticeService.page(new Page(pageCur, pageSize), null);
         long total = noticeList.getTotal();
         PaginationResult<IPage<Notice>> result = new PaginationResult<>();
         result.setCode(200);
-        result.setMsg("分页查询公告成功");
+        result.setMsg("查询成功");
         result.setData(noticeList);
         result.setTotal(total);
         return ResponseEntity.ok(result);
@@ -43,45 +49,63 @@ public class NoticeController {
 
     @PostMapping
     @ApiOperation("新建公告")
-    @ApiImplicitParam(name = "notice", value = "对应Notice的JSON数据",dataTypeClass = String.class)
+    @ApiImplicitParam(name = "notice", value = "对应Notice的JSON数据", dataTypeClass = String.class)
     @ApiResponses({@ApiResponse(code = 200, message = "添加Notice成功"), @ApiResponse(code = 500, message = "添加Notice失败")})
-    public ResponseEntity<BaseResult> saveNotice(@RequestBody Notice notice) {
-        log.info("传入notice={}",notice);
-        boolean success = noticeService.save(notice);
+    public ResponseEntity<BaseResult> saveNotice(@Valid @RequestBody Notice notice, BindingResult bindingResult) {
+        log.info("传入notice={}", notice);
         BaseResult result = new BaseResult();
-        if (!success) {
-            result.setCode(500).setMsg("新建公告失败");
-        } else {
-            result.setCode(200).setMsg("新建公告成功");
+        if(bindingResult.hasErrors()){
+            StringBuilder errorMsg= new StringBuilder();
+            for(ObjectError error : bindingResult.getAllErrors()){
+                errorMsg.append(error.getDefaultMessage());
+            }
+            result.setCode(400).setMsg(errorMsg.toString());
+        }else{
+            boolean success = noticeService.save(notice);
+            if (!success) {
+                result.setCode(500).setMsg("新建公告失败");
+            } else {
+                result.setCode(200).setMsg("新建公告成功");
+            }
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
+
     @PutMapping
     @ApiOperation("编辑公告")
-    @ApiImplicitParam(name = "notice", value = "对应Notice的JSON数据",dataTypeClass = String.class)
+    @ApiImplicitParam(name = "notice", value = "对应Notice的JSON数据", dataTypeClass = String.class)
     @ApiResponses({@ApiResponse(code = 200, message = "编辑公告成功"), @ApiResponse(code = 500, message = "编辑公告失败")})
-    public ResponseEntity<BaseResult> updateNotice(@RequestBody Notice notice){
-        log.info("传入notice={}",notice);
-        boolean success=noticeService.updateById(notice);
+    public ResponseEntity<BaseResult> updateNotice(@Valid @RequestBody Notice notice, BindingResult bindingResult) {
+        log.info("传入notice={}", notice);
         BaseResult result = new BaseResult();
-        if(!success){
-            result.setCode(500).setMsg("编辑公告失败");
-        }else {
-            result.setCode(200).setMsg("编辑公告成功");
+        if(bindingResult.hasErrors()){
+            StringBuilder errorMsg= new StringBuilder();
+            for(ObjectError error : bindingResult.getAllErrors()){
+                errorMsg.append(error.getDefaultMessage());
+            }
+            result.setCode(400).setMsg(errorMsg.toString());
+        }else{
+            boolean success = noticeService.updateById(notice);
+            if (!success) {
+                result.setCode(500).setMsg("编辑公告失败");
+            } else {
+                result.setCode(200).setMsg("编辑公告成功");
+            }
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
+
     @DeleteMapping
     @ApiOperation("删除公告")
-    @ApiImplicitParam(name = "nId", value = "对应Notice的n_id",dataTypeClass = String.class)
+    @ApiImplicitParam(name = "nId", value = "对应Notice的n_id", dataTypeClass = String.class)
     @ApiResponses({@ApiResponse(code = 200, message = "删除公告成功"), @ApiResponse(code = 500, message = "删除公告失败")})
-    public ResponseEntity<BaseResult> deleteNotice(@RequestParam int nId){
-        log.info("传入n_id={}",nId);
-        boolean success=noticeService.removeById(nId);
+    public ResponseEntity<BaseResult> deleteNoticeByNoticeId(@RequestParam int nId) {
+        log.info("传入n_id={}", nId);
+        boolean success = noticeService.removeById(nId);
         BaseResult result = new BaseResult();
-        if(!success){
+        if (!success) {
             result.setCode(500).setMsg("删除公告失败");
-        }else {
+        } else {
             result.setCode(200).setMsg("删除公告成功");
         }
         return ResponseEntity.status(result.getCode()).body(result);
