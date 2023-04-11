@@ -20,6 +20,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsUtils;
 
 /**
  * @author xulili
@@ -60,6 +61,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         // 替换原有认证入口 filter
         http.addFilterAt(myAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
+        //解决跨域问题。cors 预检请求放行,让Spring security 放行所有preflight request（cors 预检请求）
+        http.authorizeRequests().requestMatchers(CorsUtils::isPreFlightRequest).permitAll();
         //测试接口允许所有请求
         http.authorizeRequests().anyRequest().permitAll().and().csrf().disable();
         // 角色控制访问

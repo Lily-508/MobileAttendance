@@ -24,14 +24,20 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
-/**
+/**实现excel导入导出员工
  * @author xulili
  */
 @Service
 public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements StaffService, UserDetailsService {
     @Autowired
     private StaffMapper staffMapper;
-
+    /**
+     * excel导入员工
+     * @author xulili
+     * @date 10:50 2023/4/11
+     * @param file MultipartFile
+     * @return boolean
+     **/
     @Override
     public boolean importStaffExcel(MultipartFile file) throws IOException {
         ExcelReader reader= ExcelUtil.getReader(file.getInputStream());
@@ -50,12 +56,17 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
         List<Staff> staffList=reader.readAll(Staff.class);
         return this.saveBatch(staffList);
     }
-
+    /**
+     * excel导出员工
+     * @author xulili
+     * @date 10:50 2023/4/11
+     * @param out OutputStream
+     **/
     @Override
     public void exportStaffExcel(OutputStream out) {
         QueryWrapper<Staff> queryWrapper=new QueryWrapper<>();
         queryWrapper.select(Staff.class,
-                i->!i.getColumn().equals("s_pwd")&&!i.getColumn().equals("s_right")&&!i.getColumn().equals("deleted"));
+                i->!"s_pwd".equals(i.getColumn())&&!"s_right".equals(i.getColumn())&&!"deleted".equals(i.getColumn()));
         List<Map<String,Object>>staffList=staffMapper.selectMaps(queryWrapper);
         for(Map<String,Object>map :staffList){
             if(StaffSex.MAN.getCode().equals((Integer)map.get("s_sex"))){
@@ -88,7 +99,13 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
         writer.close();
         IoUtil.close(out);
     }
-
+    /**
+     * spring security自定义员工id加载
+     * @author xulili
+     * @date 10:51 2023/4/11
+     * @param userId
+     * @return org.springframework.security.core.userdetails.UserDetails
+     **/
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         LambdaQueryWrapper<Staff> queryWrapper=new LambdaQueryWrapper<>();

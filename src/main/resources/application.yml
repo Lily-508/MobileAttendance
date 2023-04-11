@@ -32,6 +32,7 @@ mybatis-plus:
 logging:
   level:
     com.as.attendance_springboot.mapper: DEBUG
+
   file:
     path: logs/info.log
     name: logs/info.log

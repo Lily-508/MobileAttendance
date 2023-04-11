@@ -21,6 +21,8 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -40,14 +42,17 @@ public class Staff implements UserDetails {
     @JsonProperty(value = "sId")
     @TableId(value = "s_id", type = IdType.AUTO)
     private Integer sId;
+    @NotNull(message = "dId不能为null")
     @JsonProperty(value = "dId")
     private Integer dId;
     @JsonProperty(value = "sName")
+    @NotBlank(message = "sName不能为null")
     @Length(max=20)
     private String sName;
     @JsonProperty(value = "sSex")
     private StaffSex sSex;
     @JsonProperty(value = "sPwd")
+    @Length(min=6,message = "密码长度至少6位")
     private String sPwd;
     @JsonProperty(value = "sPhone")
     @Pattern(regexp = "1[3|4|5|7|8][0-9]{9}$", message = "手机号不合法")

@@ -4,10 +4,9 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
-/**
+/**员工表的性别枚举
  * @author xulili
  */
-
 @Getter
 public enum StaffSex {
     //员工表的性别枚举

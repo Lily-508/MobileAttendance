@@ -7,6 +7,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**StaffService接口
+ * 自定义excel导入导出接口
+ * @author xulili
+ */
 public interface StaffService extends IService<Staff> {
     /**
      * 导入excel数据到数据库中

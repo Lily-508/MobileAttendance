@@ -26,11 +26,12 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 
 /**
+ * 员工管理接口,提供员工新建,修改,查询,excel导入导出和删除操作
  * @author xulili
  */
 @RestController
 @RequestMapping("/staffs")
-@Api(tags = "员工管理接口,提供员工新建,修改,查询,和删除操作")
+@Api(tags = "员工管理接口,提供员工新建,修改,查询,excel导入导出和删除操作")
 @Slf4j
 public class StaffController {
     @Autowired
@@ -106,7 +107,8 @@ public class StaffController {
     @PostMapping
     @ApiOperation("新建员工")
     @ApiImplicitParam(name = "staff", value = "必填dId,sName,sPwd", dataTypeClass = Staff.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "新建成功"), @ApiResponse(code = 400, message = "新建失败")})
+    @ApiResponses({@ApiResponse(code = 200, message = "新建成功"), @ApiResponse(code = 400, message = "新建失败"),
+            @ApiResponse(code = 400, message = "参数校验错误信息"), @ApiResponse(code = 400, message = "手机号或邮箱不唯一")})
     public ResponseEntity<BaseResult> setStaff(@Valid @RequestBody Staff staff, BindingResult bindingResult) {
         BaseResult result = new BaseResult();
         if (bindingResult.hasErrors()) {
@@ -115,6 +117,8 @@ public class StaffController {
                 errorMsg.append(error.getDefaultMessage());
             }
             result.setCode(400).setMsg(errorMsg.toString());
+        } else if (isExistedPhoneOrEmail(staff)) {
+            result.setCode(400).setMsg("手机号或邮箱不唯一");
         } else {
             boolean success = staffService.save(staff);
             if (success) {
@@ -129,16 +133,21 @@ public class StaffController {
     @PutMapping
     @ApiOperation("编辑员工")
     @ApiImplicitParam(name = "staff", value = "编辑后的Staff,sId必填", dataTypeClass = Staff.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "编辑成功"), @ApiResponse(code = 400, message = "编辑失败")})
+    @ApiResponses({@ApiResponse(code = 200, message = "编辑成功"), @ApiResponse(code = 400, message = "编辑失败"),
+            @ApiResponse(code = 400, message = "参数校验错误信息"), @ApiResponse(code = 400, message = "手机号或邮箱不唯一")})
     public ResponseEntity<BaseResult> updateStaff(@Valid @RequestBody Staff staff, BindingResult bindingResult) {
         BaseResult result = new BaseResult();
-        if (bindingResult.hasErrors()) {
+        if(staff.getSId()==null){
+            result.setCode(400).setMsg("sId不能为null");
+        }else if (bindingResult.hasErrors()) {
             StringBuilder errorMsg = new StringBuilder();
             for (ObjectError error : bindingResult.getAllErrors()) {
                 errorMsg.append(error.getDefaultMessage());
             }
             result.setCode(400).setMsg(errorMsg.toString());
-        } else {
+        }else if (isExistedPhoneOrEmail(staff)) {
+            result.setCode(400).setMsg("手机号或邮箱不唯一");
+        }  else {
             boolean success = staffService.updateById(staff);
             if (success) {
                 result.setCode(200).setMsg("编辑成功");
@@ -162,5 +171,13 @@ public class StaffController {
             result.setCode(400).setMsg("删除失败");
         }
         return ResponseEntity.status(result.getCode()).body(result);
+    }
+
+    private boolean isExistedPhoneOrEmail(Staff staff) {
+        String phone = staff.getSPhone();
+        String email = staff.getSEmail();
+        LambdaQueryWrapper<Staff> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Staff::getSEmail, email).or().eq(Staff::getSPhone, phone);
+        return staffService.getOne(queryWrapper) != null;
     }
 }
