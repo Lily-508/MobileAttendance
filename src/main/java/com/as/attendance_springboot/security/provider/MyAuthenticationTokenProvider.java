@@ -1,7 +1,7 @@
 package com.as.attendance_springboot.security.provider;
 
 import com.as.attendance_springboot.model.LoginData;
-import com.as.attendance_springboot.model.enum_model.LoginType;
+import com.as.attendance_springboot.model.enums.LoginType;
 import com.as.attendance_springboot.security.token.MyAuthenticationToken;
 import com.as.attendance_springboot.service.impl.StaffServiceImpl;
 import com.as.attendance_springboot.util.RedisUtil;

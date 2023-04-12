@@ -9,21 +9,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
-/**
+/**员工表实体类
  * @author xulili
  */
 @ToString
 @Data
 @NoArgsConstructor
 @TableName("notice")
-@Accessors(chain = true)
 public class Notice {
     @JsonProperty(value = "nId")
     @TableId(value = "n_id", type = IdType.AUTO)

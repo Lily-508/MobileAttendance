@@ -1,8 +1,8 @@
 package com.as.attendance_springboot.model;
 
-import com.as.attendance_springboot.model.enum_model.StaffRight;
-import com.as.attendance_springboot.model.enum_model.StaffSex;
-import com.as.attendance_springboot.model.enum_model.StaffStatus;
+import com.as.attendance_springboot.model.enums.StaffRight;
+import com.as.attendance_springboot.model.enums.StaffSex;
+import com.as.attendance_springboot.model.enums.StaffStatus;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;

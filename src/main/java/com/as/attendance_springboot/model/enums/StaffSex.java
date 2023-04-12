@@ -1,4 +1,4 @@
-package com.as.attendance_springboot.model.enum_model;
+package com.as.attendance_springboot.model.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;

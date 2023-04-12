@@ -11,30 +11,33 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 /**
  * @author xulili
  * @version 1.0
  * @project attendance_springboot
- * @description 部门表实体类
- * @date 2023/4/11 09:45:18
+ * @description 公司表实体类
+ * @date 2023/4/11 17:38:01
  */
 @Data
 @ToString
 @NoArgsConstructor
-@TableName("department")
+@TableName("company")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Department {
-    @TableId(value = "d_id", type = IdType.AUTO)
-    @JsonProperty(value = "dId")
-    private Integer dId;
-    @JsonProperty(value = "dName")
-    @NotBlank(message = "部门名称不能为null")
-    private String dName;
-    @JsonProperty(value = "dDetail")
-    private String dDetail;
-    @JsonProperty(value = "sId")
-    private Integer sId;
+public class Company {
+    @TableId(value = "c_id", type = IdType.AUTO)
+    @JsonProperty(value = "cId")
+    private Integer cId;
+    @NotBlank(message = "公司名不能为空")
+    @JsonProperty(value = "cName")
+    private String cName;
+    @JsonProperty(value = "cContent")
+    private String cContent;
+    @JsonProperty(value = "cPlace")
+    @Pattern(regexp = "^[\\-\\+]?(0(\\.\\d{1,8})?|([1-9](\\d)?)(\\.\\d{1,8})?|1[0-7]\\d{1}(\\.\\d{1,8})?|180(([" +
+            ".]0{1,8})?)),[\\-\\+]?((0|([1-8]\\d?))(\\.\\d{1,10})?|90(\\.0{1,10})?)$")
+    private String cPlace;
     @TableField(select = false)
     private Integer deleted;
 }

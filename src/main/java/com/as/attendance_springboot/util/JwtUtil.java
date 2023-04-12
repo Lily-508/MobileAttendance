@@ -16,7 +16,7 @@ import java.util.UUID;
  * @author xulili
  */
 public class JwtUtil {
-    private static final String DEFAULT_SECRET = "moblieAttendace";
+    private static final String DEFAULT_SECRET = "mobileAttendance";
 
     public static PayloadDto generatePayloadDto(String userid, String username, String right) {
         Date now = new Date();

@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,7 +32,7 @@ import java.time.LocalDate;
 @RequestMapping("/staffs")
 @Api(tags = "员工管理接口,提供员工新建,修改,查询,excel导入导出和删除操作")
 @Slf4j
-public class StaffController {
+public class StaffController extends BaseController{
     @Autowired
     private StaffService staffService;
 
@@ -111,21 +110,10 @@ public class StaffController {
             @ApiResponse(code = 400, message = "参数校验错误信息"), @ApiResponse(code = 400, message = "手机号或邮箱不唯一")})
     public ResponseEntity<BaseResult> setStaff(@Valid @RequestBody Staff staff, BindingResult bindingResult) {
         BaseResult result = new BaseResult();
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMsg = new StringBuilder();
-            for (ObjectError error : bindingResult.getAllErrors()) {
-                errorMsg.append(error.getDefaultMessage());
-            }
-            result.setCode(400).setMsg(errorMsg.toString());
-        } else if (isExistedPhoneOrEmail(staff)) {
+        if (isExistedPhoneOrEmail(staff)) {
             result.setCode(400).setMsg("手机号或邮箱不唯一");
         } else {
-            boolean success = staffService.save(staff);
-            if (success) {
-                result.setCode(200).setMsg("新建成功");
-            } else {
-                result.setCode(400).setMsg("新建失败");
-            }
+            result=super.setModel(staffService.save(staff),bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -137,23 +125,10 @@ public class StaffController {
             @ApiResponse(code = 400, message = "参数校验错误信息"), @ApiResponse(code = 400, message = "手机号或邮箱不唯一")})
     public ResponseEntity<BaseResult> updateStaff(@Valid @RequestBody Staff staff, BindingResult bindingResult) {
         BaseResult result = new BaseResult();
-        if(staff.getSId()==null){
-            result.setCode(400).setMsg("sId不能为null");
-        }else if (bindingResult.hasErrors()) {
-            StringBuilder errorMsg = new StringBuilder();
-            for (ObjectError error : bindingResult.getAllErrors()) {
-                errorMsg.append(error.getDefaultMessage());
-            }
-            result.setCode(400).setMsg(errorMsg.toString());
-        }else if (isExistedPhoneOrEmail(staff)) {
+        if (isExistedPhoneOrEmail(staff)) {
             result.setCode(400).setMsg("手机号或邮箱不唯一");
         }  else {
-            boolean success = staffService.updateById(staff);
-            if (success) {
-                result.setCode(200).setMsg("编辑成功");
-            } else {
-                result.setCode(400).setMsg("编辑失败");
-            }
+            result=super.updateModelBySingle(staff.getSId(),staffService.updateById(staff),bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -163,13 +138,8 @@ public class StaffController {
     @ApiImplicitParam(name = "sId", value = "员工id", dataTypeClass = Integer.class)
     @ApiResponses({@ApiResponse(code = 200, message = "删除成功"), @ApiResponse(code = 400, message = "删除失败")})
     public ResponseEntity<BaseResult> deleteStaffByStaffId(@RequestParam int sId) {
-        BaseResult result = new BaseResult();
-        boolean success = staffService.removeById(sId);
-        if (success) {
-            result.setCode(200).setMsg("删除成功");
-        } else {
-            result.setCode(400).setMsg("删除失败");
-        }
+        //员工表外键依赖都是CASCADE,SET NULL,直接删除
+        BaseResult result = super.deleteModel(staffService.removeById(sId),null);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 

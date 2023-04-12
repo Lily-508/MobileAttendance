@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -24,7 +23,7 @@ import javax.validation.Valid;
 @RequestMapping("/notices")
 @Api(tags = "公告接口,提供公告新建,修改,查询,和删除操作")
 @Slf4j
-public class NoticeController {
+public class NoticeController extends BaseController{
     @Autowired
     private NoticeService noticeService;
 
@@ -51,23 +50,9 @@ public class NoticeController {
     @ApiOperation("新建公告")
     @ApiImplicitParam(name = "notice", value = "对应Notice的JSON数据", dataTypeClass = String.class)
     @ApiResponses({@ApiResponse(code = 200, message = "添加Notice成功"), @ApiResponse(code = 500, message = "添加Notice失败")})
-    public ResponseEntity<BaseResult> saveNotice(@Valid @RequestBody Notice notice, BindingResult bindingResult) {
+    public ResponseEntity<BaseResult> setNotice(@Valid @RequestBody Notice notice, BindingResult bindingResult) {
         log.info("传入notice={}", notice);
-        BaseResult result = new BaseResult();
-        if(bindingResult.hasErrors()){
-            StringBuilder errorMsg= new StringBuilder();
-            for(ObjectError error : bindingResult.getAllErrors()){
-                errorMsg.append(error.getDefaultMessage());
-            }
-            result.setCode(400).setMsg(errorMsg.toString());
-        }else{
-            boolean success = noticeService.save(notice);
-            if (!success) {
-                result.setCode(500).setMsg("新建公告失败");
-            } else {
-                result.setCode(200).setMsg("新建公告成功");
-            }
-        }
+        BaseResult result = super.setModel(noticeService.save(notice),bindingResult);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
@@ -77,21 +62,7 @@ public class NoticeController {
     @ApiResponses({@ApiResponse(code = 200, message = "编辑公告成功"), @ApiResponse(code = 500, message = "编辑公告失败")})
     public ResponseEntity<BaseResult> updateNotice(@Valid @RequestBody Notice notice, BindingResult bindingResult) {
         log.info("传入notice={}", notice);
-        BaseResult result = new BaseResult();
-        if(bindingResult.hasErrors()){
-            StringBuilder errorMsg= new StringBuilder();
-            for(ObjectError error : bindingResult.getAllErrors()){
-                errorMsg.append(error.getDefaultMessage());
-            }
-            result.setCode(400).setMsg(errorMsg.toString());
-        }else{
-            boolean success = noticeService.updateById(notice);
-            if (!success) {
-                result.setCode(500).setMsg("编辑公告失败");
-            } else {
-                result.setCode(200).setMsg("编辑公告成功");
-            }
-        }
+        BaseResult result = super.updateModelBySingle(notice.getNId(),noticeService.updateById(notice),bindingResult);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
@@ -101,13 +72,7 @@ public class NoticeController {
     @ApiResponses({@ApiResponse(code = 200, message = "删除公告成功"), @ApiResponse(code = 500, message = "删除公告失败")})
     public ResponseEntity<BaseResult> deleteNoticeByNoticeId(@RequestParam int nId) {
         log.info("传入n_id={}", nId);
-        boolean success = noticeService.removeById(nId);
-        BaseResult result = new BaseResult();
-        if (!success) {
-            result.setCode(500).setMsg("删除公告失败");
-        } else {
-            result.setCode(200).setMsg("删除公告成功");
-        }
+        BaseResult result = super.deleteModel(noticeService.removeById(nId),null);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 

@@ -10,31 +10,29 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author xulili
  * @version 1.0
  * @project attendance_springboot
- * @description 部门表实体类
- * @date 2023/4/11 09:45:18
+ * @description 自定义假期表
+ * @date 2023/4/12 10:04:24
  */
 @Data
 @ToString
 @NoArgsConstructor
-@TableName("department")
+@TableName("holiday")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Department {
-    @TableId(value = "d_id", type = IdType.AUTO)
-    @JsonProperty(value = "dId")
-    private Integer dId;
-    @JsonProperty(value = "dName")
-    @NotBlank(message = "部门名称不能为null")
-    private String dName;
-    @JsonProperty(value = "dDetail")
-    private String dDetail;
-    @JsonProperty(value = "sId")
-    private Integer sId;
+public class Holiday {
+    @JsonProperty(value = "hId")
+    @TableId(value = "h_id",type = IdType.AUTO)
+    private Integer hId;
+    @JsonProperty(value = "hYear")
+    @NotNull(message = "hYear不为null")
+    private Integer hYear;
+    @JsonProperty(value = "hDate")
+    private String hDate;
     @TableField(select = false)
     private Integer deleted;
 }

@@ -2,7 +2,7 @@ package com.as.attendance_springboot.controller;
 
 import com.as.attendance_springboot.model.Department;
 import com.as.attendance_springboot.model.Staff;
-import com.as.attendance_springboot.model.enum_model.StaffRight;
+import com.as.attendance_springboot.model.enums.StaffRight;
 import com.as.attendance_springboot.result.BaseResult;
 import com.as.attendance_springboot.result.DataResult;
 import com.as.attendance_springboot.service.impl.DepartmentServiceImpl;
@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -30,7 +29,7 @@ import java.util.List;
 @RequestMapping("/departments")
 @Api(tags = "部门管理接口,提供部门新建,修改,查询操作")
 @Slf4j
-public class DepartmentController {
+public class DepartmentController extends BaseController{
     @Autowired
     private DepartmentServiceImpl departmentService;
     @Autowired
@@ -46,10 +45,13 @@ public class DepartmentController {
         DataResult<List<Department>> result = new DataResult<>();
         LambdaQueryWrapper<Department>queryWrapper = new LambdaQueryWrapper<>();
         if(dId!=null&&sId!=null){
+            //查询全部部门
             queryWrapper.eq(Department::getDId,dId).eq(Department::getSId,sId);
         }else if(dId!=null){
+            //根据部门号查询
             queryWrapper.eq(Department::getDId,dId);
         }else if(sId!=null){
+            //根据领导id查询
             queryWrapper.eq(Department::getSId,sId);
         }
         List<Department>list= departmentService.list(queryWrapper);
@@ -70,21 +72,10 @@ public class DepartmentController {
                                                     BindingResult bindingResult) {
         BaseResult result = new BaseResult();
         Integer sId=department.getSId();
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMsg = new StringBuilder();
-            for (ObjectError error : bindingResult.getAllErrors()) {
-                errorMsg.append(error.getDefaultMessage());
-            }
-            result.setCode(400).setMsg(errorMsg.toString());
-        }else if(isErrorStaffId(sId)){
+        if(isErrorStaffId(sId)){
             result.setCode(400).setMsg("负责人id没有对应权限");
         }else {
-            boolean success=departmentService.save(department);
-            if(success){
-                result.setCode(200).setMsg("新建成功");
-            }else {
-                result.setCode(400).setMsg("新建失败");
-            }
+            result=super.setModel(departmentService.save(department),bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -98,24 +89,25 @@ public class DepartmentController {
                                                        BindingResult bindingResult) {
         BaseResult result = new BaseResult();
         Integer sId=department.getSId();
-        if(department.getDId()==null){
-            result.setCode(400).setMsg("dId不能为null");
-        }else if (bindingResult.hasErrors()) {
-            StringBuilder errorMsg = new StringBuilder();
-            for (ObjectError error : bindingResult.getAllErrors()) {
-                errorMsg.append(error.getDefaultMessage());
-            }
-            result.setCode(400).setMsg(errorMsg.toString());
-        }else if(isErrorStaffId(sId)){
+        if(isErrorStaffId(sId)){
             result.setCode(400).setMsg("负责人id没有对应权限");
         }else{
-            boolean success=departmentService.updateById(department);
-            if(success){
-                result.setCode(200).setMsg("编辑成功");
-            }else {
-                result.setCode(400).setMsg("编辑失败");
-            }
+            result=super.updateModelBySingle(department.getDId(),departmentService.updateById(department),
+                    bindingResult);
         }
+        return ResponseEntity.status(result.getCode()).body(result);
+    }
+    @DeleteMapping
+    @ApiOperation("删除没有外键依赖部门")
+    @ApiImplicitParam(name="dId",value = "部门id",dataTypeClass = Integer.class)
+    @ApiResponses({@ApiResponse(code = 200, message = "删除成功", response = BaseResult.class), @ApiResponse(code =
+            400, message = "删除失败,有外键依赖", response = BaseResult.class)})
+    public ResponseEntity<BaseResult> deleteDepartment(@RequestParam Integer dId){
+        //外键依赖员工表,拜访计划表
+        LambdaQueryWrapper<Staff>queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(Staff::getDId,dId);
+        Staff staff=staffService.getOne(queryWrapper);
+        BaseResult result = super.deleteModel(staff==null,"删除失败,有外键依赖");
         return ResponseEntity.status(result.getCode()).body(result);
     }
     /**
