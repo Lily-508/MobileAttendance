@@ -35,15 +35,10 @@ public class HolidayController extends BaseController{
     @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class), @ApiResponse(code =
             400, message = "查询失败", response = DataResult.class)})
     public ResponseEntity<DataResult<List<Holiday>>> getHolidayByHolidayYear(@RequestParam(required = false) Integer hYear) {
-        DataResult<List<Holiday>> result = new DataResult<>();
         LambdaQueryWrapper<Holiday>queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.like(Holiday::getHYear,hYear);
         List<Holiday>list=holidayService.list(queryWrapper);
-        if(list != null && list.size()!=0){
-            result.setCode(200).setMsg("查询成功").setData(list);
-        }else {
-            result.setCode(400).setMsg("查询失败").setData(null);
-        }
+        DataResult<List<Holiday>> result = super.getModel(list);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
@@ -54,7 +49,7 @@ public class HolidayController extends BaseController{
             400, message = "新建失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> setHoliday(@Valid @RequestBody Holiday holiday,
                                                  BindingResult bindingResult) {
-        BaseResult result = super.setModel(holidayService.save(holiday),bindingResult);
+        BaseResult result = super.setModel(holidayService,holiday,bindingResult);
         return ResponseEntity.status(result.getCode()).body(result);
     }
     @PutMapping
@@ -64,7 +59,7 @@ public class HolidayController extends BaseController{
             400, message = "编辑失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> updateDepartment(@Valid @RequestBody Holiday holiday,
                                                        BindingResult bindingResult) {
-        BaseResult result = super.updateModelBySingle(holiday.getHId(),holidayService.updateById(holiday),bindingResult);
+        BaseResult result = super.updateModelBySingle(holiday.getHId(),holidayService,holiday,bindingResult);
         return ResponseEntity.status(result.getCode()).body(result);
     }
     @DeleteMapping

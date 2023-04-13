@@ -29,11 +29,12 @@ import java.util.List;
 @RequestMapping("/departments")
 @Api(tags = "部门管理接口,提供部门新建,修改,查询操作")
 @Slf4j
-public class DepartmentController extends BaseController{
+public class DepartmentController extends BaseController {
     @Autowired
     private DepartmentServiceImpl departmentService;
     @Autowired
     private StaffServiceImpl staffService;
+
     @GetMapping
     @ApiOperation("查询部门,查询条件:部门id,领导id")
     @ApiImplicitParams({@ApiImplicitParam(name = "dId", value = "部门id", dataTypeClass = Integer.class),
@@ -41,25 +42,18 @@ public class DepartmentController extends BaseController{
     @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class), @ApiResponse(code =
             400, message = "查询失败", response = DataResult.class)})
     public ResponseEntity<DataResult<List<Department>>> getDepartmentById(@RequestParam(required = false) Integer dId,
-                                                                    @RequestParam(required = false) Integer sId) {
-        DataResult<List<Department>> result = new DataResult<>();
-        LambdaQueryWrapper<Department>queryWrapper = new LambdaQueryWrapper<>();
-        if(dId!=null&&sId!=null){
-            //查询全部部门
-            queryWrapper.eq(Department::getDId,dId).eq(Department::getSId,sId);
-        }else if(dId!=null){
+                                                                          @RequestParam(required = false) Integer sId) {
+        LambdaQueryWrapper<Department> queryWrapper = new LambdaQueryWrapper<>();
+        if (dId != null) {
             //根据部门号查询
-            queryWrapper.eq(Department::getDId,dId);
-        }else if(sId!=null){
+            queryWrapper.eq(Department::getDId, dId);
+        }
+        if (sId != null) {
             //根据领导id查询
-            queryWrapper.eq(Department::getSId,sId);
+            queryWrapper.eq(Department::getSId, sId);
         }
-        List<Department>list= departmentService.list(queryWrapper);
-        if(list != null && list.size()!=0){
-            result.setCode(200).setMsg("查询成功").setData(list);
-        }else {
-            result.setCode(400).setMsg("查询失败").setData(null);
-        }
+        List<Department> list = departmentService.list(queryWrapper);
+        DataResult<List<Department>> result = super.getModel(list);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
@@ -71,11 +65,11 @@ public class DepartmentController extends BaseController{
     public ResponseEntity<BaseResult> setDepartment(@Valid @RequestBody Department department,
                                                     BindingResult bindingResult) {
         BaseResult result = new BaseResult();
-        Integer sId=department.getSId();
-        if(isErrorStaffId(sId)){
+        Integer sId = department.getSId();
+        if (isErrorStaffId(sId)) {
             result.setCode(400).setMsg("负责人id没有对应权限");
-        }else {
-            result=super.setModel(departmentService.save(department),bindingResult);
+        } else {
+            result = super.setModel(departmentService,department, bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -88,42 +82,43 @@ public class DepartmentController extends BaseController{
     public ResponseEntity<BaseResult> updateDepartment(@Valid @RequestBody Department department,
                                                        BindingResult bindingResult) {
         BaseResult result = new BaseResult();
-        Integer sId=department.getSId();
-        if(isErrorStaffId(sId)){
+        Integer sId = department.getSId();
+        if (isErrorStaffId(sId)) {
             result.setCode(400).setMsg("负责人id没有对应权限");
-        }else{
-            result=super.updateModelBySingle(department.getDId(),departmentService.updateById(department),
-                    bindingResult);
+        } else {
+            result = super.updateModelBySingle(department.getDId(), departmentService,department, bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
+
     @DeleteMapping
     @ApiOperation("删除没有外键依赖部门")
-    @ApiImplicitParam(name="dId",value = "部门id",dataTypeClass = Integer.class)
+    @ApiImplicitParam(name = "dId", value = "部门id", dataTypeClass = Integer.class)
     @ApiResponses({@ApiResponse(code = 200, message = "删除成功", response = BaseResult.class), @ApiResponse(code =
             400, message = "删除失败,有外键依赖", response = BaseResult.class)})
-    public ResponseEntity<BaseResult> deleteDepartment(@RequestParam Integer dId){
+    public ResponseEntity<BaseResult> deleteDepartment(@RequestParam Integer dId) {
         //外键依赖员工表,拜访计划表
-        LambdaQueryWrapper<Staff>queryWrapper=new LambdaQueryWrapper<>();
-        queryWrapper.eq(Staff::getDId,dId);
-        Staff staff=staffService.getOne(queryWrapper);
-        BaseResult result = super.deleteModel(staff==null,"删除失败,有外键依赖");
+        LambdaQueryWrapper<Staff> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Staff::getDId, dId);
+        Staff staff = staffService.getOne(queryWrapper);
+        BaseResult result = super.deleteModel(staff == null, "删除失败,有外键依赖");
         return ResponseEntity.status(result.getCode()).body(result);
     }
+
     /**
      * 判断StaffId有无领导权限
-     * @author xulili
-     * @date 14:26 2023/4/11
      * @param sId 负责人id
      * @return boolean
+     * @author xulili
+     * @date 14:26 2023/4/11
      **/
-    private boolean isErrorStaffId(Integer sId){
-        if(sId!=null){
-            LambdaQueryWrapper<Staff> queryWrapper=new LambdaQueryWrapper<>();
-            queryWrapper.eq(Staff::getSId,sId).eq(Staff::getSRight, StaffRight.LEADER);
-            Staff staff= staffService.getOne(queryWrapper);
+    private boolean isErrorStaffId(Integer sId) {
+        if (sId != null) {
+            LambdaQueryWrapper<Staff> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(Staff::getSId, sId).eq(Staff::getSRight, StaffRight.LEADER);
+            Staff staff = staffService.getOne(queryWrapper);
             return staff == null;
-        }else {
+        } else {
             return false;
         }
     }

@@ -40,15 +40,10 @@ public class CompanyController extends BaseController {
     public ResponseEntity<DataResult<List<Company>>> getCompanyByCompanyName(@RequestParam(required = false) String key) {
         key = URLDecoder.decode(key, StandardCharsets.UTF_8);
         log.info("输入关键词{}",key);
-        DataResult<List<Company>> result = new DataResult<>();
         LambdaQueryWrapper<Company>queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.like(Company::getCName,key).or().like(Company::getCContent,key);
         List<Company>list=companyService.list(queryWrapper);
-        if(list != null && list.size()!=0){
-            result.setCode(200).setMsg("查询成功").setData(list);
-        }else {
-            result.setCode(400).setMsg("查询失败").setData(null);
-        }
+        DataResult<List<Company>> result = super.getModel(list);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
@@ -59,7 +54,7 @@ public class CompanyController extends BaseController {
             400, message = "新建失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> setCompany(@Valid @RequestBody Company company,
                                                  BindingResult bindingResult) {
-        BaseResult result = super.setModel(companyService.save(company),bindingResult);
+        BaseResult result = super.setModel(companyService,company,bindingResult);
         return ResponseEntity.status(result.getCode()).body(result);
     }
     @PutMapping
@@ -69,7 +64,7 @@ public class CompanyController extends BaseController {
             400, message = "编辑失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> updateDepartment(@Valid @RequestBody Company company,
                                                        BindingResult bindingResult) {
-        BaseResult result = super.updateModelBySingle(company.getCId(),companyService.updateById(company),bindingResult);
+        BaseResult result = super.updateModelBySingle(company.getCId(),companyService,company,bindingResult);
         return ResponseEntity.status(result.getCode()).body(result);
     }
     @DeleteMapping

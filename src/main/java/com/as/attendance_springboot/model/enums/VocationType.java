@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
+import java.util.Arrays;
+
 /**前端传递remark
  * @author xulili
  * @version 1.0
@@ -33,4 +35,11 @@ public enum VocationType {
         this.code = code;
         this.remark = remark;
     }
+    public static VocationType fromText(String operator) {
+        return Arrays.stream(VocationType.values())
+                .filter(member -> member.remark.equalsIgnoreCase(operator))
+                .findFirst()
+                .orElse(null);
+    }
+
 }

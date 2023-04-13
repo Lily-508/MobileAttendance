@@ -3,7 +3,7 @@ package com.as.attendance_springboot.controller;
 import com.as.attendance_springboot.model.Notice;
 import com.as.attendance_springboot.result.BaseResult;
 import com.as.attendance_springboot.result.PaginationResult;
-import com.as.attendance_springboot.service.NoticeService;
+import com.as.attendance_springboot.service.impl.NoticeServiceImpl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.*;
@@ -25,7 +25,7 @@ import javax.validation.Valid;
 @Slf4j
 public class NoticeController extends BaseController{
     @Autowired
-    private NoticeService noticeService;
+    private NoticeServiceImpl noticeService;
 
     @GetMapping("/page")
     @ApiOperation("分页查询所有公告")
@@ -38,11 +38,7 @@ public class NoticeController extends BaseController{
         log.info("传入参数当前页数={},页面大小={}", pageCur, pageSize);
         IPage<Notice> noticeList = noticeService.page(new Page(pageCur, pageSize), null);
         long total = noticeList.getTotal();
-        PaginationResult<IPage<Notice>> result = new PaginationResult<>();
-        result.setCode(200);
-        result.setMsg("查询成功");
-        result.setData(noticeList);
-        result.setTotal(total);
+        PaginationResult<IPage<Notice>> result = super.getModelPage(noticeList);
         return ResponseEntity.ok(result);
     }
 
@@ -52,7 +48,7 @@ public class NoticeController extends BaseController{
     @ApiResponses({@ApiResponse(code = 200, message = "添加Notice成功"), @ApiResponse(code = 500, message = "添加Notice失败")})
     public ResponseEntity<BaseResult> setNotice(@Valid @RequestBody Notice notice, BindingResult bindingResult) {
         log.info("传入notice={}", notice);
-        BaseResult result = super.setModel(noticeService.save(notice),bindingResult);
+        BaseResult result = super.setModel(noticeService,notice,bindingResult);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
@@ -62,7 +58,7 @@ public class NoticeController extends BaseController{
     @ApiResponses({@ApiResponse(code = 200, message = "编辑公告成功"), @ApiResponse(code = 500, message = "编辑公告失败")})
     public ResponseEntity<BaseResult> updateNotice(@Valid @RequestBody Notice notice, BindingResult bindingResult) {
         log.info("传入notice={}", notice);
-        BaseResult result = super.updateModelBySingle(notice.getNId(),noticeService.updateById(notice),bindingResult);
+        BaseResult result = super.updateModelBySingle(notice.getNId(),noticeService,notice,bindingResult);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 

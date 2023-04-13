@@ -4,7 +4,7 @@ import com.as.attendance_springboot.model.Staff;
 import com.as.attendance_springboot.result.BaseResult;
 import com.as.attendance_springboot.result.DataResult;
 import com.as.attendance_springboot.result.PaginationResult;
-import com.as.attendance_springboot.service.StaffService;
+import com.as.attendance_springboot.service.impl.StaffServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -34,7 +34,7 @@ import java.time.LocalDate;
 @Slf4j
 public class StaffController extends BaseController{
     @Autowired
-    private StaffService staffService;
+    private StaffServiceImpl staffService;
 
     @GetMapping("/page")
     @ApiOperation("分页查询对应部门员工")
@@ -49,8 +49,7 @@ public class StaffController extends BaseController{
         LambdaQueryWrapper<Staff> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Staff::getDId, dId);
         IPage<Staff> page = staffService.page(new Page(pageCur, pageSize), lambdaQueryWrapper);
-        PaginationResult<IPage<Staff>> result = new PaginationResult<>();
-        result.setCode(200).setMsg("查询成功").setData(page).setTotal(page.getTotal());
+        PaginationResult<IPage<Staff>> result = super.getModelPage(page);
         return ResponseEntity.ok(result);
     }
 
@@ -113,7 +112,7 @@ public class StaffController extends BaseController{
         if (isExistedPhoneOrEmail(staff)) {
             result.setCode(400).setMsg("手机号或邮箱不唯一");
         } else {
-            result=super.setModel(staffService.save(staff),bindingResult);
+            result=super.setModel(staffService,staff,bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -128,7 +127,7 @@ public class StaffController extends BaseController{
         if (isExistedPhoneOrEmail(staff)) {
             result.setCode(400).setMsg("手机号或邮箱不唯一");
         }  else {
-            result=super.updateModelBySingle(staff.getSId(),staffService.updateById(staff),bindingResult);
+            result=super.updateModelBySingle(staff.getSId(),staffService,staff,bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }

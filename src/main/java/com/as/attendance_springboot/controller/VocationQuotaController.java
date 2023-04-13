@@ -15,6 +15,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -34,25 +36,22 @@ public class VocationQuotaController extends BaseController {
     @Autowired
     private StaffServiceImpl staffService;
     @GetMapping
-    @ApiOperation("查询假期,查询条件:")
+    @ApiOperation("查询假期,查询条件:员工id,假期类别")
     @ApiImplicitParams({@ApiImplicitParam(name = "sId", value = "员工id", dataTypeClass = Integer.class),
-            @ApiImplicitParam(name = "vocationType", value = "假期类别", dataTypeClass = VocationType.class)})
+            @ApiImplicitParam(name = "vocationType", value = "假期类别", dataTypeClass = String.class)})
     @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class), @ApiResponse(code = 400,
             message = "查询失败", response = DataResult.class)})
     public ResponseEntity<DataResult<List<VocationQuota>>> getVocationQuota(@RequestParam Integer sId,
-                                                                            @RequestParam(required = false) VocationType vocationType) {
-        DataResult<List<VocationQuota>> result = new DataResult<>();
+                                                                            @RequestParam(required = false) String vocationType) {
+        vocationType= URLDecoder.decode(vocationType, StandardCharsets.UTF_8);
+        VocationType vId= VocationType.fromText(vocationType);
         LambdaQueryWrapper<VocationQuota> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(VocationQuota::getSId, sId);
-        if(vocationType!=null){
-            queryWrapper.eq(VocationQuota::getVId, vocationType);
+        if(vId!=null){
+            queryWrapper.eq(VocationQuota::getVId,vId);
         }
         List<VocationQuota> list = vocationQuotaService.list(queryWrapper);
-        if (list != null && list.size() != 0) {
-            result.setCode(200).setMsg("查询成功").setData(list);
-        } else {
-            result.setCode(400).setMsg("查询失败").setData(null);
-        }
+        DataResult<List<VocationQuota>> result = super.getModel(list);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
@@ -67,7 +66,7 @@ public class VocationQuotaController extends BaseController {
         if(staffService.getById(vocationQuota.getSId())==null){
             result.setCode(400).setMsg("sId不存在");
         }else{
-            result = super.setModel(vocationQuotaService.save(vocationQuota), bindingResult);
+            result = super.setModel(vocationQuotaService,vocationQuota, bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -79,7 +78,7 @@ public class VocationQuotaController extends BaseController {
             message = "编辑失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> updateVocationQuota(@Valid @RequestBody VocationQuota vocationQuota,
                                                        BindingResult bindingResult) {
-        BaseResult result = super.updateModelByDouble(vocationQuotaService.updateByMultiId(vocationQuota), bindingResult);
+        BaseResult result = super.updateModelByDouble(vocationQuotaService,vocationQuota, bindingResult);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 

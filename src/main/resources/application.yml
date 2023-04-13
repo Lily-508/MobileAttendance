@@ -35,3 +35,5 @@ logging:
   file:
     path: logs/info.log
     name: logs/info.log
+mpp:
+  entityBasePath: com.as.attendance_springboot.model
