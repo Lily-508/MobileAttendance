@@ -29,7 +29,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping("/vocation-quotas")
-@Api(tags = "自定义假期借口,提供假期新建,修改,查询操作")
+@Api(tags = "假期额度接口,提供额度新建,修改,查询操作")
 public class VocationQuotaController extends BaseController {
     @Autowired
     private VocationQuotaServiceImpl vocationQuotaService;
@@ -63,8 +63,8 @@ public class VocationQuotaController extends BaseController {
     public ResponseEntity<BaseResult> setVocationQuota(@Valid @RequestBody VocationQuota vocationQuota,
                                                        BindingResult bindingResult) {
         BaseResult result =new BaseResult();
-        if(staffService.getById(vocationQuota.getSId())==null){
-            result.setCode(400).setMsg("sId不存在");
+        if(isErrorStaffId(vocationQuota)){
+            result.setCode(400).setMsg("错误的员工id");
         }else{
             result = super.setModel(vocationQuotaService,vocationQuota, bindingResult);
         }
@@ -78,8 +78,16 @@ public class VocationQuotaController extends BaseController {
             message = "编辑失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> updateVocationQuota(@Valid @RequestBody VocationQuota vocationQuota,
                                                        BindingResult bindingResult) {
-        BaseResult result = super.updateModelByDouble(vocationQuotaService,vocationQuota, bindingResult);
+        BaseResult result =new BaseResult();
+        if(isErrorStaffId(vocationQuota)){
+            result.setCode(400).setMsg("错误的员工id");
+        }else{
+            result = super.updateModelByDouble(vocationQuotaService,vocationQuota, bindingResult);
+        }
         return ResponseEntity.status(result.getCode()).body(result);
+    }
+    private boolean isErrorStaffId(VocationQuota vocationQuota){
+        return vocationQuota.getSId()==null||staffService.getById(vocationQuota.getSId())==null;
     }
 
 }

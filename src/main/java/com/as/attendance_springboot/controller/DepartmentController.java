@@ -34,7 +34,7 @@ public class DepartmentController extends BaseController {
     private DepartmentServiceImpl departmentService;
     @Autowired
     private StaffServiceImpl staffService;
-
+    //拜访表service
     @GetMapping
     @ApiOperation("查询部门,查询条件:部门id,领导id")
     @ApiImplicitParams({@ApiImplicitParam(name = "dId", value = "部门id", dataTypeClass = Integer.class),

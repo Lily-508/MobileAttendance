@@ -2,7 +2,7 @@
 #server.address=192.168.1.107
 server:
   ssl:
-    key-store: ./src/main/resources/server.keystore
+    key-store: ./src/main/resources/xll.keystore
     key-store-password: 123456
     key-store-type: PKCS12
   port: 8433

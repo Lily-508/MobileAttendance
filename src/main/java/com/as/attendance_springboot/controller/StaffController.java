@@ -4,6 +4,7 @@ import com.as.attendance_springboot.model.Staff;
 import com.as.attendance_springboot.result.BaseResult;
 import com.as.attendance_springboot.result.DataResult;
 import com.as.attendance_springboot.result.PaginationResult;
+import com.as.attendance_springboot.service.impl.DepartmentServiceImpl;
 import com.as.attendance_springboot.service.impl.StaffServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -35,7 +36,8 @@ import java.time.LocalDate;
 public class StaffController extends BaseController{
     @Autowired
     private StaffServiceImpl staffService;
-
+    @Autowired
+    private DepartmentServiceImpl departmentService;
     @GetMapping("/page")
     @ApiOperation("分页查询对应部门员工")
     @ApiImplicitParams({@ApiImplicitParam(name = "dId", value = "部门id", dataTypeClass = Integer.class),
@@ -111,7 +113,9 @@ public class StaffController extends BaseController{
         BaseResult result = new BaseResult();
         if (isExistedPhoneOrEmail(staff)) {
             result.setCode(400).setMsg("手机号或邮箱不唯一");
-        } else {
+        } else if (isErrorDepartmentId(staff)){
+            result.setCode(400).setMsg("错误的部门号");
+        }else{
             result=super.setModel(staffService,staff,bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
@@ -126,6 +130,8 @@ public class StaffController extends BaseController{
         BaseResult result = new BaseResult();
         if (isExistedPhoneOrEmail(staff)) {
             result.setCode(400).setMsg("手机号或邮箱不唯一");
+        }else if (isErrorDepartmentId(staff)){
+            result.setCode(400).setMsg("错误的部门号");
         }  else {
             result=super.updateModelBySingle(staff.getSId(),staffService,staff,bindingResult);
         }
@@ -148,5 +154,8 @@ public class StaffController extends BaseController{
         LambdaQueryWrapper<Staff> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Staff::getSEmail, email).or().eq(Staff::getSPhone, phone);
         return staffService.getOne(queryWrapper) != null;
+    }
+    private boolean isErrorDepartmentId(Staff staff){
+        return staff.getDId()==null||departmentService.getById(staff.getDId())==null;
     }
 }

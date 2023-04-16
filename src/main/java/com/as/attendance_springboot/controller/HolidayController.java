@@ -19,13 +19,13 @@ import java.util.List;
  * @author xulili
  * @version 1.0
  * @project attendance_springboot
- * @description 自定义假期借口
+ * @description 自定义假期接口
  * @date 2023/4/12 14:01:38
  */
 @RestController
 @Slf4j
 @RequestMapping("/holidays")
-@Api(tags = "自定义假期借口,提供假期新建,修改,查询,和删除操作")
+@Api(tags = "自定义假期接口,提供假期新建,修改,查询,和删除操作")
 public class HolidayController extends BaseController{
     @Autowired
     private HolidayServiceImpl holidayService;

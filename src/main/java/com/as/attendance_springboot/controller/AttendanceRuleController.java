@@ -4,6 +4,7 @@ import com.as.attendance_springboot.model.AttendanceRule;
 import com.as.attendance_springboot.result.BaseResult;
 import com.as.attendance_springboot.result.DataResult;
 import com.as.attendance_springboot.service.impl.AttendanceRuleServiceImpl;
+import com.as.attendance_springboot.service.impl.CompanyServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,8 @@ import java.util.List;
 public class AttendanceRuleController extends BaseController {
     @Autowired
     private AttendanceRuleServiceImpl attendanceRuleService;
-
+    @Autowired
+    private CompanyServiceImpl companyService;
     @GetMapping
     @ApiOperation("查询考勤规则,查询条件:考勤规则id,公司id")
     @ApiImplicitParams({@ApiImplicitParam(name = "aId", value = "考勤规则id", dataTypeClass = Integer.class),
@@ -58,7 +60,12 @@ public class AttendanceRuleController extends BaseController {
             400, message = "新建失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> setAttendanceRule(@Valid @RequestBody AttendanceRule attendanceRule,
                                                         BindingResult bindingResult) {
-        BaseResult result = super.setModel(attendanceRuleService,attendanceRule, bindingResult);
+        BaseResult result =new BaseResult() ;
+        if (isErrorCompanyId(attendanceRule)) {
+            result.setCode(400).setMsg("错误的公司id");
+        }else{
+            super.setModel(attendanceRuleService,attendanceRule, bindingResult);
+        }
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
@@ -69,8 +76,12 @@ public class AttendanceRuleController extends BaseController {
             400, message = "编辑失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> updateDepartment(@Valid @RequestBody AttendanceRule attendanceRule,
                                                        BindingResult bindingResult) {
-        BaseResult result = super.updateModelBySingle(attendanceRule.getAId(),
-                attendanceRuleService,attendanceRule, bindingResult);
+        BaseResult result = new BaseResult();
+        if (isErrorCompanyId(attendanceRule)) {
+            result.setCode(400).setMsg("错误的公司id");
+        }else{
+            super.updateModelBySingle(attendanceRule.getAId(), attendanceRuleService,attendanceRule, bindingResult);
+        }
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
@@ -84,5 +95,7 @@ public class AttendanceRuleController extends BaseController {
         BaseResult result = super.deleteModel(attendanceRuleService.removeById(aId), "删除失败,有外键依赖");
         return ResponseEntity.status(result.getCode()).body(result);
     }
-
+    private boolean isErrorCompanyId(AttendanceRule attendanceRule){
+        return attendanceRule.getCId()==null||companyService.getById(attendanceRule.getCId())==null;
+    }
 }

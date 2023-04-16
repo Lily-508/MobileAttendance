@@ -35,6 +35,7 @@ public class Company {
     @JsonProperty(value = "cContent")
     private String cContent;
     @JsonProperty(value = "cPlace")
+    @NotBlank(message = "公司地点不为null")
     @Pattern(regexp = "^[\\-\\+]?(0(\\.\\d{1,8})?|([1-9](\\d)?)(\\.\\d{1,8})?|1[0-7]\\d{1}(\\.\\d{1,8})?|180(([" +
             ".]0{1,8})?)),[\\-\\+]?((0|([1-8]\\d?))(\\.\\d{1,10})?|90(\\.0{1,10})?)$")
     private String cPlace;

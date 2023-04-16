@@ -6,6 +6,7 @@ import com.as.attendance_springboot.result.PaginationResult;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.jeffreyning.mybatisplus.service.MppServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 
@@ -19,6 +20,7 @@ import java.util.Objects;
  * @description
  * @date 2023/4/12 20:03:34
  */
+@Slf4j
 public class BaseController {
 
     /**
@@ -35,6 +37,7 @@ public class BaseController {
                 errorMsg.append(error.getDefaultMessage());
             }
             result.setCode(400).setMsg(errorMsg.toString());
+            log.info("验证失败result:{}",result);
         }
     }
 
@@ -114,11 +117,19 @@ public class BaseController {
             return result;
         }
         //调用save方法后会自动为实体类赋id值
-        if (service.saveOrUpdate(model)) {
-            result.setCode(200).setMsg("新建成功").setData(model);
-        } else {
-            result.setCode(500).setMsg("新建失败");
+        log.info("调用saveOrUpdate");
+        try{
+            if (service.saveOrUpdate(model)) {
+
+                result.setCode(200).setMsg("新建成功").setData(model);
+            } else {
+                result.setCode(500).setMsg("新建失败");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
+
+        log.info("调用saveOrUpdate结束");
         return result;
     }
     /**

@@ -1,15 +1,14 @@
 package com.as.attendance_springboot.controller;
 
 import com.as.attendance_springboot.model.AttendanceRule;
-import com.as.attendance_springboot.model.Company;
 import com.as.attendance_springboot.model.RecordAttendance;
 import com.as.attendance_springboot.model.enums.RecordResultType;
 import com.as.attendance_springboot.result.BaseResult;
 import com.as.attendance_springboot.result.DataResult;
 import com.as.attendance_springboot.result.PaginationResult;
 import com.as.attendance_springboot.service.impl.AttendanceRuleServiceImpl;
-import com.as.attendance_springboot.service.impl.CompanyServiceImpl;
 import com.as.attendance_springboot.service.impl.RecordAttendanceServiceImpl;
+import com.as.attendance_springboot.service.impl.StaffServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -44,7 +43,8 @@ public class RecordAttendanceController extends BaseController {
     @Autowired
     private AttendanceRuleServiceImpl attendanceRuleService;
     @Autowired
-    private CompanyServiceImpl companyService;
+    private StaffServiceImpl staffService;
+
     @GetMapping
     @ApiOperation("查询单个考勤记录,查询条件:考勤记录id")
     @ApiImplicitParams({@ApiImplicitParam(name = "rId", value = "考勤记录id", dataTypeClass = Integer.class)})
@@ -68,7 +68,7 @@ public class RecordAttendanceController extends BaseController {
         if (sId != null) {
             queryWrapper.eq(RecordAttendance::getSId, sId);
         }
-        IPage<RecordAttendance> page= recordAttendanceService.page(new Page(pageCur,pageSize),queryWrapper);
+        IPage<RecordAttendance> page = recordAttendanceService.page(new Page(pageCur, pageSize), queryWrapper);
         PaginationResult<IPage<RecordAttendance>> result = super.getModelPage(page);
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -79,54 +79,56 @@ public class RecordAttendanceController extends BaseController {
     @ApiResponses({@ApiResponse(code = 200, message = "新建成功", response = BaseResult.class), @ApiResponse(code =
             400, message = "新建失败", response = BaseResult.class)})
     public ResponseEntity<DataResult<RecordAttendance>> setRecordAttendance(@NotNull @Valid @RequestBody RecordAttendance recordAttendance,
-                                                          BindingResult bindingResult) {
-        //签到最少参数
-        if(recordAttendance.getRPunchIn()==null&&recordAttendance.getRDate()==null){
-            recordAttendance.setRDate(LocalDate.now());
-            recordAttendance.setRPunchIn(LocalDateTime.now());
+                                                                            BindingResult bindingResult) {
+        DataResult<RecordAttendance> result=new DataResult<>();
+        //外键有效判断
+        if(isErrorForeignId(recordAttendance)){
+            result.setCode(400).setMsg("错误的外键id");
+        }else{
+            //签到最少参数
+            if (recordAttendance.getRPunchIn() == null && recordAttendance.getRDate() == null) {
+                recordAttendance.setRDate(LocalDate.now());
+                recordAttendance.setRPunchIn(LocalDateTime.now());
+            }
+            if (recordAttendance.getRDate() == null) {
+                recordAttendance.setRDate(LocalDate.now());
+            }
+            //考勤结果判断
+            if (recordAttendance.getRPunchOut() != null && recordAttendance.getRResult() == null) {
+                decideRecordResultByTime(recordAttendance);
+            }
+            result = super.setModelAndReturn(recordAttendanceService, recordAttendance, bindingResult);
         }
-        if(recordAttendance.getRDate()==null){
-            recordAttendance.setRDate(LocalDate.now());
-        }
-        //考勤结果判断
-        if(recordAttendance.getRPunchOut()!=null&&recordAttendance.getRResult()==null){
-            decideRecordResultByTime(recordAttendance);
-        }
-        DataResult<RecordAttendance> result = super.setModelAndReturn(recordAttendanceService,recordAttendance, bindingResult);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
-    @PutMapping
-    @ApiOperation("编辑考勤记录")
-    @ApiImplicitParam(name = "recordAttendance", value = "RecordAttendance类实例", dataTypeClass = RecordAttendance.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "编辑成功", response = BaseResult.class), @ApiResponse(code =
-            400, message = "编辑失败", response = BaseResult.class)})
-    public ResponseEntity<BaseResult> updateDepartment(@NotNull @Valid @RequestBody RecordAttendance recordAttendance,
-                                                       BindingResult bindingResult) {
-        BaseResult result = super.updateModelBySingle(recordAttendance.getAId(), recordAttendanceService,recordAttendance, bindingResult);
-        return ResponseEntity.status(result.getCode()).body(result);
-    }
-    private void decideRecordResultByTime(RecordAttendance recordAttendance){
-        AttendanceRule attendanceRule=attendanceRuleService.getById(recordAttendance.getAId());
-        LocalTime punchIn=recordAttendance.getRPunchIn().toLocalTime();
-        LocalTime punchOut=recordAttendance.getRPunchOut().toLocalTime();
-        LocalTime start=attendanceRule.getAStart();
-        LocalTime end=attendanceRule.getAEnd();
-        int exceptionRange=attendanceRule.getExceptionRange();
-        int neglectRange=attendanceRule.getNeglectRange();
-        Duration punchInDuration=Duration.between(start,punchIn);
-        Duration punchOutDuration=Duration.between(punchOut,end);
-        log.info("签到时差{},签退时差{}",punchInDuration.toMinutes(),punchOutDuration.toMinutes());
-        if(punchInDuration.toMinutes()<exceptionRange&&punchOutDuration.toMinutes()<exceptionRange){
-            recordAttendance.setRResult(RecordResultType.SUCCESS);
-        }else if(punchInDuration.toMinutes()>neglectRange||punchOutDuration.toMinutes()>neglectRange){
-            recordAttendance.setRResult(RecordResultType.NEGLECT);
+    private boolean isErrorForeignId(RecordAttendance recordAttendance) {
+        log.info("考勤记录判断外键id有效性");
+        if (recordAttendance.getSId() != null && recordAttendance.getAId() != null) {
+            return staffService.getById(recordAttendance.getSId()) == null || attendanceRuleService.getById(recordAttendance.getAId()) == null;
         }else {
+            return true;
+        }
+    }
+
+    private void decideRecordResultByTime(RecordAttendance recordAttendance) {
+        AttendanceRule attendanceRule = attendanceRuleService.getById(recordAttendance.getAId());
+        LocalTime punchIn = recordAttendance.getRPunchIn().toLocalTime();
+        LocalTime punchOut = recordAttendance.getRPunchOut().toLocalTime();
+        LocalTime start = attendanceRule.getAStart();
+        LocalTime end = attendanceRule.getAEnd();
+        int exceptionRange = attendanceRule.getExceptionRange();
+        int neglectRange = attendanceRule.getNeglectRange();
+        Duration punchInDuration = Duration.between(start, punchIn);
+        Duration punchOutDuration = Duration.between(punchOut, end);
+        log.info("签到时差{},签退时差{}", punchInDuration.toMinutes(), punchOutDuration.toMinutes());
+        if (punchInDuration.toMinutes() < exceptionRange && punchOutDuration.toMinutes() < exceptionRange) {
+            recordAttendance.setRResult(RecordResultType.SUCCESS);
+        } else if (punchInDuration.toMinutes() > neglectRange || punchOutDuration.toMinutes() > neglectRange) {
+            recordAttendance.setRResult(RecordResultType.NEGLECT);
+        } else {
             recordAttendance.setRResult(RecordResultType.EXCEPTION);
         }
         //打卡地点是否在范围判断,打算交给前端
-        Company company=companyService.getById(attendanceRule.getCId());
-        String companyPlace=company.getCPlace();
-        int locationRange=attendanceRule.getLocationRange();
     }
 }
