@@ -12,6 +12,7 @@ import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 
 /**
@@ -27,7 +28,7 @@ import java.time.LocalDateTime;
 @TableName("visit")
 public class Visit {
     @JsonProperty(value = "vId")
-    @TableId(value = "vId", type = IdType.AUTO)
+    @TableId(value = "v_id", type = IdType.AUTO)
     private Integer vId;
     @JsonProperty(value = "cId")
     @NotNull(message = "cId不为null")
@@ -53,6 +54,12 @@ public class Visit {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime vPunchOut;
+    @Pattern(regexp = "^[\\-\\+]?(0(\\.\\d{1,8})?|([1-9](\\d)?)(\\.\\d{1,8})?|1[0-7]\\d(\\.\\d{1,8})?|180(([.]0{1,8})" +
+            "?)),[\\-\\+]?((0|([1-8]\\d?))(\\.\\d{1,10})?|90(\\.0{1,10})?)$",message = "经纬度格式错误")
+    private String punchInPlace;
+    @Pattern(regexp = "^[\\-\\+]?(0(\\.\\d{1,8})?|([1-9](\\d)?)(\\.\\d{1,8})?|1[0-7]\\d(\\.\\d{1,8})?|180(([" +
+            ".]0{1,8})?)),[\\-\\+]?((0|([1-8]\\d?))(\\.\\d{1,10})?|90(\\.0{1,10})?)$", message = "经纬度格式错误")
+    private String punchOutPlace;
     @TableField(select = false)
     private Integer deleted;
 }

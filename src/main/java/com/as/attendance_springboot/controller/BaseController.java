@@ -30,7 +30,7 @@ public class BaseController {
      * @author xulili
      * @date 22:08 2023/4/12
      **/
-    public void validBindingResult(BindingResult bindingResult,BaseResult result) {
+    public boolean validBindingResult(BindingResult bindingResult,BaseResult result) {
         if (bindingResult.hasErrors()) {
             StringBuilder errorMsg = new StringBuilder();
             for (ObjectError error : bindingResult.getAllErrors()) {
@@ -38,7 +38,9 @@ public class BaseController {
             }
             result.setCode(400).setMsg(errorMsg.toString());
             log.info("验证失败result:{}",result);
+            return false;
         }
+        return true;
     }
 
 
@@ -90,8 +92,7 @@ public class BaseController {
      **/
     public <M> BaseResult setModel(ServiceImpl<?, M> service, M model, BindingResult bindingResult) {
         BaseResult result = new BaseResult();
-        validBindingResult(bindingResult,result);
-        if(result.getMsg() != null){
+        if(!validBindingResult(bindingResult,result)){
             return result;
         }
         if (service.save(model)) {
@@ -112,8 +113,7 @@ public class BaseController {
      **/
     public <M>DataResult<M> setModelAndReturn(ServiceImpl<?, M> service, M model, BindingResult bindingResult){
         DataResult<M> result =new DataResult<>();
-        validBindingResult(bindingResult,result);
-        if(result.getMsg() != null){
+        if(!validBindingResult(bindingResult,result)){
             return result;
         }
         //调用save方法后会自动为实体类赋id值
@@ -145,8 +145,7 @@ public class BaseController {
     public<M> BaseResult updateModelBySingle(Integer primaryId,ServiceImpl<?, M> service, M model,
                                            BindingResult bindingResult) {
         BaseResult result = new BaseResult();
-        validBindingResult(bindingResult,result);
-        if(result.getMsg() != null){
+        if(!validBindingResult(bindingResult,result)){
             return result;
         }
         if (primaryId == null) {
@@ -172,8 +171,7 @@ public class BaseController {
      **/
     public  <M> BaseResult updateModelByDouble(MppServiceImpl<?,M>mppService,M model, BindingResult bindingResult) {
         BaseResult result = new BaseResult();
-        validBindingResult(bindingResult,result);
-        if(result.getMsg() != null){
+        if(!validBindingResult(bindingResult,result)){
             return result;
         }
         if (mppService.updateByMultiId(model)) {

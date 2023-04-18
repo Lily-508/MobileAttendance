@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 /**
@@ -51,7 +50,6 @@ public class RecordAttendanceController extends BaseController {
     @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class), @ApiResponse(code =
             400, message = "查询失败", response = DataResult.class)})
     public ResponseEntity<DataResult<RecordAttendance>> getRecordAttendanceByRid(@RequestParam Integer rId) {
-        log.info("输入参数{}", rId);
         DataResult<RecordAttendance> result = super.getModel(recordAttendanceService.getById(rId));
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -73,40 +71,79 @@ public class RecordAttendanceController extends BaseController {
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
-    @PostMapping("/punch")
-    @ApiOperation("考勤签到签退记录")
+    @PostMapping("/punch-in")
+    @ApiOperation("考勤签到")
     @ApiImplicitParam(name = "recordAttendance", value = "RecordAttendance类实例", dataTypeClass = RecordAttendance.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "新建成功", response = BaseResult.class), @ApiResponse(code =
-            400, message = "新建失败", response = BaseResult.class)})
-    public ResponseEntity<DataResult<RecordAttendance>> setRecordAttendance(@NotNull @Valid @RequestBody RecordAttendance recordAttendance,
-                                                                            BindingResult bindingResult) {
-        DataResult<RecordAttendance> result=new DataResult<>();
-        //外键有效判断
-        if(isErrorForeignId(recordAttendance)){
+    @ApiResponses({@ApiResponse(code = 200, message = "签到成功", response = DataResult.class),
+            @ApiResponse(code = 400, message = "签到失败", response = DataResult.class),
+            @ApiResponse(code = 400, message = "错误的外键id", response = DataResult.class),
+            @ApiResponse(code = 400, message = "签到参数格式错误", response = DataResult.class),
+            @ApiResponse(code = 400, message = "签到操作只能进行一次", response = DataResult.class)})
+    public ResponseEntity<DataResult<RecordAttendance>> recordPunchIn(@NotNull @Valid @RequestBody RecordAttendance recordAttendance,
+                                                                      BindingResult bindingResult) {
+        DataResult<RecordAttendance> result = new DataResult<>();
+        if (!super.validBindingResult(bindingResult, result)) {
+            return ResponseEntity.status(result.getCode()).body(result);
+        } else if (isErrorForeignId(recordAttendance)) {
+            log.info("外键有效性判断:无效,员工id={},考勤规则id={}", recordAttendance.getSId(), recordAttendance.getAId());
             result.setCode(400).setMsg("错误的外键id");
-        }else{
-            //签到最少参数
-            if (recordAttendance.getRPunchIn() == null && recordAttendance.getRDate() == null) {
-                recordAttendance.setRDate(LocalDate.now());
-                recordAttendance.setRPunchIn(LocalDateTime.now());
+        } else if (recordAttendance.getRPunchIn() == null || recordAttendance.getPunchInPlace() == null || recordAttendance.getRDate() == null) {
+            result.setCode(400).setMsg("签到参数格式错误");
+        } else {
+            LambdaQueryWrapper<RecordAttendance> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(RecordAttendance::getSId, recordAttendance.getSId())
+                    .eq(RecordAttendance::getRDate, LocalDate.now());
+            RecordAttendance record = recordAttendanceService.getOne(queryWrapper);
+            if (record != null) {
+                result.setCode(400).setMsg("签到操作只能进行一次");
+            } else if (recordAttendanceService.saveOrUpdate(recordAttendance)) {
+                result.setCode(200).setMsg("签到成功").setData(recordAttendance);
+            } else {
+                result.setCode(400).setMsg("签到失败");
             }
-            if (recordAttendance.getRDate() == null) {
-                recordAttendance.setRDate(LocalDate.now());
-            }
-            //考勤结果判断
-            if (recordAttendance.getRPunchOut() != null && recordAttendance.getRResult() == null) {
+        }
+        return ResponseEntity.status(result.getCode()).body(result);
+    }
+    @PostMapping("/punch-out")
+    @ApiOperation("考勤签退")
+    @ApiImplicitParam(name = "recordAttendance", value = "RecordAttendance类实例", dataTypeClass = RecordAttendance.class)
+    @ApiResponses({@ApiResponse(code = 200, message = "签退成功", response = DataResult.class),
+            @ApiResponse(code = 400, message = "签退失败", response = DataResult.class),
+            @ApiResponse(code = 400, message = "错误的外键id", response = DataResult.class),
+            @ApiResponse(code = 400, message = "请先签到", response = BaseResult.class),
+            @ApiResponse(code = 400, message = "签退参数格式错误", response = DataResult.class),
+            @ApiResponse(code = 400, message = "签退操作只能进行一次", response = DataResult.class)})
+    public ResponseEntity<DataResult<RecordAttendance>> recordPunchOut(@NotNull @Valid @RequestBody RecordAttendance recordAttendance,
+                                                                       BindingResult bindingResult) {
+        DataResult<RecordAttendance> result = new DataResult<>();
+        if (!super.validBindingResult(bindingResult, result)) {
+            return ResponseEntity.status(result.getCode()).body(result);
+        } else if (isErrorForeignId(recordAttendance)) {
+            log.info("外键有效性判断:无效,员工id={},考勤规则id={}", recordAttendance.getSId(), recordAttendance.getAId());
+            result.setCode(400).setMsg("错误的外键id");
+        } else if (recordAttendance.getRPunchOut() == null || recordAttendance.getPunchOutPlace() == null || recordAttendance.getRId() == null) {
+            result.setCode(400).setMsg("签退参数格式错误");
+        } else {
+            RecordAttendance record = recordAttendanceService.getById(recordAttendance.getRId());
+            if (record == null) {
+                result.setCode(400).setMsg("请先签到");
+            } else if (record.getPunchOutPlace()!=null) {
+                result.setCode(400).setMsg("签退操作只能进行一次");
+            } else if (recordAttendance.getRResult()==null) {
                 decideRecordResultByTime(recordAttendance);
+            } else if (recordAttendanceService.saveOrUpdate(recordAttendance)) {
+                result.setCode(200).setMsg("签到成功").setData(recordAttendance);
+            } else {
+                result.setCode(400).setMsg("签到失败");
             }
-            result = super.setModelAndReturn(recordAttendanceService, recordAttendance, bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
     private boolean isErrorForeignId(RecordAttendance recordAttendance) {
-        log.info("考勤记录判断外键id有效性");
         if (recordAttendance.getSId() != null && recordAttendance.getAId() != null) {
             return staffService.getById(recordAttendance.getSId()) == null || attendanceRuleService.getById(recordAttendance.getAId()) == null;
-        }else {
+        } else {
             return true;
         }
     }
@@ -121,7 +158,7 @@ public class RecordAttendanceController extends BaseController {
         int neglectRange = attendanceRule.getNeglectRange();
         Duration punchInDuration = Duration.between(start, punchIn);
         Duration punchOutDuration = Duration.between(punchOut, end);
-        log.info("签到时差{},签退时差{}", punchInDuration.toMinutes(), punchOutDuration.toMinutes());
+        log.info("考勤结果判断,签到时差{},签退时差{}", punchInDuration.toMinutes(), punchOutDuration.toMinutes());
         if (punchInDuration.toMinutes() < exceptionRange && punchOutDuration.toMinutes() < exceptionRange) {
             recordAttendance.setRResult(RecordResultType.SUCCESS);
         } else if (punchInDuration.toMinutes() > neglectRange || punchOutDuration.toMinutes() > neglectRange) {
