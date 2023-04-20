@@ -9,10 +9,11 @@ import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
 
-/**vDuration单位小时
+/**vDuration单位分钟
  * @author xulili
  * @version 1.0
  * @project attendance_springboot
@@ -23,6 +24,7 @@ import javax.validation.constraints.NotNull;
 @ToString
 @NoArgsConstructor
 @TableName("vocation_quota")
+@Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class VocationQuota {
     @JsonProperty(value = "sId")

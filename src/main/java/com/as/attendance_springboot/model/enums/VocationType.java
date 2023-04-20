@@ -21,7 +21,7 @@ public enum VocationType {
     COMPENSATORY(2, "调休"),
     ANNUAL(3,"年假"),
     SICK(4,"病假"),
-    PREGNANCY(5,"孕假");
+    PREGNANCY(5,"产假");
 
     /**
      * @EnumValue 标记存储到数据库的值

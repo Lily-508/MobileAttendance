@@ -1,10 +1,12 @@
 package com.as.attendance_springboot.controller;
 
 import com.as.attendance_springboot.model.AttendanceRule;
+import com.as.attendance_springboot.model.RecordAttendance;
 import com.as.attendance_springboot.result.BaseResult;
 import com.as.attendance_springboot.result.DataResult;
 import com.as.attendance_springboot.service.impl.AttendanceRuleServiceImpl;
 import com.as.attendance_springboot.service.impl.CompanyServiceImpl;
+import com.as.attendance_springboot.service.impl.RecordAttendanceServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,8 @@ public class AttendanceRuleController extends BaseController {
     private AttendanceRuleServiceImpl attendanceRuleService;
     @Autowired
     private CompanyServiceImpl companyService;
+    @Autowired
+    private RecordAttendanceServiceImpl recordAttendanceService;
     @GetMapping
     @ApiOperation("查询考勤规则,查询条件:考勤规则id,公司id")
     @ApiImplicitParams({@ApiImplicitParam(name = "aId", value = "考勤规则id", dataTypeClass = Integer.class),
@@ -88,11 +92,18 @@ public class AttendanceRuleController extends BaseController {
     @DeleteMapping
     @ApiOperation("删除没有外键依赖考勤规则")
     @ApiImplicitParam(name = "aId", value = "考勤规则id", dataTypeClass = Integer.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "删除成功", response = BaseResult.class), @ApiResponse(code =
-            400, message = "删除失败,有外键依赖", response = BaseResult.class)})
+    @ApiResponses({@ApiResponse(code = 200, message = "删除成功", response = BaseResult.class),
+            @ApiResponse(code = 400, message = "已被考勤记录表外键依赖", response = BaseResult.class),
+            @ApiResponse(code = 400, message = "删除失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> deleteDepartment(@RequestParam Integer aId) {
-        //外键依赖判断 CASCADE依赖公司表 直接删除
-        BaseResult result = super.deleteModel(attendanceRuleService.removeById(aId));
+        //被考勤记录表外键依赖
+        BaseResult result =new BaseResult();
+        RecordAttendance recordAttendance=recordAttendanceService.getOne(new LambdaQueryWrapper<RecordAttendance>().eq(RecordAttendance::getAId,aId));
+        if(recordAttendance!=null){
+            result.setCode(400).setMsg("已被考勤记录表外键依赖");
+        }else{
+            super.deleteModel(attendanceRuleService.removeById(aId));
+        }
         return ResponseEntity.status(result.getCode()).body(result);
     }
     private boolean isErrorCompanyId(AttendanceRule attendanceRule){

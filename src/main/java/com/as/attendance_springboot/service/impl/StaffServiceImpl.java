@@ -5,9 +5,12 @@ import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.as.attendance_springboot.mapper.StaffMapper;
+import com.as.attendance_springboot.mapper.VocationQuotaMapper;
 import com.as.attendance_springboot.model.Staff;
+import com.as.attendance_springboot.model.VocationQuota;
 import com.as.attendance_springboot.model.enums.StaffSex;
 import com.as.attendance_springboot.model.enums.StaffStatus;
+import com.as.attendance_springboot.model.enums.VocationType;
 import com.as.attendance_springboot.service.StaffService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -31,6 +34,18 @@ import java.util.Map;
 public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements StaffService, UserDetailsService {
     @Autowired
     private StaffMapper staffMapper;
+    @Autowired
+    private VocationQuotaMapper vocationQuotaMapper;
+
+    @Override
+    public boolean save(Staff entity) {
+        boolean success=super.save(entity);
+        if(success){
+            success=initVocationQuota(entity);
+        }
+        return success;
+    }
+
     /**
      * excel导入员工
      * @author xulili
@@ -54,7 +69,47 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
         reader.addHeaderAlias("员工出生日期","sBirthday");
         reader.addHeaderAlias("员工入职日期","sHiredate");
         List<Staff> staffList=reader.readAll(Staff.class);
-        return this.saveBatch(staffList);
+        boolean success= this.saveBatch(staffList);
+        if(success){
+            for(Staff staff:staffList){
+                boolean isSuccess=initVocationQuota(staff);
+                if(!isSuccess){
+                    success=false;
+                    break;
+                }
+            }
+        }
+        return success;
+    }
+    public boolean initVocationQuota(Staff staff) {
+        VocationQuota vocation = new VocationQuota().setSId(staff.getSId());
+        boolean success;
+        try {
+            //事假20天
+            vocation.setVId(VocationType.PERSONAL).setVDuration(20 * 24 * 60);
+            vocationQuotaMapper.insert(vocation);
+//        婚假10天
+            vocation.setVId(VocationType.MARRIAGE).setVDuration(10*24*60);
+            vocationQuotaMapper.insert(vocation);
+//        调休初始为0
+            vocation.setVId(VocationType.COMPENSATORY).setVDuration(0);
+            vocationQuotaMapper.insert(vocation);
+//        年假5天
+            vocation.setVId(VocationType.ANNUAL).setVDuration(5*24*60);
+            vocationQuotaMapper.insert(vocation);
+//        病假3个月
+            vocation.setVId(VocationType.SICK).setVDuration(3*30*24*60);
+            vocationQuotaMapper.insert(vocation);
+//        产假98天
+            vocation.setVId(VocationType.PREGNANCY).setVDuration(98*24*60);
+            vocationQuotaMapper.insert(vocation);
+            success=true;
+        }catch (Exception e){
+            e.printStackTrace();
+            success=false;
+        }
+        return success;
+
     }
     /**
      * excel导出员工

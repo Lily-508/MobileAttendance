@@ -33,11 +33,13 @@ import java.time.LocalDate;
 @RequestMapping("/staffs")
 @Api(tags = "员工管理接口,提供员工新建,修改,查询,excel导入导出和删除操作")
 @Slf4j
-public class StaffController extends BaseController{
+public class StaffController extends BaseController {
     @Autowired
     private StaffServiceImpl staffService;
     @Autowired
     private DepartmentServiceImpl departmentService;
+
+
     @GetMapping("/page")
     @ApiOperation("分页查询对应部门员工")
     @ApiImplicitParams({@ApiImplicitParam(name = "dId", value = "部门id", dataTypeClass = Integer.class),
@@ -78,8 +80,8 @@ public class StaffController extends BaseController{
         log.info(fileName);
         try {
             response.setContentType("application/x-msdownload");
-            response.setHeader("Content-Disposition", "attachment; filename="
-                    + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+            response.setHeader("Content-Disposition",
+                               "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
             staffService.exportStaffExcel(response.getOutputStream());
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,8 +91,8 @@ public class StaffController extends BaseController{
     @GetMapping
     @ApiOperation("根据sId查询对应员工")
     @ApiImplicitParam(name = "sId", value = "员工id", dataTypeClass = Integer.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class), @ApiResponse(code =
-            400, message = "查询失败", response = DataResult.class)})
+    @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class), @ApiResponse(code = 400,
+            message = "查询失败", response = DataResult.class)})
     public ResponseEntity<DataResult<Staff>> getStaffByStaffId(@RequestParam int sId) {
         log.info("传入参数员工id={}", sId);
         Staff staff = staffService.getById(sId);
@@ -113,10 +115,10 @@ public class StaffController extends BaseController{
         BaseResult result = new BaseResult();
         if (isExistedPhoneOrEmail(staff)) {
             result.setCode(400).setMsg("手机号或邮箱不唯一");
-        } else if (isErrorDepartmentId(staff)){
+        } else if (isErrorDepartmentId(staff)) {
             result.setCode(400).setMsg("错误的部门号");
-        }else{
-            result=super.setModel(staffService,staff,bindingResult);
+        } else {
+            result = super.setModel(staffService, staff, bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -130,10 +132,10 @@ public class StaffController extends BaseController{
         BaseResult result = new BaseResult();
         if (isExistedPhoneOrEmail(staff)) {
             result.setCode(400).setMsg("手机号或邮箱不唯一");
-        }else if (isErrorDepartmentId(staff)){
+        } else if (isErrorDepartmentId(staff)) {
             result.setCode(400).setMsg("错误的部门号");
-        }  else {
-            result=super.updateModelBySingle(staff.getSId(),staffService,staff,bindingResult);
+        } else {
+            result = super.updateModelBySingle(staff.getSId(), staffService, staff, bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -155,7 +157,10 @@ public class StaffController extends BaseController{
         queryWrapper.eq(Staff::getSEmail, email).or().eq(Staff::getSPhone, phone);
         return staffService.getOne(queryWrapper) != null;
     }
-    private boolean isErrorDepartmentId(Staff staff){
-        return staff.getDId()==null||departmentService.getById(staff.getDId())==null;
+
+    private boolean isErrorDepartmentId(Staff staff) {
+        return staff.getDId() == null || departmentService.getById(staff.getDId()) == null;
     }
+
+
 }
