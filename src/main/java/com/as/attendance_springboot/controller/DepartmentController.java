@@ -101,7 +101,7 @@ public class DepartmentController extends BaseController {
         LambdaQueryWrapper<Staff> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Staff::getDId, dId);
         Staff staff = staffService.getOne(queryWrapper);
-        BaseResult result = super.deleteModel(staff == null, "删除失败,有外键依赖");
+        BaseResult result = super.deleteModel(staff == null);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 

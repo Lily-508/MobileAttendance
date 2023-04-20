@@ -68,7 +68,7 @@ public class HolidayController extends BaseController{
     @ApiResponses({@ApiResponse(code = 200, message = "删除成功", response = BaseResult.class), @ApiResponse(code =
             400, message = "删除失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> deleteDepartment(@RequestParam Integer hId){
-        BaseResult result = super.deleteModel(holidayService.removeById(hId),null);
+        BaseResult result = super.deleteModel(holidayService.removeById(hId));
         return ResponseEntity.status(result.getCode()).body(result);
     }
 

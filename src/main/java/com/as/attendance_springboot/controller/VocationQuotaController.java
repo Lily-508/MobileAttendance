@@ -36,7 +36,7 @@ public class VocationQuotaController extends BaseController {
     @Autowired
     private StaffServiceImpl staffService;
     @GetMapping
-    @ApiOperation("查询假期,查询条件:员工id,假期类别")
+    @ApiOperation("查询假期额度,查询条件:员工id,假期类别")
     @ApiImplicitParams({@ApiImplicitParam(name = "sId", value = "员工id", dataTypeClass = Integer.class),
             @ApiImplicitParam(name = "vocationType", value = "假期类别", dataTypeClass = String.class)})
     @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class), @ApiResponse(code = 400,
@@ -56,7 +56,7 @@ public class VocationQuotaController extends BaseController {
     }
 
     @PostMapping
-    @ApiOperation("新建假期")
+    @ApiOperation("新建假期额度")
     @ApiImplicitParam(name = "vocationQuota", value = "VocationQuota类实例", dataTypeClass = VocationQuota.class)
     @ApiResponses({@ApiResponse(code = 200, message = "新建成功", response = BaseResult.class), @ApiResponse(code = 400,
             message = "新建失败", response = BaseResult.class)})
@@ -72,7 +72,7 @@ public class VocationQuotaController extends BaseController {
     }
 
     @PutMapping
-    @ApiOperation("编辑假期")
+    @ApiOperation("编辑假期额度")
     @ApiImplicitParam(name = "VocationQuota", value = "VocationQuota类实例", dataTypeClass = VocationQuota.class)
     @ApiResponses({@ApiResponse(code = 200, message = "编辑成功", response = BaseResult.class), @ApiResponse(code = 400,
             message = "编辑失败", response = BaseResult.class)})

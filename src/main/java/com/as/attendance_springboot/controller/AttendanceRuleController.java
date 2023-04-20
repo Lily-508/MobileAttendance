@@ -92,7 +92,7 @@ public class AttendanceRuleController extends BaseController {
             400, message = "删除失败,有外键依赖", response = BaseResult.class)})
     public ResponseEntity<BaseResult> deleteDepartment(@RequestParam Integer aId) {
         //外键依赖判断 CASCADE依赖公司表 直接删除
-        BaseResult result = super.deleteModel(attendanceRuleService.removeById(aId), "删除失败,有外键依赖");
+        BaseResult result = super.deleteModel(attendanceRuleService.removeById(aId));
         return ResponseEntity.status(result.getCode()).body(result);
     }
     private boolean isErrorCompanyId(AttendanceRule attendanceRule){

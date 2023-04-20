@@ -39,7 +39,6 @@ public class CompanyController extends BaseController {
             400, message = "查询失败", response = DataResult.class)})
     public ResponseEntity<DataResult<List<Company>>> getCompanyByCompanyName(@RequestParam(required = false) String key) {
         key = URLDecoder.decode(key, StandardCharsets.UTF_8);
-        log.info("输入关键词{}",key);
         LambdaQueryWrapper<Company>queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.like(Company::getCName,key).or().like(Company::getCContent,key);
         List<Company>list=companyService.list(queryWrapper);

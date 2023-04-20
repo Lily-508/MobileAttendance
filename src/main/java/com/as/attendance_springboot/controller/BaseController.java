@@ -1,5 +1,6 @@
 package com.as.attendance_springboot.controller;
 
+import com.as.attendance_springboot.model.Affair;
 import com.as.attendance_springboot.result.BaseResult;
 import com.as.attendance_springboot.result.DataResult;
 import com.as.attendance_springboot.result.PaginationResult;
@@ -10,8 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author xulili
@@ -26,18 +28,18 @@ public class BaseController {
     /**
      * 对前端参数校验结构判断
      * @param bindingResult 前端参数校验
-     * @param result 响应格式
+     * @param result        响应格式
      * @author xulili
      * @date 22:08 2023/4/12
      **/
-    public boolean validBindingResult(BindingResult bindingResult,BaseResult result) {
+    public boolean validBindingResult(BindingResult bindingResult, BaseResult result) {
         if (bindingResult.hasErrors()) {
             StringBuilder errorMsg = new StringBuilder();
             for (ObjectError error : bindingResult.getAllErrors()) {
                 errorMsg.append(error.getDefaultMessage());
             }
             result.setCode(400).setMsg(errorMsg.toString());
-            log.info("验证失败result:{}",result);
+            log.info("验证失败result:{}", result);
             return false;
         }
         return true;
@@ -83,8 +85,8 @@ public class BaseController {
 
     /**
      * 对新建模型的代码重构,泛型M代表实体类
-     * @param service ServiceImpl 对应service实例
-     * @param model 对应实体类
+     * @param service       ServiceImpl 对应service实例
+     * @param model         对应实体类
      * @param bindingResult 前端参数校验
      * @return com.as.attendance_springboot.result.BaseResult
      * @author xulili
@@ -92,7 +94,7 @@ public class BaseController {
      **/
     public <M> BaseResult setModel(ServiceImpl<?, M> service, M model, BindingResult bindingResult) {
         BaseResult result = new BaseResult();
-        if(!validBindingResult(bindingResult,result)){
+        if (!validBindingResult(bindingResult, result)) {
             return result;
         }
         if (service.save(model)) {
@@ -104,48 +106,51 @@ public class BaseController {
     }
     /**
      * 对新建并返回模型的代码重构,泛型M代表实体类
-     * @param service ServiceImpl 对应service实例
-     * @param model 对应实体类
+     * @param service       ServiceImpl 对应service实例
+     * @param model         对应实体类
      * @param bindingResult 前端参数校验
      * @return com.as.attendance_springboot.result.BaseResult
      * @author xulili
      * @date 22:09 2023/4/12
      **/
-    public <M>DataResult<M> setModelAndReturn(ServiceImpl<?, M> service, M model, BindingResult bindingResult){
-        DataResult<M> result =new DataResult<>();
-        if(!validBindingResult(bindingResult,result)){
+    public <M> DataResult<M> setModelAndReturn(ServiceImpl<?, M> service, M model, BindingResult bindingResult) {
+        DataResult<M> result = new DataResult<>();
+        if (!validBindingResult(bindingResult, result)) {
             return result;
         }
         //调用save方法后会自动为实体类赋id值
         log.info("调用saveOrUpdate");
-        try{
+        try {
             if (service.saveOrUpdate(model)) {
 
                 result.setCode(200).setMsg("新建成功").setData(model);
             } else {
                 result.setCode(500).setMsg("新建失败");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         log.info("调用saveOrUpdate结束");
         return result;
     }
+
     /**
      * 对编辑单主键模型的代码重构
-     * @param primaryId 表主键
-     * @param service ServiceImpl 对应service实例
-     * @param model 对应实体类
+     * @param primaryId     表主键
+     * @param service       ServiceImpl 对应service实例
+     * @param model         对应实体类
      * @param bindingResult 前端参数校验
      * @return com.as.attendance_springboot.result.BaseResult
      * @author xulili
      * @date 22:10 2023/4/12
      **/
-    public<M> BaseResult updateModelBySingle(Integer primaryId,ServiceImpl<?, M> service, M model,
-                                           BindingResult bindingResult) {
+    public <M> BaseResult updateModelBySingle(Integer primaryId,
+                                              ServiceImpl<?, M> service,
+                                              M model,
+                                              BindingResult bindingResult) {
         BaseResult result = new BaseResult();
-        if(!validBindingResult(bindingResult,result)){
+        if (!validBindingResult(bindingResult, result)) {
             return result;
         }
         if (primaryId == null) {
@@ -162,16 +167,16 @@ public class BaseController {
 
     /**
      * 对编辑复合主键模型的代码重构,复合主键都不为null故无需输入
-     * @param mppService MppServiceImpl 对应service实例
-     * @param model 对应实体类
+     * @param mppService    MppServiceImpl 对应service实例
+     * @param model         对应实体类
      * @param bindingResult 前端参数校验
      * @return com.as.attendance_springboot.result.BaseResult
      * @author xulili
      * @date 22:10 2023/4/12
      **/
-    public  <M> BaseResult updateModelByDouble(MppServiceImpl<?,M>mppService,M model, BindingResult bindingResult) {
+    public <M> BaseResult updateModelByDouble(MppServiceImpl<?, M> mppService, M model, BindingResult bindingResult) {
         BaseResult result = new BaseResult();
-        if(!validBindingResult(bindingResult,result)){
+        if (!validBindingResult(bindingResult, result)) {
             return result;
         }
         if (mppService.updateByMultiId(model)) {
@@ -189,13 +194,35 @@ public class BaseController {
      * @author xulili
      * @date 22:12 2023/4/12
      **/
-    public BaseResult deleteModel(boolean success, String errorMsg) {
+    public BaseResult deleteModel(boolean success) {
         BaseResult result = new BaseResult();
         if (success) {
             result.setCode(200).setMsg("删除成功");
         } else {
-            result.setCode(500).setMsg(Objects.requireNonNullElse(errorMsg, "删除失败"));
+            result.setCode(500).setMsg("删除失败");
         }
         return result;
+    }
+    /**
+     * 判断时间是否合理,total为空则赋值单位分钟
+     * @author xulili
+     * @date 10:26 2023/4/20
+     * @param model 四个事务子类
+     * @return boolean
+     **/
+    public <T extends Affair> boolean isErrorTime(T model) {
+        LocalDateTime start = model.getStartTime();
+        LocalDateTime end = model.getEndTime();
+        if (start.isBefore(end)) {
+            int total = (int) ChronoUnit.MINUTES.between(start, end);
+            if (model.getTotal() == null) {
+                model.setTotal(total);
+            } else {
+                return model.getTotal() == total;
+            }
+        } else {
+            return true;
+        }
+        return false;
     }
 }

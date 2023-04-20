@@ -161,7 +161,7 @@ public class VisitController extends BaseController {
             400, message = "删除失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> deleteDepartment(@RequestParam Integer vId) {
         //外键依赖判断 没有被用作外键直接删除
-        BaseResult result = super.deleteModel(visitService.removeById(vId), null);
+        BaseResult result = super.deleteModel(visitService.removeById(vId));
         return ResponseEntity.status(result.getCode()).body(result);
     }
 

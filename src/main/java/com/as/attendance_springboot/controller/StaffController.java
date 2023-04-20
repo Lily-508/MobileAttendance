@@ -144,7 +144,7 @@ public class StaffController extends BaseController{
     @ApiResponses({@ApiResponse(code = 200, message = "删除成功"), @ApiResponse(code = 400, message = "删除失败")})
     public ResponseEntity<BaseResult> deleteStaffByStaffId(@RequestParam int sId) {
         //员工表外键依赖都是CASCADE,SET NULL,直接删除
-        BaseResult result = super.deleteModel(staffService.removeById(sId),null);
+        BaseResult result = super.deleteModel(staffService.removeById(sId));
         return ResponseEntity.status(result.getCode()).body(result);
     }
 

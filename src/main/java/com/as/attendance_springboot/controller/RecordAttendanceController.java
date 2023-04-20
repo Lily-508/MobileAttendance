@@ -47,8 +47,8 @@ public class RecordAttendanceController extends BaseController {
     @GetMapping
     @ApiOperation("查询单个考勤记录,查询条件:考勤记录id")
     @ApiImplicitParams({@ApiImplicitParam(name = "rId", value = "考勤记录id", dataTypeClass = Integer.class)})
-    @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class), @ApiResponse(code =
-            400, message = "查询失败", response = DataResult.class)})
+    @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class),
+            @ApiResponse(code = 400, message = "查询失败", response = DataResult.class)})
     public ResponseEntity<DataResult<RecordAttendance>> getRecordAttendanceByRid(@RequestParam Integer rId) {
         DataResult<RecordAttendance> result = super.getModel(recordAttendanceService.getById(rId));
         return ResponseEntity.status(result.getCode()).body(result);
@@ -87,7 +87,7 @@ public class RecordAttendanceController extends BaseController {
         } else if (isErrorForeignId(recordAttendance)) {
             log.info("外键有效性判断:无效,员工id={},考勤规则id={}", recordAttendance.getSId(), recordAttendance.getAId());
             result.setCode(400).setMsg("错误的外键id");
-        } else if (recordAttendance.getRPunchIn() == null || recordAttendance.getPunchInPlace() == null || recordAttendance.getRDate() == null) {
+        } else if (recordAttendance.getRPunchIn() == null || recordAttendance.getPunchInPlace() == null || recordAttendance.getRDate() == null || recordAttendance.getRCategory() == null) {
             result.setCode(400).setMsg("签到参数格式错误");
         } else {
             LambdaQueryWrapper<RecordAttendance> queryWrapper = new LambdaQueryWrapper<>();
@@ -104,7 +104,8 @@ public class RecordAttendanceController extends BaseController {
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
-    @PostMapping("/punch-out")
+
+    @PutMapping("/punch-out")
     @ApiOperation("考勤签退")
     @ApiImplicitParam(name = "recordAttendance", value = "RecordAttendance类实例", dataTypeClass = RecordAttendance.class)
     @ApiResponses({@ApiResponse(code = 200, message = "签退成功", response = DataResult.class),
@@ -127,9 +128,9 @@ public class RecordAttendanceController extends BaseController {
             RecordAttendance record = recordAttendanceService.getById(recordAttendance.getRId());
             if (record == null) {
                 result.setCode(400).setMsg("请先签到");
-            } else if (record.getPunchOutPlace()!=null) {
+            } else if (record.getPunchOutPlace() != null) {
                 result.setCode(400).setMsg("签退操作只能进行一次");
-            } else if (recordAttendance.getRResult()==null) {
+            } else if (recordAttendance.getRResult() == null) {
                 decideRecordResultByTime(recordAttendance);
             } else if (recordAttendanceService.saveOrUpdate(recordAttendance)) {
                 result.setCode(200).setMsg("签到成功").setData(recordAttendance);

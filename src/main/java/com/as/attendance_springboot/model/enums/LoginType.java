@@ -2,9 +2,13 @@ package com.as.attendance_springboot.model.enums;
 
 import lombok.Getter;
 
+/**
+ * @author xulili
+ */
+
 @Getter
 public enum LoginType {
-    /**登陆方式*/
+    //登陆方式
     USERNAME_CODE(0,"用户名密码"),
     PHONE_CODE(1,"手机号验证码"),
     THIRD_PLATFORM(2,"第三方登陆");
