@@ -43,6 +43,7 @@ public class TakeVocationController extends BaseController {
     private StaffServiceImpl staffService;
     @Autowired
     private VocationQuotaServiceImpl vocationQuotaService;
+    private VocationQuota vocationQuota;
 
     @GetMapping
     @ApiOperation("查询请休假事务,查询条件:请休假事务id,员工id,公司id")
@@ -82,6 +83,7 @@ public class TakeVocationController extends BaseController {
     @ApiImplicitParam(name = "TakeVocation", value = "TakeVocation类实例", dataTypeClass = TakeVocation.class)
     @ApiResponses({@ApiResponse(code = 200, message = "新建成功", response = BaseResult.class),
             @ApiResponse(code = 400, message = "错误的外键id", response = BaseResult.class),
+            @ApiResponse(code = 400, message = "假期额度不足", response = BaseResult.class),
             @ApiResponse(code = 500, message = "新建失败", response = BaseResult.class),
             @ApiResponse(code = 400, message = "请休假事务开始或结束时间不能为空", response = BaseResult.class)})
     public ResponseEntity<BaseResult> setTakeVocation(@NotNull @Valid @RequestBody TakeVocation takeVocation,
@@ -91,6 +93,8 @@ public class TakeVocationController extends BaseController {
             result.setCode(400).setMsg("错误的外键id");
         } else if (super.isErrorTime(takeVocation)) {
             result.setCode(400).setMsg("错误的时间");
+        } else if (isErrorVocationQuota(takeVocation)) {
+            result.setCode(400).setMsg("假期额度不足");
         } else {
             result = super.setModel(takeVocationService, takeVocation, bindingResult);
         }
@@ -103,6 +107,7 @@ public class TakeVocationController extends BaseController {
     @ApiResponses({@ApiResponse(code = 200, message = "编辑成功"),
             @ApiResponse(code = 400, message = "错误的外键id"),
             @ApiResponse(code = 400, message = "错误的时间"),
+            @ApiResponse(code = 400, message = "假期额度不足"),
             @ApiResponse(code = 500, message = "编辑失败")})
     public ResponseEntity<BaseResult> updateTakeVocation(@NotNull @Valid @RequestBody TakeVocation takeVocation,
                                                          BindingResult bindingResult) {
@@ -111,9 +116,15 @@ public class TakeVocationController extends BaseController {
             result.setCode(400).setMsg("错误的外键id");
         } else if (super.isErrorTime(takeVocation)) {
             result.setCode(400).setMsg("错误的时间");
+        } else if (isErrorVocationQuota(takeVocation)) {
+            result.setCode(400).setMsg("假期额度不足");
         } else {
-            result = super.updateModelBySingle(takeVocation.getTkId(), takeVocationService, takeVocation,
-                                               bindingResult);
+            result = super.updateModelBySingle(takeVocation.getTkId(), takeVocationService, takeVocation, bindingResult);
+            //事务审核通过,对应假期额度减少
+            if (result.getCode()==200&&takeVocation.getResult() == AuditType.AGREE){
+                this.vocationQuota.setVDuration(vocationQuota.getVDuration() - takeVocation.getTotal());
+                vocationQuotaService.updateByMultiId(this.vocationQuota);
+            }
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -144,5 +155,12 @@ public class TakeVocationController extends BaseController {
                           .eq(VocationQuota::getSId, takeVocation.getSId());
         VocationQuota vocationQuota = vocationQuotaService.getOne(lambdaQueryWrapper);
         return staff == null || reviewer == null || vocationQuota == null || reviewer.getSRight() != StaffRight.LEADER;
+    }
+
+    private boolean isErrorVocationQuota(TakeVocation takeVocation) {
+        LambdaQueryWrapper<VocationQuota> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(VocationQuota::getSId, takeVocation.getSId()).eq(VocationQuota::getVId, takeVocation.getVId());
+        this.vocationQuota = vocationQuotaService.getOne(queryWrapper);
+        return vocationQuota.getVDuration() < takeVocation.getTotal();
     }
 }

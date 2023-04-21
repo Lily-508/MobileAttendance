@@ -27,7 +27,7 @@ public class WorkOutside extends Affair {
     @TableId(value = "wu_id",type = IdType.AUTO)
     @JsonProperty(value = "wuId")
     private Integer wuId;
-    @NotNull(message = "cId不为null")
-    @JsonProperty(value = "cId")
-    private Integer cId;
+    @NotNull(message = "aId不为null")
+    @JsonProperty(value = "aId")
+    private Integer aId;
 }

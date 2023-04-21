@@ -2,13 +2,13 @@ package com.as.attendance_springboot.controller;
 
 import com.as.attendance_springboot.model.AttendanceRule;
 import com.as.attendance_springboot.model.RecordAttendance;
+import com.as.attendance_springboot.model.WorkOutside;
+import com.as.attendance_springboot.model.enums.RecordCategoryType;
 import com.as.attendance_springboot.model.enums.RecordResultType;
 import com.as.attendance_springboot.result.BaseResult;
 import com.as.attendance_springboot.result.DataResult;
 import com.as.attendance_springboot.result.PaginationResult;
-import com.as.attendance_springboot.service.impl.AttendanceRuleServiceImpl;
-import com.as.attendance_springboot.service.impl.RecordAttendanceServiceImpl;
-import com.as.attendance_springboot.service.impl.StaffServiceImpl;
+import com.as.attendance_springboot.service.impl.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -24,6 +24,7 @@ import javax.validation.Valid;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 /**
  * @author xulili
@@ -43,6 +44,10 @@ public class RecordAttendanceController extends BaseController {
     private AttendanceRuleServiceImpl attendanceRuleService;
     @Autowired
     private StaffServiceImpl staffService;
+    @Autowired
+    private CompanyServiceImpl companyService;
+    @Autowired
+    private WorkOutsideServiceImpl workOutsideService;
 
     @GetMapping
     @ApiOperation("查询单个考勤记录,查询条件:考勤记录id")
@@ -77,6 +82,7 @@ public class RecordAttendanceController extends BaseController {
     @ApiResponses({@ApiResponse(code = 200, message = "签到成功", response = DataResult.class),
             @ApiResponse(code = 500, message = "签到失败", response = DataResult.class),
             @ApiResponse(code = 400, message = "错误的外键id", response = DataResult.class),
+            @ApiResponse(code = 400, message = "没有对应外派事务", response = DataResult.class),
             @ApiResponse(code = 400, message = "签到参数格式错误", response = DataResult.class),
             @ApiResponse(code = 400, message = "签到操作只能进行一次", response = DataResult.class)})
     public ResponseEntity<DataResult<RecordAttendance>> recordPunchIn(
@@ -86,13 +92,12 @@ public class RecordAttendanceController extends BaseController {
         if (!super.validBindingResult(bindingResult, result)) {
             return ResponseEntity.status(result.getCode()).body(result);
         } else if (isErrorForeignId(recordAttendance)) {
-            log.info("外键有效性判断:无效,员工id={},考勤规则id={}",
-                     recordAttendance.getSId(),
-                     recordAttendance.getAId());
             result.setCode(400).setMsg("错误的外键id");
         } else if (recordAttendance.getRPunchIn() == null || recordAttendance.getPunchInPlace() == null ||
                 recordAttendance.getRDate() == null || recordAttendance.getRCategory() == null) {
             result.setCode(400).setMsg("签到参数格式错误");
+        } else if (!isCorrectWorkOutside(recordAttendance)) {
+            result.setCode(400).setMsg("没有对应外派事务");
         } else {
             LambdaQueryWrapper<RecordAttendance> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(RecordAttendance::getSId, recordAttendance.getSId())
@@ -123,11 +128,6 @@ public class RecordAttendanceController extends BaseController {
         DataResult<RecordAttendance> result = new DataResult<>();
         if (!super.validBindingResult(bindingResult, result)) {
             return ResponseEntity.status(result.getCode()).body(result);
-        } else if (isErrorForeignId(recordAttendance)) {
-            log.info("外键有效性判断:无效,员工id={},考勤规则id={}",
-                     recordAttendance.getSId(),
-                     recordAttendance.getAId());
-            result.setCode(400).setMsg("错误的外键id");
         } else if (recordAttendance.getRPunchOut() == null || recordAttendance.getPunchOutPlace() == null ||
                 recordAttendance.getRId() == null) {
             result.setCode(400).setMsg("签退参数格式错误");
@@ -149,12 +149,38 @@ public class RecordAttendanceController extends BaseController {
     }
 
     private boolean isErrorForeignId(RecordAttendance recordAttendance) {
+        log.info("外键有效性判断:无效,员工id={},考勤规则id={}",
+                 recordAttendance.getSId(),
+                 recordAttendance.getAId());
         if (recordAttendance.getSId() != null && recordAttendance.getAId() != null) {
             return staffService.getById(recordAttendance.getSId()) == null || attendanceRuleService.getById(
                     recordAttendance.getAId()) == null;
         } else {
             return true;
         }
+    }
+
+    private boolean isCorrectWorkOutside(RecordAttendance recordAttendance) {
+        boolean correct = false;
+        if (recordAttendance.getRCategory() == RecordCategoryType.OUTSIDE) {
+            LambdaQueryWrapper<WorkOutside> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(WorkOutside::getAId, recordAttendance.getAId())
+                        .eq(WorkOutside::getSId, recordAttendance.getSId());
+            log.info("检查是否有对应外派事务");
+            List<WorkOutside> workOutsideList = workOutsideService.list(queryWrapper);
+            LocalDate recordDate = recordAttendance.getRDate();
+            for (WorkOutside workOutside : workOutsideList) {
+                LocalDate start = workOutside.getStartTime().toLocalDate();
+                LocalDate end = workOutside.getEndTime().toLocalDate();
+                if (recordDate.isAfter(start) && recordDate.isBefore(end)) {
+                    correct = true;
+                    break;
+                }
+            }
+        } else {
+            correct = true;
+        }
+        return correct;
     }
 
     private void decideRecordResultByTime(RecordAttendance recordAttendance) {

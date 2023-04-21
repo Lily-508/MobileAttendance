@@ -1,9 +1,15 @@
 package com.as.attendance_springboot.controller;
 
+import com.as.attendance_springboot.model.AttendanceRule;
 import com.as.attendance_springboot.model.Company;
+import com.as.attendance_springboot.model.Visit;
+import com.as.attendance_springboot.model.WorkOutside;
 import com.as.attendance_springboot.result.BaseResult;
 import com.as.attendance_springboot.result.DataResult;
+import com.as.attendance_springboot.service.impl.AttendanceRuleServiceImpl;
 import com.as.attendance_springboot.service.impl.CompanyServiceImpl;
+import com.as.attendance_springboot.service.impl.VisitServiceImpl;
+import com.as.attendance_springboot.service.impl.WorkOutsideServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +37,12 @@ import java.util.List;
 public class CompanyController extends BaseController {
     @Autowired
     private CompanyServiceImpl companyService;
-
+    @Autowired
+    private AttendanceRuleServiceImpl attendanceRuleService;
+    @Autowired
+    private WorkOutsideServiceImpl workOutsideService;
+    @Autowired
+    private VisitServiceImpl visitService;
     @GetMapping
     @ApiOperation("查询公司,查询条件:关键词")
     @ApiImplicitParam(name = "key", value = "关键词", dataTypeClass = String.class)
@@ -70,14 +81,28 @@ public class CompanyController extends BaseController {
     }
 
     @DeleteMapping
-    @ApiOperation("删除没有外键依赖公司")
+    @ApiOperation("删除没有被外键依赖公司")
     @ApiImplicitParam(name = "cId", value = "公司id", dataTypeClass = Integer.class)
     @ApiResponses({@ApiResponse(code = 200, message = "删除成功", response = BaseResult.class),
-            @ApiResponse(code = 500, message = "删除失败", response = BaseResult.class)})
+            @ApiResponse(code = 500, message = "删除失败", response = BaseResult.class),
+            @ApiResponse(code = 400, message = "删除失败,被外键依赖", response = BaseResult.class)})
     public ResponseEntity<BaseResult> deleteDepartment(@RequestParam Integer cId) {
         BaseResult result = new BaseResult();
-        //外键依赖判断 考勤规则,外勤记录,拜访表
-//        LambdaQueryWrapper<Staff> queryWrapper=new LambdaQueryWrapper<>();
+        //被外键依赖,外派记录,考勤规则,拜访表
+        LambdaQueryWrapper<AttendanceRule> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(AttendanceRule::getCId, cId);
+        LambdaQueryWrapper<Visit> queryWrapper2 = new LambdaQueryWrapper<>();
+        queryWrapper2.eq(Visit::getCId, cId);
+        LambdaQueryWrapper<WorkOutside> queryWrapper3 = new LambdaQueryWrapper<>();
+        queryWrapper3.eq(WorkOutside::getCId, cId);
+        AttendanceRule attendanceRule = attendanceRuleService.getOne(queryWrapper);
+        Visit visit=visitService.getOne(queryWrapper2);
+        WorkOutside workOutside=workOutsideService.getOne(queryWrapper3);
+        if(attendanceRule==null&&visit==null&&workOutside==null){
+            result = super.deleteModel(companyService.removeById(cId));
+        }else {
+            result.setCode(400).setMsg("删除失败,被外键依赖");
+        }
         return ResponseEntity.status(result.getCode()).body(result);
 
     }

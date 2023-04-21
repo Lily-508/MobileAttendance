@@ -2,11 +2,13 @@ package com.as.attendance_springboot.controller;
 
 import com.as.attendance_springboot.model.Department;
 import com.as.attendance_springboot.model.Staff;
+import com.as.attendance_springboot.model.Visit;
 import com.as.attendance_springboot.model.enums.StaffRight;
 import com.as.attendance_springboot.result.BaseResult;
 import com.as.attendance_springboot.result.DataResult;
 import com.as.attendance_springboot.service.impl.DepartmentServiceImpl;
 import com.as.attendance_springboot.service.impl.StaffServiceImpl;
+import com.as.attendance_springboot.service.impl.VisitServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +36,8 @@ public class DepartmentController extends BaseController {
     private DepartmentServiceImpl departmentService;
     @Autowired
     private StaffServiceImpl staffService;
-
+    @Autowired
+    private VisitServiceImpl visitService;
     //拜访表service
     @GetMapping
     @ApiOperation("查询部门,查询条件:部门id,领导id")
@@ -93,16 +96,25 @@ public class DepartmentController extends BaseController {
     }
 
     @DeleteMapping
-    @ApiOperation("删除没有外键依赖部门")
+    @ApiOperation("删除没有被外键依赖部门")
     @ApiImplicitParam(name = "dId", value = "部门id", dataTypeClass = Integer.class)
     @ApiResponses({@ApiResponse(code = 200, message = "删除成功", response = BaseResult.class),
+            @ApiResponse(code = 400, message = "删除失败,被外键依赖", response = BaseResult.class),
             @ApiResponse(code = 500, message = "删除失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> deleteDepartment(@RequestParam Integer dId) {
-        //外键依赖员工表,拜访计划表
+        BaseResult result=new BaseResult();
+        //被外键依赖员工表,拜访计划表
         LambdaQueryWrapper<Staff> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Staff::getDId, dId);
+        LambdaQueryWrapper<Visit> queryWrapper2 = new LambdaQueryWrapper<>();
+        queryWrapper2.eq(Visit::getDId, dId);
         Staff staff = staffService.getOne(queryWrapper);
-        BaseResult result = super.deleteModel(staff == null);
+        Visit visit=visitService.getOne(queryWrapper2);
+        if(staff==null&&visit==null){
+            result= super.deleteModel(departmentService.removeById(dId));
+        }else{
+            result.setCode(400).setMsg("删除失败,被外键依赖");
+        }
         return ResponseEntity.status(result.getCode()).body(result);
     }
 

@@ -1,13 +1,13 @@
 package com.as.attendance_springboot.controller;
 
-import com.as.attendance_springboot.model.Company;
+import com.as.attendance_springboot.model.AttendanceRule;
 import com.as.attendance_springboot.model.Staff;
 import com.as.attendance_springboot.model.WorkOutside;
 import com.as.attendance_springboot.model.enums.AuditType;
 import com.as.attendance_springboot.model.enums.StaffRight;
 import com.as.attendance_springboot.result.BaseResult;
 import com.as.attendance_springboot.result.DataResult;
-import com.as.attendance_springboot.service.impl.CompanyServiceImpl;
+import com.as.attendance_springboot.service.impl.AttendanceRuleServiceImpl;
 import com.as.attendance_springboot.service.impl.StaffServiceImpl;
 import com.as.attendance_springboot.service.impl.WorkOutsideServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -39,7 +39,7 @@ public class WorkOutsideController extends BaseController {
     @Autowired
     private StaffServiceImpl staffService;
     @Autowired
-    private CompanyServiceImpl companyService;
+    private AttendanceRuleServiceImpl attendanceRuleService;
 
     @GetMapping
     @ApiOperation("查询外派事务,查询条件:外派事务id,员工id,公司id")
@@ -62,7 +62,7 @@ public class WorkOutsideController extends BaseController {
             queryWrapper.eq(WorkOutside::getSId, sId);
         }
         if (cId != null) {
-            queryWrapper.eq(WorkOutside::getCId, cId);
+            queryWrapper.inSql(WorkOutside::getAId,"select a_id from `attendance_rule` where c_id="+cId);
         }
         if (reviewerId != null) {
             queryWrapper.eq(WorkOutside::getReviewer, reviewerId);
@@ -132,7 +132,7 @@ public class WorkOutsideController extends BaseController {
     private boolean isErrorForeignId(WorkOutside workOutside) {
         Staff staff = staffService.getById(workOutside.getSId());
         Staff reviewer = staffService.getById(workOutside.getReviewer());
-        Company company = companyService.getById(workOutside.getCId());
-        return staff == null || reviewer == null || company == null || reviewer.getSRight() != StaffRight.LEADER;
+        AttendanceRule attendanceRule = attendanceRuleService.getById(workOutside.getAId());
+        return staff == null || reviewer == null || attendanceRule == null || reviewer.getSRight() != StaffRight.LEADER;
     }
 }
