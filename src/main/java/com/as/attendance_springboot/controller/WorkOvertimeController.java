@@ -42,7 +42,7 @@ public class WorkOvertimeController extends BaseController{
             @ApiImplicitParam(name = "sId", value = "员工id", dataTypeClass = Integer.class),
             @ApiImplicitParam(name = "reviewerId", value = "审核人id", dataTypeClass = Integer.class)})
     @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class),
-            @ApiResponse(code = 400, message = "查询失败", response = DataResult.class)})
+            @ApiResponse(code = 500, message = "查询失败", response = DataResult.class)})
     public ResponseEntity<DataResult<List<WorkOvertime>>> getWorkOvertime(@RequestParam(required = false)Integer wvId,
                                                                         @RequestParam(required = false)Integer sId,
                                                                         @RequestParam(required = false)Integer reviewerId){
@@ -66,7 +66,7 @@ public class WorkOvertimeController extends BaseController{
     @ApiImplicitParam(name = "workOvertime", value = "WorkOvertime类实例", dataTypeClass = WorkOvertime.class)
     @ApiResponses({@ApiResponse(code = 200, message = "新建成功", response = BaseResult.class),
             @ApiResponse(code = 400, message = "错误的外键id", response = BaseResult.class),
-            @ApiResponse(code = 400, message = "新建失败", response = BaseResult.class),
+            @ApiResponse(code = 500, message = "新建失败", response = BaseResult.class),
             @ApiResponse(code = 400, message = "错误的时间", response = BaseResult.class)})
     public ResponseEntity<BaseResult> setWorkOvertime(@NotNull @Valid @RequestBody WorkOvertime workOvertime,
                                                      BindingResult bindingResult) {
@@ -84,6 +84,8 @@ public class WorkOvertimeController extends BaseController{
     @ApiOperation("编辑加班事务")
     @ApiImplicitParam(name = "workOvertime", value = "对应WorkOvertime的JSON数据", dataTypeClass = String.class)
     @ApiResponses({@ApiResponse(code = 200, message = "编辑成功"),
+            @ApiResponse(code = 400, message = "错误的外键id"),
+            @ApiResponse(code = 400, message = "错误的时间"),
             @ApiResponse(code = 500, message = "编辑失败")})
     public ResponseEntity<BaseResult> updateWorkOvertime(@NotNull @Valid @RequestBody WorkOvertime workOvertime,
                                                         BindingResult bindingResult) {
@@ -102,7 +104,7 @@ public class WorkOvertimeController extends BaseController{
     @ApiImplicitParam(name = "wvId", value = "加班事务id", dataTypeClass = Integer.class)
     @ApiResponses({@ApiResponse(code = 200, message = "删除成功", response = BaseResult.class),
             @ApiResponse(code = 200, message = "对应事务不存在或已审核通过", response = BaseResult.class),
-            @ApiResponse(code = 400, message = "删除失败", response = BaseResult.class)})
+            @ApiResponse(code = 500, message = "删除失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> deleteWorkOvertime(@RequestParam Integer wvId) {
         BaseResult result = new BaseResult();
         WorkOvertime workOvertime=workOvertimeService.getById(wvId);

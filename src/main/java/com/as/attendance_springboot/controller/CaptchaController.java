@@ -38,9 +38,7 @@ public class CaptchaController {
         String code=lineCaptcha.getCode();
         String uuid= UUID.randomUUID().toString();
         log.info("uuid={},code={}",uuid,code);
-        log.info("Redis缓存开始");
         redisUtil.set(uuid, code,15*60);
-        log.info("Redis缓存 "+code);
         httpServletResponse.setContentType("image/png");
         httpServletResponse.setHeader("uuid",uuid);
         httpServletResponse.setStatus(200);
@@ -50,7 +48,7 @@ public class CaptchaController {
             responseOutputStream.flush();
             responseOutputStream.close();
         }catch (IOException e) {
-            throw new IOException("读取响应流失败"+e.getMessage());
+            e.printStackTrace();
         }
     }
 }

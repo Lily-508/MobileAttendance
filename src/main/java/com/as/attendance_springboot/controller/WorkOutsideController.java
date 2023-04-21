@@ -33,13 +33,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/work-outside")
 @Slf4j
-public class WorkOutsideController extends BaseController{
+public class WorkOutsideController extends BaseController {
     @Autowired
     private WorkOutsideServiceImpl workOutsideService;
     @Autowired
     private StaffServiceImpl staffService;
     @Autowired
     private CompanyServiceImpl companyService;
+
     @GetMapping
     @ApiOperation("查询外派事务,查询条件:外派事务id,员工id,公司id")
     @ApiImplicitParams({@ApiImplicitParam(name = "wuId", value = "外派事务id", dataTypeClass = Integer.class),
@@ -47,85 +48,91 @@ public class WorkOutsideController extends BaseController{
             @ApiImplicitParam(name = "reviewerId", value = "审核人id", dataTypeClass = Integer.class),
             @ApiImplicitParam(name = "cId", value = "公司id", dataTypeClass = Integer.class)})
     @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class),
-            @ApiResponse(code = 400, message = "查询失败", response = DataResult.class)})
-    public ResponseEntity<DataResult<List<WorkOutside>>> getWorkOutside(@RequestParam(required = false)Integer wuId,
-                                                                        @RequestParam(required = false)Integer sId,
-                                                                        @RequestParam(required = false)Integer reviewerId,
-                                                                        @RequestParam(required = false)Integer cId){
+            @ApiResponse(code = 500, message = "查询失败", response = DataResult.class)})
+    public ResponseEntity<DataResult<List<WorkOutside>>> getWorkOutside(@RequestParam(required = false) Integer wuId,
+                                                                        @RequestParam(required = false) Integer sId,
+                                                                        @RequestParam(required = false) Integer reviewerId,
+                                                                        @RequestParam(required = false) Integer cId) {
         DataResult<List<WorkOutside>> result;
-        LambdaQueryWrapper<WorkOutside>queryWrapper=new LambdaQueryWrapper<>();
-        if(wuId!=null){
-            queryWrapper.eq(WorkOutside::getWuId,wuId);
+        LambdaQueryWrapper<WorkOutside> queryWrapper = new LambdaQueryWrapper<>();
+        if (wuId != null) {
+            queryWrapper.eq(WorkOutside::getWuId, wuId);
         }
-        if(sId!=null){
-            queryWrapper.eq(WorkOutside::getSId,sId);
+        if (sId != null) {
+            queryWrapper.eq(WorkOutside::getSId, sId);
         }
-        if(cId!=null){
-            queryWrapper.eq(WorkOutside::getCId,cId);
+        if (cId != null) {
+            queryWrapper.eq(WorkOutside::getCId, cId);
         }
-        if(reviewerId!=null){
-            queryWrapper.eq(WorkOutside::getReviewer,reviewerId);
+        if (reviewerId != null) {
+            queryWrapper.eq(WorkOutside::getReviewer, reviewerId);
         }
-        List<WorkOutside>list=workOutsideService.list(queryWrapper);
-        result=super.getModel(list);
+        List<WorkOutside> list = workOutsideService.list(queryWrapper);
+        result = super.getModel(list);
         return ResponseEntity.status(result.getCode()).body(result);
     }
+
     @PostMapping
     @ApiOperation("新建外派事务")
     @ApiImplicitParam(name = "workOutside", value = "WorkOutside类实例", dataTypeClass = WorkOutside.class)
     @ApiResponses({@ApiResponse(code = 200, message = "新建成功", response = BaseResult.class),
             @ApiResponse(code = 400, message = "错误的外键id", response = BaseResult.class),
-            @ApiResponse(code = 400, message = "新建失败", response = BaseResult.class),
+            @ApiResponse(code = 500, message = "新建失败", response = BaseResult.class),
             @ApiResponse(code = 400, message = "错误的时间", response = BaseResult.class)})
     public ResponseEntity<BaseResult> setWorkOutside(@NotNull @Valid @RequestBody WorkOutside workOutside,
-                                               BindingResult bindingResult) {
+                                                     BindingResult bindingResult) {
         BaseResult result = new BaseResult();
-        if(isErrorForeignId(workOutside)){
+        if (isErrorForeignId(workOutside)) {
             result.setCode(400).setMsg("错误的外键id");
-        }else if(super.isErrorTime(workOutside)){
+        } else if (super.isErrorTime(workOutside)) {
             result.setCode(400).setMsg("错误的时间");
-        }else {
-            result=super.setModel(workOutsideService,workOutside,bindingResult);
+        } else {
+            result = super.setModel(workOutsideService, workOutside, bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
+
     @PutMapping
     @ApiOperation("编辑外派事务")
     @ApiImplicitParam(name = "workOutside", value = "对应WorkOutside的JSON数据", dataTypeClass = String.class)
     @ApiResponses({@ApiResponse(code = 200, message = "编辑成功"),
+            @ApiResponse(code = 400, message = "错误的外键id"),
+            @ApiResponse(code = 400, message = "错误的时间"),
             @ApiResponse(code = 500, message = "编辑失败")})
     public ResponseEntity<BaseResult> updateWorkOutside(@NotNull @Valid @RequestBody WorkOutside workOutside,
                                                         BindingResult bindingResult) {
         BaseResult result = new BaseResult();
-        if(isErrorForeignId(workOutside)){
+        if (isErrorForeignId(workOutside)) {
             result.setCode(400).setMsg("错误的外键id");
-        }else if(super.isErrorTime(workOutside)){
+        } else if (super.isErrorTime(workOutside)) {
             result.setCode(400).setMsg("错误的时间");
-        }else {
-            result=super.updateModelBySingle(workOutside.getWuId(),workOutsideService,workOutside,bindingResult);
+        } else {
+            result = super.updateModelBySingle(workOutside.getWuId(), workOutsideService, workOutside, bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
+
     @DeleteMapping
     @ApiOperation("删除未通过的外派事务")
     @ApiImplicitParam(name = "wuId", value = "外派事务id", dataTypeClass = Integer.class)
     @ApiResponses({@ApiResponse(code = 200, message = "删除成功", response = BaseResult.class),
             @ApiResponse(code = 200, message = "对应事务不存在或已审核通过", response = BaseResult.class),
-            @ApiResponse(code = 400, message = "删除失败", response = BaseResult.class)})
+            @ApiResponse(code = 500, message = "删除失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> deleteWorkOutside(@RequestParam Integer wuId) {
         BaseResult result = new BaseResult();
-        WorkOutside workOutside=workOutsideService.getById(wuId);
-        if(workOutside==null||workOutside.getResult()== AuditType.AGREE){
+        WorkOutside workOutside = workOutsideService.getById(wuId);
+        if (workOutside == null || workOutside.getResult() == AuditType.AGREE) {
             result.setCode(400).setMsg("对应事务不存在或已审核通过");
-        }else {
-            result=super.deleteModel(workOutsideService.removeById(wuId));
+        } else {
+            result = super.deleteModel(workOutsideService.removeById(wuId));
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
-    private boolean isErrorForeignId(WorkOutside workOutside){
-        Staff staff=staffService.getById(workOutside.getSId());
-        Staff reviewer=staffService.getById(workOutside.getReviewer());
-        Company company=companyService.getById(workOutside.getCId());
-        return staff==null||reviewer==null||company==null||reviewer.getSRight()!= StaffRight.LEADER;
+
+    private boolean isErrorForeignId(WorkOutside workOutside) {
+        Staff staff = staffService.getById(workOutside.getSId());
+        Staff reviewer = staffService.getById(workOutside.getReviewer());
+        Company company = companyService.getById(workOutside.getCId());
+        return staff == null || reviewer == null || company == null || reviewer.getSRight() != StaffRight.LEADER;
     }
 }

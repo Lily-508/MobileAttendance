@@ -32,8 +32,8 @@ public class HolidayController extends BaseController{
     @GetMapping
     @ApiOperation("查询假期,查询条件:年份")
     @ApiImplicitParam(name = "hYear", value = "年份名",dataTypeClass = Integer.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class), @ApiResponse(code =
-            400, message = "查询失败", response = DataResult.class)})
+    @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class),
+            @ApiResponse(code = 500, message = "查询失败", response = DataResult.class)})
     public ResponseEntity<DataResult<List<Holiday>>> getHolidayByHolidayYear(@RequestParam(required = false) Integer hYear) {
         LambdaQueryWrapper<Holiday>queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.like(Holiday::getHYear,hYear);
@@ -45,8 +45,8 @@ public class HolidayController extends BaseController{
     @PostMapping
     @ApiOperation("新建假期")
     @ApiImplicitParam(name = "holiday", value = "Holiday类实例", dataTypeClass = Holiday.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "新建成功", response = BaseResult.class), @ApiResponse(code =
-            400, message = "新建失败", response = BaseResult.class)})
+    @ApiResponses({@ApiResponse(code = 200, message = "新建成功", response = BaseResult.class),
+            @ApiResponse(code = 500, message = "新建失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> setHoliday(@Valid @RequestBody Holiday holiday,
                                                  BindingResult bindingResult) {
         BaseResult result = super.setModel(holidayService,holiday,bindingResult);
@@ -55,8 +55,8 @@ public class HolidayController extends BaseController{
     @PutMapping
     @ApiOperation("编辑假期")
     @ApiImplicitParam(name = "Holiday", value = "Holiday类实例", dataTypeClass = Holiday.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "编辑成功", response = BaseResult.class), @ApiResponse(code =
-            400, message = "编辑失败", response = BaseResult.class)})
+    @ApiResponses({@ApiResponse(code = 200, message = "编辑成功", response = BaseResult.class),
+            @ApiResponse(code = 500, message = "编辑失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> updateDepartment(@Valid @RequestBody Holiday holiday,
                                                        BindingResult bindingResult) {
         BaseResult result = super.updateModelBySingle(holiday.getHId(),holidayService,holiday,bindingResult);
@@ -65,8 +65,8 @@ public class HolidayController extends BaseController{
     @DeleteMapping
     @ApiOperation("删除假期")
     @ApiImplicitParam(name="hYear",value = "年份名",dataTypeClass = Integer.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "删除成功", response = BaseResult.class), @ApiResponse(code =
-            400, message = "删除失败", response = BaseResult.class)})
+    @ApiResponses({@ApiResponse(code = 200, message = "删除成功", response = BaseResult.class),
+            @ApiResponse(code = 500, message = "删除失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> deleteDepartment(@RequestParam Integer hId){
         BaseResult result = super.deleteModel(holidayService.removeById(hId));
         return ResponseEntity.status(result.getCode()).body(result);

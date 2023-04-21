@@ -43,7 +43,7 @@ public class VisitController extends BaseController {
             @ApiImplicitParam(name = "cId", value = "公司id", dataTypeClass = Integer.class),
             @ApiImplicitParam(name = "dId", value = "部门id", dataTypeClass = Integer.class)})
     @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class),
-            @ApiResponse(code = 400, message = "查询失败", response = DataResult.class)})
+            @ApiResponse(code = 500, message = "查询失败", response = DataResult.class)})
     public ResponseEntity<DataResult<List<Visit>>> getVisitById(@RequestParam(required = false) Integer vId,
                                                                 @RequestParam(required = false) Integer cId,
                                                                 @RequestParam(required = false) Integer dId) {
@@ -67,7 +67,7 @@ public class VisitController extends BaseController {
     @ApiImplicitParam(name = "visit", value = "Visit类实例", dataTypeClass = Visit.class)
     @ApiResponses({@ApiResponse(code = 200, message = "新建成功", response = BaseResult.class),
             @ApiResponse(code = 400, message = "错误的外键id", response = BaseResult.class),
-            @ApiResponse(code = 400, message = "新建失败", response = BaseResult.class),
+            @ApiResponse(code = 500, message = "新建失败", response = BaseResult.class),
             @ApiResponse(code = 400, message = "拜访计划开始或结束时间不能为空", response = BaseResult.class)})
     public ResponseEntity<BaseResult> setVisit(@NotNull @Valid @RequestBody Visit visit,
                                                BindingResult bindingResult) {
@@ -75,10 +75,10 @@ public class VisitController extends BaseController {
         if (isErrorForeignId(visit)) {
             log.info("VisitController外键有效性判断:无效,公司id={},部门id={}", visit.getCId(), visit.getDId());
             result.setCode(400).setMsg("错误的外键id");
-        } else if(visit.getVStart()==null||visit.getVEnd()==null) {
+        } else if (visit.getVStart() == null || visit.getVEnd() == null) {
             result.setCode(400).setMsg("拜访计划开始或结束时间不能为空");
-        }else{
-            result =super.setModel(visitService, visit, bindingResult);
+        } else {
+            result = super.setModel(visitService, visit, bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -87,7 +87,7 @@ public class VisitController extends BaseController {
     @ApiOperation("拜访签到")
     @ApiImplicitParam(name = "visit", value = "Visit类实例", dataTypeClass = Visit.class)
     @ApiResponses({@ApiResponse(code = 200, message = "签到成功", response = BaseResult.class),
-            @ApiResponse(code = 400, message = "签到失败", response = BaseResult.class),
+            @ApiResponse(code = 500, message = "签到失败", response = BaseResult.class),
             @ApiResponse(code = 400, message = "错误的外键id", response = BaseResult.class),
             @ApiResponse(code = 400, message = "签到参数格式错误", response = BaseResult.class),
             @ApiResponse(code = 400, message = "签到操作只能进行一次", response = BaseResult.class),
@@ -100,18 +100,18 @@ public class VisitController extends BaseController {
         } else if (isErrorForeignId(visit)) {
             log.info("外键有效性判断:无效,公司id={},部门id={}", visit.getCId(), visit.getDId());
             result.setCode(400).setMsg("错误的外键id");
-        }  else if(visit.getVPunchIn()==null||visit.getPunchInPlace()==null||visit.getVId() == null) {
+        } else if (visit.getVPunchIn() == null || visit.getPunchInPlace() == null || visit.getVId() == null) {
             result.setCode(400).setMsg("签到参数格式错误");
-        }else{
+        } else {
             Visit v = visitService.getById(visit.getVId());
             if (v == null) {
                 result.setCode(400).setMsg("拜访计划不存在");
-            }else if(v.getPunchInPlace()!=null){
+            } else if (v.getPunchInPlace() != null) {
                 result.setCode(400).setMsg("签到操作只能进行一次");
-            }else if (visitService.updateById(visit)) {
+            } else if (visitService.updateById(visit)) {
                 result.setCode(200).setMsg("签到成功");
             } else {
-                result.setCode(400).setMsg("签到失败");
+                result.setCode(500).setMsg("签到失败");
             }
         }
         return ResponseEntity.status(result.getCode()).body(result);
@@ -121,7 +121,7 @@ public class VisitController extends BaseController {
     @ApiOperation("拜访签退")
     @ApiImplicitParam(name = "visit", value = "Visit类实例", dataTypeClass = Visit.class)
     @ApiResponses({@ApiResponse(code = 200, message = "签退成功", response = BaseResult.class),
-            @ApiResponse(code = 400, message = "签退失败", response = BaseResult.class),
+            @ApiResponse(code = 500, message = "签退失败", response = BaseResult.class),
             @ApiResponse(code = 400, message = "错误的外键id", response = BaseResult.class),
             @ApiResponse(code = 400, message = "签退参数格式错误", response = BaseResult.class),
             @ApiResponse(code = 400, message = "签退操作只能进行一次", response = BaseResult.class),
@@ -132,10 +132,10 @@ public class VisitController extends BaseController {
         BaseResult result = new BaseResult();
         if (!super.validBindingResult(bindingResult, result)) {
             return ResponseEntity.status(result.getCode()).body(result);
-        }else if (isErrorForeignId(visit)) {
+        } else if (isErrorForeignId(visit)) {
             log.info("外键有效性判断:无效,公司id={},部门id={}", visit.getCId(), visit.getDId());
             result.setCode(400).setMsg("错误的外键id");
-        } else if (visit.getVPunchOut()==null||visit.getPunchOutPlace()==null||visit.getVId() == null) {
+        } else if (visit.getVPunchOut() == null || visit.getPunchOutPlace() == null || visit.getVId() == null) {
             result.setCode(400).setMsg("签退参数格式错误");
         } else {
             Visit v = visitService.getById(visit.getVId());
@@ -143,12 +143,12 @@ public class VisitController extends BaseController {
                 result.setCode(400).setMsg("拜访计划不存在");
             } else if (v.getVPunchIn() == null || v.getPunchInPlace() == null) {
                 result.setCode(400).setMsg("请先签到");
-            } else if (v.getVPunchOut()!=null) {
+            } else if (v.getVPunchOut() != null) {
 
             } else if (visitService.updateById(visit)) {
                 result.setCode(200).setMsg("签退成功");
             } else {
-                result.setCode(400).setMsg("签退失败");
+                result.setCode(500).setMsg("签退失败");
             }
         }
         return ResponseEntity.status(result.getCode()).body(result);
@@ -157,8 +157,8 @@ public class VisitController extends BaseController {
     @DeleteMapping
     @ApiOperation("删除拜访表")
     @ApiImplicitParam(name = "vId", value = "拜访表id", dataTypeClass = Integer.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "删除成功", response = BaseResult.class), @ApiResponse(code =
-            400, message = "删除失败", response = BaseResult.class)})
+    @ApiResponses({@ApiResponse(code = 200, message = "删除成功", response = BaseResult.class),
+            @ApiResponse(code = 500, message = "删除失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> deleteDepartment(@RequestParam Integer vId) {
         //外键依赖判断 没有被用作外键直接删除
         BaseResult result = super.deleteModel(visitService.removeById(vId));
@@ -166,7 +166,8 @@ public class VisitController extends BaseController {
     }
 
     private boolean isErrorForeignId(Visit visit) {
-        return visit.getCId() == null || visit.getDId() == null || departmentService.getById(visit.getDId()) == null || companyService.getById(visit.getCId()) == null;
+        return visit.getCId() == null || visit.getDId() == null || departmentService.getById(visit.getDId()) == null ||
+                companyService.getById(visit.getCId()) == null;
     }
 
 }

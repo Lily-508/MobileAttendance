@@ -60,14 +60,14 @@ public class StaffController extends BaseController {
     @PostMapping("/excel")
     @ApiOperation("excel员工表导入数据库")
     @ApiImplicitParam(name = "file", value = "excel文件", dataTypeClass = MultipartFile.class)
-    @ApiResponse(code = 200, message = "导入成功")
+    @ApiResponses({@ApiResponse(code = 200, message = "导入成功"),@ApiResponse(code = 500, message = "导入成功")})
     public ResponseEntity<BaseResult> importStaffExcel(MultipartFile file) throws IOException {
         boolean success = staffService.importStaffExcel(file);
         BaseResult result = new BaseResult();
         if (success) {
             result.setCode(200).setMsg("导入成功");
         } else {
-            result.setCode(400).setMsg("导入失败");
+            result.setCode(500).setMsg("导入失败");
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -82,6 +82,7 @@ public class StaffController extends BaseController {
             response.setContentType("application/x-msdownload");
             response.setHeader("Content-Disposition",
                                "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+            response.setStatus(200);
             staffService.exportStaffExcel(response.getOutputStream());
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,14 +92,14 @@ public class StaffController extends BaseController {
     @GetMapping
     @ApiOperation("根据sId查询对应员工")
     @ApiImplicitParam(name = "sId", value = "员工id", dataTypeClass = Integer.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class), @ApiResponse(code = 400,
-            message = "查询失败", response = DataResult.class)})
+    @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class),
+            @ApiResponse(code = 500, message = "查询失败", response = DataResult.class)})
     public ResponseEntity<DataResult<Staff>> getStaffByStaffId(@RequestParam int sId) {
         log.info("传入参数员工id={}", sId);
         Staff staff = staffService.getById(sId);
         DataResult<Staff> result = new DataResult<>();
         if (staff == null) {
-            result.setCode(400).setMsg("查询失败").setData(null);
+            result.setCode(500).setMsg("查询失败").setData(null);
         } else {
             staff.setSPwd(null);
             result.setCode(200).setMsg("查询成功").setData(staff);
@@ -109,8 +110,10 @@ public class StaffController extends BaseController {
     @PostMapping
     @ApiOperation("新建员工")
     @ApiImplicitParam(name = "staff", value = "必填dId,sName,sPwd", dataTypeClass = Staff.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "新建成功"), @ApiResponse(code = 400, message = "新建失败"),
-            @ApiResponse(code = 400, message = "参数校验错误信息"), @ApiResponse(code = 400, message = "手机号或邮箱不唯一")})
+    @ApiResponses({@ApiResponse(code = 200, message = "新建成功"),
+            @ApiResponse(code = 500, message = "新建失败"),
+            @ApiResponse(code = 400, message = "参数校验错误信息"),
+            @ApiResponse(code = 400, message = "手机号或邮箱不唯一")})
     public ResponseEntity<BaseResult> setStaff(@Valid @RequestBody Staff staff, BindingResult bindingResult) {
         BaseResult result = new BaseResult();
         if (isExistedPhoneOrEmail(staff)) {
@@ -126,8 +129,10 @@ public class StaffController extends BaseController {
     @PutMapping
     @ApiOperation("编辑员工")
     @ApiImplicitParam(name = "staff", value = "编辑后的Staff,sId必填", dataTypeClass = Staff.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "编辑成功"), @ApiResponse(code = 400, message = "编辑失败"),
-            @ApiResponse(code = 400, message = "参数校验错误信息"), @ApiResponse(code = 400, message = "手机号或邮箱不唯一")})
+    @ApiResponses({@ApiResponse(code = 200, message = "编辑成功"),
+            @ApiResponse(code = 500, message = "编辑失败"),
+            @ApiResponse(code = 400, message = "参数校验错误信息"),
+            @ApiResponse(code = 400, message = "手机号或邮箱不唯一")})
     public ResponseEntity<BaseResult> updateStaff(@Valid @RequestBody Staff staff, BindingResult bindingResult) {
         BaseResult result = new BaseResult();
         if (isExistedPhoneOrEmail(staff)) {
@@ -143,9 +148,9 @@ public class StaffController extends BaseController {
     @DeleteMapping
     @ApiOperation("删除员工")
     @ApiImplicitParam(name = "sId", value = "员工id", dataTypeClass = Integer.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "删除成功"), @ApiResponse(code = 400, message = "删除失败")})
+    @ApiResponses({@ApiResponse(code = 200, message = "删除成功"), @ApiResponse(code = 500, message = "删除失败")})
     public ResponseEntity<BaseResult> deleteStaffByStaffId(@RequestParam int sId) {
-        //员工表外键依赖都是CASCADE,SET NULL,直接删除
+        //员工表被外键依赖都是CASCADE,SET NULL,直接删除
         BaseResult result = super.deleteModel(staffService.removeById(sId));
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -153,6 +158,9 @@ public class StaffController extends BaseController {
     private boolean isExistedPhoneOrEmail(Staff staff) {
         String phone = staff.getSPhone();
         String email = staff.getSEmail();
+        if(phone==null&&email==null){
+            return false;
+        }
         LambdaQueryWrapper<Staff> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Staff::getSEmail, email).or().eq(Staff::getSPhone, phone);
         return staffService.getOne(queryWrapper) != null;

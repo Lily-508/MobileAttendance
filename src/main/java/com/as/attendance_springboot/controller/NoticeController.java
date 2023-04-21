@@ -24,7 +24,7 @@ import javax.validation.Valid;
 @RequestMapping("/notices")
 @Api(tags = "公告接口,提供公告新建,修改,查询,和删除操作")
 @Slf4j
-public class NoticeController extends BaseController{
+public class NoticeController extends BaseController {
     @Autowired
     private NoticeServiceImpl noticeService;
 
@@ -45,11 +45,12 @@ public class NoticeController extends BaseController{
     @PostMapping
     @ApiOperation("新建公告")
     @ApiImplicitParam(name = "notice", value = "对应Notice的JSON数据", dataTypeClass = Notice.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "添加Notice成功"), @ApiResponse(code = 500, message = "添加Notice失败")})
-    public ResponseEntity<BaseResult> setNotice(@NotNull  @Valid @RequestBody Notice notice,
+    @ApiResponses({@ApiResponse(code = 200, message = "添加Notice成功"),
+            @ApiResponse(code = 500, message = "添加Notice失败")})
+    public ResponseEntity<BaseResult> setNotice(@NotNull @Valid @RequestBody Notice notice,
                                                 BindingResult bindingResult) {
         log.info("传入notice={}", notice);
-        BaseResult result = super.setModel(noticeService,notice,bindingResult);
+        BaseResult result = super.setModel(noticeService, notice, bindingResult);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
@@ -60,14 +61,15 @@ public class NoticeController extends BaseController{
     public ResponseEntity<BaseResult> updateNotice(@NotNull @Valid @RequestBody Notice notice,
                                                    BindingResult bindingResult) {
         log.info("传入notice={}", notice);
-        BaseResult result = super.updateModelBySingle(notice.getNId(),noticeService,notice,bindingResult);
+        BaseResult result = super.updateModelBySingle(notice.getNId(), noticeService, notice, bindingResult);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
     @DeleteMapping
     @ApiOperation("删除公告")
     @ApiImplicitParam(name = "nId", value = "对应Notice的n_id", dataTypeClass = Integer.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "删除公告成功"), @ApiResponse(code = 500, message = "删除公告失败")})
+    @ApiResponses({@ApiResponse(code = 200, message = "删除公告成功"),
+            @ApiResponse(code = 500, message = "删除公告失败")})
     public ResponseEntity<BaseResult> deleteNoticeByNoticeId(@RequestParam int nId) {
         log.info("传入n_id={}", nId);
         BaseResult result = super.deleteModel(noticeService.removeById(nId));

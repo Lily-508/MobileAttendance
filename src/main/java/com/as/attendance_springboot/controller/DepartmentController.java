@@ -34,13 +34,14 @@ public class DepartmentController extends BaseController {
     private DepartmentServiceImpl departmentService;
     @Autowired
     private StaffServiceImpl staffService;
+
     //拜访表service
     @GetMapping
     @ApiOperation("查询部门,查询条件:部门id,领导id")
     @ApiImplicitParams({@ApiImplicitParam(name = "dId", value = "部门id", dataTypeClass = Integer.class),
             @ApiImplicitParam(name = "sId", value = "领导id", dataTypeClass = Integer.class)})
-    @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class), @ApiResponse(code =
-            400, message = "查询失败", response = DataResult.class)})
+    @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class),
+            @ApiResponse(code = 500, message = "查询失败", response = DataResult.class)})
     public ResponseEntity<DataResult<List<Department>>> getDepartmentById(@RequestParam(required = false) Integer dId,
                                                                           @RequestParam(required = false) Integer sId) {
         LambdaQueryWrapper<Department> queryWrapper = new LambdaQueryWrapper<>();
@@ -60,8 +61,8 @@ public class DepartmentController extends BaseController {
     @PostMapping
     @ApiOperation("新建部门")
     @ApiImplicitParam(name = "department", value = "Department类实例", dataTypeClass = Department.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "新建成功", response = BaseResult.class), @ApiResponse(code =
-            400, message = "新建失败", response = BaseResult.class)})
+    @ApiResponses({@ApiResponse(code = 200, message = "新建成功", response = BaseResult.class),
+            @ApiResponse(code = 500, message = "新建失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> setDepartment(@Valid @RequestBody Department department,
                                                     BindingResult bindingResult) {
         BaseResult result = new BaseResult();
@@ -69,7 +70,7 @@ public class DepartmentController extends BaseController {
         if (isErrorStaffId(sId)) {
             result.setCode(400).setMsg("负责人id没有对应权限");
         } else {
-            result = super.setModel(departmentService,department, bindingResult);
+            result = super.setModel(departmentService, department, bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -77,8 +78,8 @@ public class DepartmentController extends BaseController {
     @PutMapping
     @ApiOperation("编辑部门")
     @ApiImplicitParam(name = "department", value = "Department类实例", dataTypeClass = Department.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "编辑成功", response = BaseResult.class), @ApiResponse(code =
-            400, message = "编辑失败", response = BaseResult.class)})
+    @ApiResponses({@ApiResponse(code = 200, message = "编辑成功", response = BaseResult.class),
+            @ApiResponse(code = 500, message = "编辑失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> updateDepartment(@Valid @RequestBody Department department,
                                                        BindingResult bindingResult) {
         BaseResult result = new BaseResult();
@@ -86,7 +87,7 @@ public class DepartmentController extends BaseController {
         if (isErrorStaffId(sId)) {
             result.setCode(400).setMsg("负责人id没有对应权限");
         } else {
-            result = super.updateModelBySingle(department.getDId(), departmentService,department, bindingResult);
+            result = super.updateModelBySingle(department.getDId(), departmentService, department, bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -94,8 +95,8 @@ public class DepartmentController extends BaseController {
     @DeleteMapping
     @ApiOperation("删除没有外键依赖部门")
     @ApiImplicitParam(name = "dId", value = "部门id", dataTypeClass = Integer.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "删除成功", response = BaseResult.class), @ApiResponse(code =
-            400, message = "删除失败,有外键依赖", response = BaseResult.class)})
+    @ApiResponses({@ApiResponse(code = 200, message = "删除成功", response = BaseResult.class),
+            @ApiResponse(code = 500, message = "删除失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> deleteDepartment(@RequestParam Integer dId) {
         //外键依赖员工表,拜访计划表
         LambdaQueryWrapper<Staff> queryWrapper = new LambdaQueryWrapper<>();

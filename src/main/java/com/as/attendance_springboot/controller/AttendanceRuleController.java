@@ -36,21 +36,22 @@ public class AttendanceRuleController extends BaseController {
     private CompanyServiceImpl companyService;
     @Autowired
     private RecordAttendanceServiceImpl recordAttendanceService;
+
     @GetMapping
     @ApiOperation("查询考勤规则,查询条件:考勤规则id,公司id")
     @ApiImplicitParams({@ApiImplicitParam(name = "aId", value = "考勤规则id", dataTypeClass = Integer.class),
             @ApiImplicitParam(name = "cId", value = "公司id", dataTypeClass = Integer.class)})
-    @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class), @ApiResponse(code =
-            400, message = "查询失败", response = DataResult.class)})
-    public ResponseEntity<DataResult<List<AttendanceRule>>> getAttendanceRuleById(@RequestParam(required = false) Integer aId,
-                                                                                  @RequestParam(required = false) Integer cId) {
-        log.info("输入参数{},{}", aId,cId);
+    @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class),
+            @ApiResponse(code = 500, message = "查询失败", response = DataResult.class)})
+    public ResponseEntity<DataResult<List<AttendanceRule>>> getAttendanceRuleById(
+            @RequestParam(required = false) Integer aId,
+            @RequestParam(required = false) Integer cId) {
         LambdaQueryWrapper<AttendanceRule> queryWrapper = new LambdaQueryWrapper<>();
-        if(aId!=null){
-            queryWrapper.eq(AttendanceRule::getAId,aId);
+        if (aId != null) {
+            queryWrapper.eq(AttendanceRule::getAId, aId);
         }
-        if(cId!=null){
-            queryWrapper.eq(AttendanceRule::getCId,cId);
+        if (cId != null) {
+            queryWrapper.eq(AttendanceRule::getCId, cId);
         }
         List<AttendanceRule> list = attendanceRuleService.list(queryWrapper);
         DataResult<List<AttendanceRule>> result = super.getModel(list);
@@ -60,15 +61,16 @@ public class AttendanceRuleController extends BaseController {
     @PostMapping
     @ApiOperation("新建考勤规则")
     @ApiImplicitParam(name = "attendanceRule", value = "AttendanceRule类实例", dataTypeClass = AttendanceRule.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "新建成功", response = BaseResult.class), @ApiResponse(code =
-            400, message = "新建失败", response = BaseResult.class)})
+    @ApiResponses({@ApiResponse(code = 200, message = "新建成功", response = BaseResult.class),
+            @ApiResponse(code = 400, message = "错误的公司id", response = BaseResult.class),
+            @ApiResponse(code = 500, message = "新建失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> setAttendanceRule(@Valid @RequestBody AttendanceRule attendanceRule,
                                                         BindingResult bindingResult) {
-        BaseResult result =new BaseResult() ;
+        BaseResult result = new BaseResult();
         if (isErrorCompanyId(attendanceRule)) {
             result.setCode(400).setMsg("错误的公司id");
-        }else{
-            super.setModel(attendanceRuleService,attendanceRule, bindingResult);
+        } else {
+            super.setModel(attendanceRuleService, attendanceRule, bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -76,15 +78,16 @@ public class AttendanceRuleController extends BaseController {
     @PutMapping
     @ApiOperation("编辑考勤规则")
     @ApiImplicitParam(name = "attendanceRule", value = "AttendanceRule类实例", dataTypeClass = AttendanceRule.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "编辑成功", response = BaseResult.class), @ApiResponse(code =
-            400, message = "编辑失败", response = BaseResult.class)})
+    @ApiResponses({@ApiResponse(code = 200, message = "编辑成功", response = BaseResult.class),
+            @ApiResponse(code = 400, message = "错误的公司id", response = BaseResult.class),
+            @ApiResponse(code = 500, message = "编辑失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> updateDepartment(@Valid @RequestBody AttendanceRule attendanceRule,
                                                        BindingResult bindingResult) {
         BaseResult result = new BaseResult();
         if (isErrorCompanyId(attendanceRule)) {
             result.setCode(400).setMsg("错误的公司id");
-        }else{
-            super.updateModelBySingle(attendanceRule.getAId(), attendanceRuleService,attendanceRule, bindingResult);
+        } else {
+            super.updateModelBySingle(attendanceRule.getAId(), attendanceRuleService, attendanceRule, bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
@@ -94,19 +97,23 @@ public class AttendanceRuleController extends BaseController {
     @ApiImplicitParam(name = "aId", value = "考勤规则id", dataTypeClass = Integer.class)
     @ApiResponses({@ApiResponse(code = 200, message = "删除成功", response = BaseResult.class),
             @ApiResponse(code = 400, message = "已被考勤记录表外键依赖", response = BaseResult.class),
-            @ApiResponse(code = 400, message = "删除失败", response = BaseResult.class)})
+            @ApiResponse(code = 500, message = "删除失败", response = BaseResult.class)})
     public ResponseEntity<BaseResult> deleteDepartment(@RequestParam Integer aId) {
         //被考勤记录表外键依赖
-        BaseResult result =new BaseResult();
-        RecordAttendance recordAttendance=recordAttendanceService.getOne(new LambdaQueryWrapper<RecordAttendance>().eq(RecordAttendance::getAId,aId));
-        if(recordAttendance!=null){
+        BaseResult result = new BaseResult();
+        RecordAttendance recordAttendance =
+                recordAttendanceService.getOne(new LambdaQueryWrapper<RecordAttendance>().eq(
+                        RecordAttendance::getAId,
+                        aId));
+        if (recordAttendance != null) {
             result.setCode(400).setMsg("已被考勤记录表外键依赖");
-        }else{
+        } else {
             super.deleteModel(attendanceRuleService.removeById(aId));
         }
         return ResponseEntity.status(result.getCode()).body(result);
     }
-    private boolean isErrorCompanyId(AttendanceRule attendanceRule){
-        return attendanceRule.getCId()==null||companyService.getById(attendanceRule.getCId())==null;
+
+    private boolean isErrorCompanyId(AttendanceRule attendanceRule) {
+        return attendanceRule.getCId() == null || companyService.getById(attendanceRule.getCId()) == null;
     }
 }

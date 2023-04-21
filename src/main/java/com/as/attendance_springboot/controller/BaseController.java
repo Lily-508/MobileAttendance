@@ -39,7 +39,7 @@ public class BaseController {
                 errorMsg.append(error.getDefaultMessage());
             }
             result.setCode(400).setMsg(errorMsg.toString());
-            log.info("验证失败result:{}", result);
+            log.info("验证失败result:{}", result.getMsg());
             return false;
         }
         return true;
@@ -62,7 +62,7 @@ public class BaseController {
             success = (queryResult != null);
         }
         if (!success) {
-            result.setCode(400).setMsg("查询失败").setData(null);
+            result.setCode(500).setMsg("查询失败").setData(null);
         } else {
             result.setCode(200).setMsg("查询成功").setData(queryResult);
         }
@@ -119,7 +119,6 @@ public class BaseController {
             return result;
         }
         //调用save方法后会自动为实体类赋id值
-        log.info("调用saveOrUpdate");
         try {
             if (service.saveOrUpdate(model)) {
 
@@ -130,8 +129,6 @@ public class BaseController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        log.info("调用saveOrUpdate结束");
         return result;
     }
 
