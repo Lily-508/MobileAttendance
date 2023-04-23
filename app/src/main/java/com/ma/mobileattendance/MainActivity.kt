@@ -1,16 +1,14 @@
 package com.ma.mobileattendance
 
 import android.Manifest
-import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.Color
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
 import com.baidu.location.BDAbstractLocationListener
 import com.baidu.location.BDLocation
 import com.baidu.location.LocationClient
@@ -22,95 +20,76 @@ import com.ma.mobileattendance.logic.model.DataResponse
 import com.ma.mobileattendance.logic.model.RecordAttendance
 import com.ma.mobileattendance.logic.network.RecordAttendanceService
 import com.ma.mobileattendance.logic.network.ServiceCreator
+import com.permissionx.guolindev.PermissionX
 import retrofit2.Call
 import retrofit2.Response
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var mLocClient: LocationClient
     private lateinit var mBaiduMap: BaiduMap
-    private var isGetPermission: Boolean = true
-    private var isFirstLoc: Boolean = true
     private lateinit var latLng: LatLng
 
-    //标点的图标
-    private var bitmap: BitmapDescriptor? = null
-
-    //标点纬度
-    private var markerLatitude = 0.0
-
-    //标点经度
-    private var markerLongitude = 0.0
-
-    //重置定位按钮
-    private var ibLocation: ImageButton? = null
-
-    //标点也可以说是覆盖物
-    private var marker: Marker? = null
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d("main","开始运行")
+        Log.d("main", "开始运行")
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        checkPermission()
-        if (isGetPermission) {
-            //所有权限都已经成功获取
-            //视图初始化
-            initView()
-            initLocation()
-            binding.punchInButton.setOnClickListener {
-                val recordAttendanceService =
-                        ServiceCreator.create(RecordAttendanceService::class.java)
-                val time = System.currentTimeMillis()
-                val rDate = DateFormat.format("yyyy-MM-dd", time).toString()
-                val recordDateTime = DateFormat.format("yyyy-MM-dd hh:mm:ss", time).toString()
-                val recordLocation = "${latLng.longitude},${latLng.latitude}"
-                var recordAttendance = RecordAttendance(
-                        aId = 1,
-                        sId = 100002,
-                        rDate = rDate,
-                        rPunchIn = recordDateTime,
-                        punchInPlace = recordLocation
-                )
-                Log.d("Main","请求体:${recordAttendance}")
-                recordAttendanceService.punchAttendanceRecord(recordAttendance)
-                        .enqueue(object : retrofit2.Callback<DataResponse<RecordAttendance>> {
-                            override fun onResponse(
-                                    call: Call<DataResponse<RecordAttendance>>,
-                                    response: Response<DataResponse<RecordAttendance>>
-                            ) {
-                                val body: DataResponse<RecordAttendance>? =response.body()
-                                Log.d("Main","响应体:${body}")
-                                if (body != null) {
-                                    Toast.makeText(this@MainActivity, body.msg, Toast.LENGTH_LONG).show()
-                                }
-                            }
+        initPermissionX()
+        binding.punchInButton.setOnClickListener {
+            val recordAttendanceService =
+                ServiceCreator.create(RecordAttendanceService::class.java)
+            val time = System.currentTimeMillis()
+            val rDate = DateFormat.format("yyyy-MM-dd", time).toString()
+            val recordDateTime = DateFormat.format("yyyy-MM-dd hh:mm:ss", time).toString()
+            val recordLocation = "${latLng.longitude},${latLng.latitude}"
+            var recordAttendance = RecordAttendance(
+                aId = 1,
+                sId = 100002,
+                rDate = rDate,
+                rPunchIn = recordDateTime,
+                punchInPlace = recordLocation
+            )
+            Log.d("Main", "请求体:${recordAttendance}")
+            recordAttendanceService.punchAttendanceRecord(recordAttendance)
+                .enqueue(object : retrofit2.Callback<DataResponse<RecordAttendance>> {
+                    override fun onResponse(
+                        call: Call<DataResponse<RecordAttendance>>,
+                        response: Response<DataResponse<RecordAttendance>>
+                    ) {
+                        val body: DataResponse<RecordAttendance>? = response.body()
+                        Log.d("Main", "响应体:${body}")
+                        if (body != null) {
+                            Toast.makeText(this@MainActivity, body.msg, Toast.LENGTH_LONG)
+                                .show()
+                        }
+                    }
 
-                            override fun onFailure(
-                                    call: Call<DataResponse<RecordAttendance>>,
-                                    t: Throwable
-                            ) {
-                                t.printStackTrace()
-                            }
-                        })
-            }
-        } else {
-            Toast.makeText(
-                    this, "必须同意所有权限才能使用本程序", Toast.LENGTH_SHORT
-            ).show()
-            checkPermission()
+                    override fun onFailure(
+                        call: Call<DataResponse<RecordAttendance>>,
+                        t: Throwable
+                    ) {
+                        t.printStackTrace()
+                    }
+                })
         }
 
     }
 
-    private fun resetLocation(view: View) {
-
+    /**
+     * 重置定位显示，点击之后回到自动定位
+     */
+    fun resetLocation(view: View) {
+        initLocation()
     }
 
     private fun initView() {
-        mBaiduMap =binding.mMapView.map
+        mBaiduMap = binding.mMapView.map
         // 开启定位图层
         mBaiduMap.isMyLocationEnabled = true
+        mBaiduMap.setCompassEnable(false)
+
     }
 
     private fun initLocation() {
@@ -143,23 +122,44 @@ class MainActivity : AppCompatActivity() {
         override fun onReceiveLocation(location: BDLocation?) {
             //此处的BDLocation为定位结果信息类，通过它的各种get方法可获取定位相关的全部结果
             //mapView 销毁后不在处理新接收的位置
-            if (location == null) {
+            if (location == null || binding.mMapView.map == null) {
                 return
             }
-            val locDate = MyLocationData.Builder()
-                    .accuracy(location.radius)
-                    .direction(location.direction)
-                    .latitude(location.latitude)
-                    .longitude(location.longitude)
-                    .build()
-            mBaiduMap.setMyLocationData(locDate)
-            if (isFirstLoc) {
-                isFirstLoc = false
-                latLng = LatLng(location.latitude, location.longitude)
-                binding.locationText.text = "经度:${latLng.longitude},纬度:${latLng.latitude}"
-                val mapStatus = MapStatus.Builder().target(latLng).zoom(20.0f).build()
-                mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mapStatus))
+            //开启指南针
+            if (!mBaiduMap.uiSettings.isCompassEnabled) {
+                mBaiduMap.setCompassEnable(true)
             }
+            latLng = LatLng(location.latitude, location.longitude)
+            binding.locationText.text = "经度:${latLng.longitude},纬度:${latLng.latitude}"
+            val locDate = MyLocationData.Builder()
+                .accuracy(location.radius)
+                .direction(location.direction)
+                .latitude(location.latitude)
+                .longitude(location.longitude)
+                .build()
+            mBaiduMap.setMyLocationData(locDate)
+            // 定位要手动移动画面到当前位置
+            val mapStatus = MapStatus.Builder().target(latLng).zoom(20.0f).build()
+            mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mapStatus))
+            //定义Maker坐标点
+            val point = LatLng(30.0, 120.0)
+            //构建Marker图标
+            val bitmap = BitmapDescriptorFactory
+                .fromResource(R.drawable.icon_marka)
+//构建MarkerOption，用于在地图上添加Marker
+            val option: OverlayOptions = MarkerOptions()
+                .position(latLng)
+                .icon(bitmap)
+                .draggable(false)
+//在地图上添加Marker，并显示
+            mBaiduMap.addOverlay(option)
+            val mCircleOptions = CircleOptions().center(latLng)// 设置圆心坐标
+                .setIsGradientCircle(true)
+                .setCenterColor(Color.argb(0, 93, 232, 204))
+                .setSideColor(Color.rgb(93, 232, 204))
+                .stroke(Stroke(2, Color.rgb(93, 232, 204)))// 设置圆边框信息
+                .radius(5000); //  圆半径，单位：米
+            mBaiduMap.addOverlay(mCircleOptions)
         }
 
     }
@@ -182,62 +182,35 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-
-    private fun checkPermission() {
-        val permissionList: MutableList<String> = ArrayList()
-        if (ContextCompat.checkSelfPermission(
-                        this, Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-        if (ContextCompat.checkSelfPermission(
-                        this, Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            permissionList.add(Manifest.permission.ACCESS_COARSE_LOCATION)
-        }
-        if (ContextCompat.checkSelfPermission(
-                        this, Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-        if (ContextCompat.checkSelfPermission(
-                        this, Manifest.permission.READ_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-        }
-        if (ContextCompat.checkSelfPermission(
-                        this, Manifest.permission.READ_PHONE_STATE
-                ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            permissionList.add(Manifest.permission.READ_PHONE_STATE)
-        }
-        if (permissionList.isNotEmpty()) {
-            Log.d("Main", "开启权限申请")
-            val permissions = permissionList.toTypedArray()
-            ActivityCompat.requestPermissions(this, permissions, 123)
-        }
-
-    }
-
-    override fun onRequestPermissionsResult(
-            requestCode: Int, permissions: Array<out String>, grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            123 -> if (grantResults.isNotEmpty()) {
-                Log.d("Main", "isGetPermission: $isGetPermission")
-                for (result in grantResults) {
-                    if (result != PackageManager.PERMISSION_GRANTED) {
-                        isGetPermission = false
-                        break
-                    }
-                }
+    private fun initPermissionX() {
+        PermissionX.init(this)
+            .permissions(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.READ_PHONE_STATE
+            )
+            .explainReasonBeforeRequest()
+            .onExplainRequestReason { scope, deniedList ->
+                val message = "PermissionX需要您同意以下权限才能正常使用"
+                scope.showRequestReasonDialog(deniedList, message, "确定", "取消")
             }
-        }
+            .onForwardToSettings { scope, deniedList ->
+                scope.showForwardToSettingsDialog(deniedList, "您需要去应用程序设置当中手动开启权限", "我已明白", "取消")
+            }
+            .request { allGranted, grantedList, deniedList ->
+                if (allGranted) {
+                    //所有权限都已经成功获取
+                    //视图初始化
+                    initView()
+                    initLocation()
+                    Toast.makeText(this, "所有申请的权限都已通过", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "您拒绝了如下权限：$deniedList", Toast.LENGTH_SHORT).show()
+                }
+
+            }
     }
 
 }
