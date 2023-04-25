@@ -1,11 +1,11 @@
 package com.ma.mobileattendance.logic.model
 
 data class RecordAttendance (
-    var aId: Int,
-    var sId: Int,
-    var rDate: String,
-    var rPunchIn: String,
-    var punchInPlace: String
+    val aId: Int,
+    val sId: Int,
+    val rDate: String,
+    val rPunchIn: String,
+    val punchInPlace: String
 ){
     var rId: Int? =null
     var rCategory: String="正常考勤"

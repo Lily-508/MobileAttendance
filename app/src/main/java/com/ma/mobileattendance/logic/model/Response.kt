@@ -1,16 +1,22 @@
 package com.ma.mobileattendance.logic.model
 
 
+import android.graphics.Bitmap
 import com.google.gson.annotations.SerializedName
 
 data class BaseResponse(
     val code: Int,
     val msg: String
 )
-data class
-DataResponse<T>(
+data class DataResponse<T>(
     val code: Int,
     val msg: String,
+    @SerializedName("data") val responseData: T
+)
+data class JwtResult<T>(
+    val code: Int,
+    val msg: String,
+    val token:String,
     @SerializedName("data") val responseData: T
 )
 data class PageResponse<T>(

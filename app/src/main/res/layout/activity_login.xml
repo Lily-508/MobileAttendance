@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.login.LoginActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    <TextView
+        android:id="@+id/loginTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="@string/psw_login_title"
+        android:textSize="28sp"
+        app:layout_constraintBottom_toTopOf="@+id/userId"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintVertical_chainStyle="spread" />
+
+    <TextView
+        android:id="@+id/userIdText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/psw_login_user_id"
+        app:layout_constraintBottom_toBottomOf="@+id/userId"
+        app:layout_constraintEnd_toStartOf="@+id/userId"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/userId" />
+
+    <EditText
+        android:id="@+id/userId"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:autofillHints="userId"
+        android:hint="@string/psw_login_user_id_edit"
+        android:inputType="number"
+        android:maxLines="1"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/userPsw"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/barrier"
+        app:layout_constraintTop_toBottomOf="@+id/loginTitle" />
+
+    <TextView
+        android:id="@+id/userPswText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/psw_login_user_psw"
+        app:layout_constraintBottom_toBottomOf="@+id/userPsw"
+        app:layout_constraintStart_toStartOf="@+id/userIdText"
+        app:layout_constraintTop_toTopOf="@+id/userPsw" />
+
+    <EditText
+        android:id="@+id/userPsw"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:autofillHints="userPsw"
+        android:hint="@string/psw_login_user_psw_edit"
+        android:inputType="textPassword"
+        android:maxLines="1"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/pswLoginCode"
+        app:layout_constraintEnd_toEndOf="@+id/userId"
+        app:layout_constraintStart_toStartOf="@+id/userId"
+        app:layout_constraintTop_toBottomOf="@+id/userId" />
+
+
+    <TextView
+        android:id="@+id/pswLoginCodeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/psw_login_code"
+        app:layout_constraintBottom_toBottomOf="@+id/pswLoginCode"
+        app:layout_constraintStart_toStartOf="@+id/userPswText"
+        app:layout_constraintTop_toTopOf="@+id/pswLoginCode" />
+
+    <EditText
+        android:id="@+id/pswLoginCode"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:autofillHints="loginCode"
+        android:hint="@string/psw_login_code_edit"
+        android:inputType="text"
+        android:maxLength="1"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline2"
+        app:layout_constraintStart_toStartOf="@+id/userPsw"
+        app:layout_constraintTop_toBottomOf="@+id/userPsw" />
+
+    <ImageView
+        android:id="@+id/captcha"
+        android:layout_width="80dp"
+        android:layout_height="45dp"
+        android:contentDescription="@string/psw_login_code"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_launcher_background"
+        app:layout_constraintBottom_toBottomOf="@+id/pswLoginCode"
+        app:layout_constraintEnd_toEndOf="@+id/userPsw"
+        app:layout_constraintTop_toTopOf="@+id/pswLoginCode" />
+
+    <Button
+        android:id="@+id/loginBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:text="@string/psw_login_btn"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toTopOf="@+id/guideline2" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/change_login_type"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toBottomOf="@+id/loginBtn" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.55" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="right"
+        app:constraint_referenced_ids="userIdText,userPswText,pswLoginCodeText"
+        tools:layout_editor_absoluteX="90dp" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

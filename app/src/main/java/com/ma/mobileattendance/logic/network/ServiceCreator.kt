@@ -27,8 +27,7 @@ object ServiceCreator {
         var sslContext: SSLContext? = null
         val okhttpClient = OkHttpClient().newBuilder()
         try {
-            val certificateFactory =
-                CertificateFactory.getInstance("X.509")
+            val certificateFactory = CertificateFactory.getInstance("X.509")
             //方法一：将证书放到assets文件夹里面然后获取
             val certificates = MyApplication.context.assets.open("xll.cer")
 
@@ -38,7 +37,7 @@ object ServiceCreator {
             // 创建秘钥，添加证书进去
             val keyStore = KeyStore.getInstance(KeyStore.getDefaultType())
             keyStore.load(null)
-            val certificateAlias = 0.toString()
+            val certificateAlias = Integer.toString(0)
             keyStore.setCertificateEntry(certificateAlias, certificateFactory.generateCertificate(certificates))
             // 创建信任管理器工厂并初始化秘钥
             val trustManagerFactory =
@@ -50,7 +49,8 @@ object ServiceCreator {
             //okhttp设置sokect工厂，并校验主机名
             okhttpClient.sslSocketFactory(sslContext.socketFactory)
             okhttpClient.hostnameVerifier { p0, p1 ->
-                Log.d("main","hostname:$p0,session:${p1.toString()}")
+                Log.d("https","hostname:$p0,session:$p1")
+//                p0.equals("hostname开发先不搞")
                 true
             }
         } catch (e: Exception) {
