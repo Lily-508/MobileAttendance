@@ -4,7 +4,10 @@ import android.graphics.Bitmap
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ma.mobileattendance.logic.Repository
+import com.ma.mobileattendance.logic.model.Staff
+import kotlinx.coroutines.launch
 
 class LoginViewModel :ViewModel() {
     private val _captchaLiveData=MutableLiveData<Bitmap>()
@@ -13,5 +16,13 @@ class LoginViewModel :ViewModel() {
     }
     fun getCaptcha(){
         _captchaLiveData.value=_captchaLiveData.value
+    }
+    fun insertStaff(staff: Staff){
+        viewModelScope.launch {
+            Repository.insertStaff(staff)
+        }
+    }
+    fun saveToken(token:String){
+        Repository.saveToken(token)
     }
 }

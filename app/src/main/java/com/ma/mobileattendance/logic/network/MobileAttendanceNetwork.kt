@@ -17,6 +17,10 @@ object MobileAttendanceNetwork {
      *获取验证码
      */
     suspend fun getCaptcha()= loginService.getCaptcha().await()
+
+    /**
+     * 登陆
+     */
     suspend fun login(loginData: LoginData)= loginService.login(loginData).await()
     suspend fun setRecord(recordAttendance: RecordAttendance) =
         recordAttendanceService.punchAttendanceRecord(recordAttendance).await()

@@ -1,5 +1,6 @@
 package com.ma.mobileattendance.ui.login
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.ViewModelProviders
@@ -36,6 +37,7 @@ class LoginActivity : BaseActivity() {
             } else {
                 binding.captcha.setImageResource(R.drawable.ic_launcher_background)
                 "验证码加载异常,请重试".showToast(this)
+                Log.d("BaseActivity","验证码加载异常")
                 result.exceptionOrNull()?.printStackTrace()
             }
         }
@@ -51,9 +53,14 @@ class LoginActivity : BaseActivity() {
                 val loginData=LoginData(captcha!!.uuid,loginType,userId,loginCode,userPsw)
                 Repository.login(loginData).observe(this){result->
                     val loginResponse=result.getOrNull()
-                    if(loginResponse!=null){
-                        Log.d("BaseActivity","登陆成功$loginResponse")
+                    if(loginResponse!=null&&loginResponse.code==200){
                         //存储JWT和Staff
+                        viewModel.saveToken(loginResponse.token)
+                        viewModel.insertStaff(loginResponse.responseData)
+                        Log.d("BaseActivity","登陆成功$loginResponse")
+                    }else{
+                        Log.d("BaseActivity","登陆失败$loginData")
+                        result.exceptionOrNull()?.printStackTrace()
                     }
                 }
             }
