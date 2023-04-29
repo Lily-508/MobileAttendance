@@ -19,15 +19,8 @@ object Repository {
      */
     fun getCaptcha() = liveData(Dispatchers.IO) {
         val result = try {
-            val response = MobileAttendanceNetwork.getCaptcha()
-            val body = response.body()
-            val uuid = response.headers().get("uuid")
-            if (body != null && uuid != null) {
-                val bitmap = BitmapFactory.decodeStream(body.byteStream())
-                Result.success(Captcha(uuid, bitmap))
-            } else {
-                Result.failure(ExceptionInInitializerError("验证码响应有空值"))
-            }
+            val captcha = MobileAttendanceNetwork.getCaptcha()
+                Result.success(captcha)
         } catch (e: Exception) {
             Result.failure(e)
         }

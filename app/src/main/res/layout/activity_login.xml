@@ -108,7 +108,6 @@
         android:layout_height="45dp"
         android:contentDescription="@string/psw_login_code"
         android:scaleType="fitXY"
-        android:src="@drawable/ic_launcher_background"
         app:layout_constraintBottom_toBottomOf="@+id/pswLoginCode"
         app:layout_constraintEnd_toEndOf="@+id/userPsw"
         app:layout_constraintTop_toTopOf="@+id/pswLoginCode" />

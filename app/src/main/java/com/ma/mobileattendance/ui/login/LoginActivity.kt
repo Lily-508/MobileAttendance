@@ -1,10 +1,12 @@
 package com.ma.mobileattendance.ui.login
 
-import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProviders
 import com.ma.mobileattendance.BaseActivity
+import com.ma.mobileattendance.MainActivity
 import com.ma.mobileattendance.R
 import com.ma.mobileattendance.databinding.ActivityLoginBinding
 import com.ma.mobileattendance.logic.Repository
@@ -32,12 +34,12 @@ class LoginActivity : BaseActivity() {
         viewModel.captchaLiveData.observe(this) { result ->
             captcha = result.getOrNull()
             if (captcha != null) {
-                Log.d("BaseActivity", "验证码加载成功")
+                Log.d("ActivityBase", "验证码加载成功")
                 binding.captcha.setImageBitmap(captcha!!.bitmap)
             } else {
                 binding.captcha.setImageResource(R.drawable.ic_launcher_background)
                 "验证码加载异常,请重试".showToast(this)
-                Log.d("BaseActivity","验证码加载异常")
+                Log.d("ActivityBase","验证码加载异常")
                 result.exceptionOrNull()?.printStackTrace()
             }
         }
@@ -57,9 +59,15 @@ class LoginActivity : BaseActivity() {
                         //存储JWT和Staff
                         viewModel.saveToken(loginResponse.token)
                         viewModel.insertStaff(loginResponse.responseData)
-                        Log.d("BaseActivity","登陆成功$loginResponse")
+                        Log.d("ActivityBase","登陆成功$loginResponse")
+                        "登陆成功".showToast(this, Toast.LENGTH_LONG)
+                        val intent=Intent(this,MainActivity::class.java)
+                        startActivity(intent)
+                    }else if(loginResponse!=null&&loginResponse.code==400){
+                        loginResponse.msg.showToast(this, Toast.LENGTH_SHORT)
+                        Log.d("ActivityBase","认证失败$loginResponse")
                     }else{
-                        Log.d("BaseActivity","登陆失败$loginData")
+                        Log.d("ActivityBase","登陆失败$loginData")
                         result.exceptionOrNull()?.printStackTrace()
                     }
                 }
