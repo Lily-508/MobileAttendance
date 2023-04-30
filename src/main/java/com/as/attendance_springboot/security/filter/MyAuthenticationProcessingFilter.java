@@ -24,13 +24,13 @@ public class MyAuthenticationProcessingFilter extends UsernamePasswordAuthentica
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        log.info("MyAuthenticationProcessingFilter:进入认证入口。");
+        log.info("MyAuthenticationProcessingFilter:进入认证入口。{}",request);
         // 校验请求方法、请求体格式
         if (!request.getMethod().equals(HttpMethod.POST.name())) {
             throw new AuthenticationServiceException(
                     "Authentication method not supported: " + request.getMethod());
         }
-        if (!request.getContentType().equals(MediaType.APPLICATION_JSON_VALUE)) {
+        if (!request.getContentType().startsWith(MediaType.APPLICATION_JSON_VALUE)) {
             throw new AuthenticationServiceException(
                     "Authentication contentType not supported: " + request.getContentType());
         }

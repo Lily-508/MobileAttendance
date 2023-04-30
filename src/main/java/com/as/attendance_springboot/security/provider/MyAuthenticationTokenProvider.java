@@ -99,7 +99,7 @@ public class MyAuthenticationTokenProvider implements AuthenticationProvider {
         }else {
             String redisCode = (String) redisUtil.get(uuid);
             log.info(redisCode);
-            if (redisCode == null || !redisCode.equals(code)) {
+            if (redisCode == null || !redisCode.equalsIgnoreCase(code)) {
                 throw new AuthenticationServiceException("验证码为空或验证码错误");
             }
             //确保验证码的一次性
