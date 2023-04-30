@@ -3,7 +3,6 @@ package com.as.attendance_springboot.controller;
 import com.as.attendance_springboot.model.AttendanceRule;
 import com.as.attendance_springboot.model.Company;
 import com.as.attendance_springboot.model.Visit;
-import com.as.attendance_springboot.model.WorkOutside;
 import com.as.attendance_springboot.result.BaseResult;
 import com.as.attendance_springboot.result.DataResult;
 import com.as.attendance_springboot.service.impl.AttendanceRuleServiceImpl;
@@ -88,17 +87,14 @@ public class CompanyController extends BaseController {
             @ApiResponse(code = 400, message = "删除失败,被外键依赖", response = BaseResult.class)})
     public ResponseEntity<BaseResult> deleteDepartment(@RequestParam Integer cId) {
         BaseResult result = new BaseResult();
-        //被外键依赖,外派记录,考勤规则,拜访表
+        //被外键依赖,外派记录,拜访表
         LambdaQueryWrapper<AttendanceRule> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(AttendanceRule::getCId, cId);
         LambdaQueryWrapper<Visit> queryWrapper2 = new LambdaQueryWrapper<>();
         queryWrapper2.eq(Visit::getCId, cId);
-        LambdaQueryWrapper<WorkOutside> queryWrapper3 = new LambdaQueryWrapper<>();
-        queryWrapper3.eq(WorkOutside::getCId, cId);
         AttendanceRule attendanceRule = attendanceRuleService.getOne(queryWrapper);
         Visit visit=visitService.getOne(queryWrapper2);
-        WorkOutside workOutside=workOutsideService.getOne(queryWrapper3);
-        if(attendanceRule==null&&visit==null&&workOutside==null){
+        if(attendanceRule==null&&visit==null){
             result = super.deleteModel(companyService.removeById(cId));
         }else {
             result.setCode(400).setMsg("删除失败,被外键依赖");

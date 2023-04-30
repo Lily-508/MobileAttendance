@@ -16,6 +16,7 @@ public class PayloadDto {
     private Long iat;
     private Long exp;
     private String jti;
+    private String loginPlatform;
     private String username;
     private String userId;
     private String right;

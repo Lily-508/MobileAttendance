@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -38,6 +39,8 @@ import java.util.Collection;
 @TableName("staff")
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties({"deleted", "roles", "enabled", "password", "username", "authorities", "accountNonLocked",
+        "credentialsNonExpired", "accountNonExpired"})
 public class Staff implements UserDetails {
     @JsonProperty(value = "sId")
     @TableId(value = "s_id", type = IdType.AUTO)
@@ -47,12 +50,12 @@ public class Staff implements UserDetails {
     private Integer dId;
     @JsonProperty(value = "sName")
     @NotBlank(message = "sName不能为null")
-    @Length(max=20)
+    @Length(max = 20)
     private String sName;
     @JsonProperty(value = "sSex")
     private StaffSex sSex;
     @JsonProperty(value = "sPwd")
-    @Length(min=6,message = "密码长度至少6位")
+    @Length(min = 6, message = "密码长度至少6位")
     private String sPwd;
     @JsonProperty(value = "sPhone")
     @Pattern(regexp = "1[3|4|5|7|8][0-9]{9}$", message = "手机号不合法")

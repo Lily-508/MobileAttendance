@@ -31,20 +31,21 @@ public class MyAuthenticationTokenProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         MyAuthenticationToken myAuthenticationToken = (MyAuthenticationToken) authentication;
-        log.info("MyAuthenticationTokenProvider开始认证{}", myAuthenticationToken.toString());
         LoginData loginData = myAuthenticationToken.getLoginData();
+        log.info("MyAuthenticationTokenProvider开始认证{}", loginData);
         if (loginData == null) {
             throw new AuthenticationServiceException("未获取到登陆参数");
         }
-        if (loginData.getLoginType() == null || "".equals(loginData.getLoginType())) {
-            throw new AuthenticationServiceException("登陆方式不可为空");
-        }
-        Integer loginType = Integer.parseInt(loginData.getLoginType());
+        Integer loginType = loginData.getLoginType();
         UserDetails userDetails;
+        if (loginType == null || loginData.getLoginPlatform() == null ||
+                 "".equals(loginData.getLoginPlatform())) {
+            throw new AuthenticationServiceException("登陆方式或平台不可为空");
+        }
         if (LoginType.USERNAME_CODE.getCode().equals(loginType)) {
             // 用户名密码登陆
             log.info("尝试以 {} 方式登陆", LoginType.USERNAME_CODE.getRemark());
-            this.checkUsernameCode(loginData.getUuid(),loginData.getCode());
+            this.checkUsernameCode(loginData.getUuid(), loginData.getCode());
             userDetails = myUserDetailService.loadUserByUsername(loginData.getUsername());
         } else if (LoginType.PHONE_CODE.getCode().equals(loginType)) {
             // 手机号验证码登陆
@@ -55,13 +56,14 @@ public class MyAuthenticationTokenProvider implements AuthenticationProvider {
             // 三方平台登陆
             log.info("尝试以 {} 方式登陆", LoginType.THIRD_PLATFORM.getRemark());
             userDetails = myUserDetailService.loadByThirdPlatformId(loginData.getThirdPlatformType(),
-                    loginData.getThirdPlatformId());
+                                                                    loginData.getThirdPlatformId());
         } else {
             throw new AuthenticationServiceException("不支持的登陆方式");
         }
 
         // 认证成功
-        MyAuthenticationToken token = new MyAuthenticationToken(userDetails,loginData.getPassword(),userDetails.getAuthorities());
+        MyAuthenticationToken token = new MyAuthenticationToken(userDetails, loginData.getPassword(),
+                                                                userDetails.getAuthorities());
         token.setLoginData(loginData);
         token.setDetails(userDetails);
         return token;
@@ -83,20 +85,25 @@ public class MyAuthenticationTokenProvider implements AuthenticationProvider {
 //            throw new AuthenticationServiceException("手机验证码错误");
 //        }
     }
+
     /**
      * 校验图片登陆验证码
-     * @author xulili
-     * @date 13:56 2023/4/8
      * @param uuid
      * @param code
+     * @author xulili
+     * @date 13:56 2023/4/8
      **/
     public void checkUsernameCode(String uuid, String code) {
-        String redisCode = (String) redisUtil.get(uuid);
-        log.info(redisCode);
-        if (redisCode == null || !redisCode.equals(code)) {
-            throw new AuthenticationServiceException("验证码为空或验证码错误");
+        if(uuid==null||code==null){
+            throw new AuthenticationServiceException("请重新获取验证码");
+        }else {
+            String redisCode = (String) redisUtil.get(uuid);
+            log.info(redisCode);
+            if (redisCode == null || !redisCode.equals(code)) {
+                throw new AuthenticationServiceException("验证码为空或验证码错误");
+            }
+            //确保验证码的一次性
+            redisUtil.remove(uuid);
         }
-        //确保验证码的一次性
-        redisUtil.remove(uuid);
     }
 }

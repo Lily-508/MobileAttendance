@@ -18,18 +18,23 @@ import java.util.UUID;
 public class JwtUtil {
     private static final String DEFAULT_SECRET = "mobileAttendance";
 
-    public static PayloadDto generatePayloadDto(String userid, String username, String right) {
+    public static PayloadDto generatePayloadDto(String userid, String username, String right,String loginPlatform) {
         Date now = new Date();
-        Date exp = DateUtil.offsetSecond(now, 5*60 * 60);
-        PayloadDto payloadDto = PayloadDto.builder()
-                .iat(now.getTime())
-                .exp(exp.getTime())
-                .jti(UUID.randomUUID().toString())
-                .userId(userid)
-                .username(username)
-                .right(right)
-                .build();
-        return payloadDto;
+        Date exp;
+        if("android".equalsIgnoreCase(loginPlatform)){
+            exp = DateUtil.offsetDay(now,7);
+        } else{
+            exp= DateUtil.offsetSecond(now, 5*60 * 60);
+        }
+        return PayloadDto.builder()
+                         .iat(now.getTime())
+                         .exp(exp.getTime())
+                         .jti(UUID.randomUUID().toString())
+                         .loginPlatform(loginPlatform)
+                         .userId(userid)
+                         .username(username)
+                         .right(right)
+                         .build();
     }
 
     public static PayloadDto getByToken(String token) throws ParseException {

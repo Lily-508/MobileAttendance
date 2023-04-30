@@ -24,7 +24,7 @@ public class MyAuthenticationProcessingFilter extends UsernamePasswordAuthentica
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        log.info("进入认证入口。");
+        log.info("MyAuthenticationProcessingFilter:进入认证入口。");
         // 校验请求方法、请求体格式
         if (!request.getMethod().equals(HttpMethod.POST.name())) {
             throw new AuthenticationServiceException(
@@ -46,7 +46,6 @@ public class MyAuthenticationProcessingFilter extends UsernamePasswordAuthentica
         } catch (IOException e) {
             throw new AuthenticationServiceException("LoginDataJson to LoginData failed");
         }
-        log.info(loginData.toString());
 
         // 传递令牌类 UsernamePasswordAuthenticationToken
         String username = loginData.getUsername();

@@ -1,6 +1,7 @@
 package com.as.attendance_springboot.service.impl;
 
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
@@ -69,6 +70,9 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
         reader.addHeaderAlias("员工出生日期","sBirthday");
         reader.addHeaderAlias("员工入职日期","sHiredate");
         List<Staff> staffList=reader.readAll(Staff.class);
+        staffList.forEach(staff->
+            staff.setSPwd(DigestUtil.md5Hex(staff.getSPwd()))
+        );
         boolean success= this.saveBatch(staffList);
         if(success){
             for(Staff staff:staffList){

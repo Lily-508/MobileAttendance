@@ -33,7 +33,7 @@ public class MyAuthenticationFailureHandler implements AuthenticationFailureHand
         } else if (exception instanceof BadCredentialsException) {
             result.setMsg("用户名或者密码输入错误，请重新输入!");
         } else if (exception instanceof AuthenticationServiceException) {
-            result.setMsg("AuthenticationServiceException错误: "+exception.getMessage());
+            result.setMsg("认证错误: "+exception.getMessage());
         }else{
             result.setMsg("错误信息: "+exception.getMessage());
         }

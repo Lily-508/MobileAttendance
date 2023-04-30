@@ -25,6 +25,7 @@ import java.util.UUID;
 public class CaptchaController {
     @Autowired
     private RedisUtil redisUtil;
+
     /**
      * 获取验证码图片, 验证在/login
      * @param httpServletRequest
@@ -32,23 +33,20 @@ public class CaptchaController {
      * @throws IOException
      */
     @RequestMapping("/captcha")
-    public void captcha(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+    public void captcha(HttpServletRequest httpServletRequest,
+                        HttpServletResponse httpServletResponse) throws IOException {
         //定义图形验证码的长和宽
         LineCaptcha lineCaptcha = CaptchaUtil.createLineCaptcha(200, 100);
-        String code=lineCaptcha.getCode();
-        String uuid= UUID.randomUUID().toString();
-        log.info("uuid={},code={}",uuid,code);
-        redisUtil.set(uuid, code,15*60);
+        String code = lineCaptcha.getCode();
+        String uuid = UUID.randomUUID().toString();
+        log.info("uuid={},code={}", uuid, code);
+        redisUtil.set(uuid, code, 15 * 60);
         httpServletResponse.setContentType("image/png");
-        httpServletResponse.setHeader("uuid",uuid);
+        httpServletResponse.setHeader("uuid", uuid);
         httpServletResponse.setStatus(200);
-        try {
-            ServletOutputStream responseOutputStream =httpServletResponse.getOutputStream();
-            lineCaptcha.write(responseOutputStream);
-            responseOutputStream.flush();
-            responseOutputStream.close();
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
+        ServletOutputStream responseOutputStream = httpServletResponse.getOutputStream();
+        lineCaptcha.write(responseOutputStream);
+        responseOutputStream.flush();
+        responseOutputStream.close();
     }
 }

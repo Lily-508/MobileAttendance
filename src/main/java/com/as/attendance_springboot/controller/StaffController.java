@@ -1,5 +1,6 @@
 package com.as.attendance_springboot.controller;
 
+import cn.hutool.crypto.digest.DigestUtil;
 import com.as.attendance_springboot.model.Staff;
 import com.as.attendance_springboot.result.BaseResult;
 import com.as.attendance_springboot.result.DataResult;
@@ -121,6 +122,7 @@ public class StaffController extends BaseController {
         } else if (isErrorDepartmentId(staff)) {
             result.setCode(400).setMsg("错误的部门号");
         } else {
+            staff.setSPwd(DigestUtil.md5Hex(staff.getSPwd()));
             result = super.setModel(staffService, staff, bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);
@@ -140,6 +142,7 @@ public class StaffController extends BaseController {
         } else if (isErrorDepartmentId(staff)) {
             result.setCode(400).setMsg("错误的部门号");
         } else {
+            staff.setSPwd(DigestUtil.md5Hex(staff.getSPwd()));
             result = super.updateModelBySingle(staff.getSId(), staffService, staff, bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);

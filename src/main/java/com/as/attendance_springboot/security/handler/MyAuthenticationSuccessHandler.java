@@ -2,7 +2,8 @@ package com.as.attendance_springboot.security.handler;
 
 import com.as.attendance_springboot.model.PayloadDto;
 import com.as.attendance_springboot.model.Staff;
-import com.as.attendance_springboot.result.DataResult;
+import com.as.attendance_springboot.result.JwtResult;
+import com.as.attendance_springboot.security.token.MyAuthenticationToken;
 import com.as.attendance_springboot.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
@@ -25,20 +26,22 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
         httpServletResponse.setContentType("application/json;charset=utf-8");
         PrintWriter out = httpServletResponse.getWriter();
         Staff userDetails = (Staff) authentication.getPrincipal();
-        DataResult<String> result = new DataResult<>();
+        MyAuthenticationToken myAuthenticationToken = (MyAuthenticationToken) authentication;
+        String loginPlatform=myAuthenticationToken.getLoginData().getLoginPlatform();
+        JwtResult<Staff> result = new JwtResult<>();
         String right = userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
         PayloadDto payloadDto = JwtUtil.generatePayloadDto(userDetails.getSId().toString(),
-                userDetails.getSName(), right);
+                userDetails.getSName(), right,loginPlatform);
         String token;
         try {
             token = JwtUtil.generateTokenByHmac(payloadDto);
         } catch (JOSEException e) {
             throw new IOException("生成JWToken失败 "+e.getMessage());
         }
-        result.setCode(200).setMsg("登陆成功").setData(token);
+        result.setCode(200).setMsg("登陆成功").setData(userDetails).setToken(token);
         out.write(new ObjectMapper().writeValueAsString(result));
         out.flush();
         out.close();

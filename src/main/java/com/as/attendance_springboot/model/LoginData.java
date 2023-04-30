@@ -2,12 +2,17 @@ package com.as.attendance_springboot.model;
 
 import lombok.Data;
 
+/**
+ * @author xulili
+ */
 @Data
 public class LoginData {
     /** 验证码对应标识 */
     private String uuid;
     /** 登陆方式 */
-    private String loginType;
+    private Integer loginType;
+    /**登陆平台**/
+    private String loginPlatform;
     private String username;
     private String password;
     private String phone;
