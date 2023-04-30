@@ -14,7 +14,7 @@ import javax.net.ssl.TrustManagerFactory
 
 object ServiceCreator {
     private const val BASE_URL = "https://192.168.1.107:8433"
-    private val client= getHttpsClient()
+    private val client = getHttpsClient()
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
@@ -49,7 +49,7 @@ object ServiceCreator {
             //okhttp设置sokect工厂，并校验主机名
             okhttpClient.sslSocketFactory(sslContext.socketFactory)
             okhttpClient.hostnameVerifier { p0, p1 ->
-                Log.d("https","hostname:$p0,session:$p1")
+                Log.d("https", "hostname:$p0,session:$p1")
 //                p0.equals("hostname开发先不搞")
                 true
             }
@@ -59,6 +59,15 @@ object ServiceCreator {
         return okhttpClient
             .readTimeout(7676, TimeUnit.MILLISECONDS)
             .connectTimeout(7676, TimeUnit.MILLISECONDS)
+            .addInterceptor {
+                val request = it.request()
+                    .newBuilder()
+                    .addHeader("Content-Type", "application/json;charset=UTF-8")
+                    .addHeader("User-Agent", "android")
+                    .addHeader("token", "")
+                    .build()
+                it.proceed(request)
+            }
             .build()
     }
 

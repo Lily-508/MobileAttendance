@@ -25,11 +25,11 @@ object MobileAttendanceNetwork {
                 override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                     val body=response.body()
                     val uuid=response.headers().get("uuid")
-                    if(body!=null&&uuid!=null){
+                    if(response.code()==200&&body!=null&&uuid!=null){
                         val bitmap = BitmapFactory.decodeStream(body.byteStream())
                         continuation.resume(Captcha(uuid,bitmap))
                     }else{
-                        continuation.resumeWithException(RuntimeException("响应体为空"))
+                        continuation.resumeWithException(RuntimeException("响应异常"))
                     }
                 }
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
@@ -51,8 +51,8 @@ object MobileAttendanceNetwork {
             enqueue(object : Callback<T> {
                 override fun onResponse(call: Call<T>, response: Response<T>) {
                     val body = response.body()
-                    if (body != null) continuation.resume(body)
-                    else continuation.resumeWithException(RuntimeException("响应体为空"))
+                    if (response.code()==200&&body != null) continuation.resume(body)
+                    else continuation.resumeWithException(RuntimeException("响应异常"))
                 }
 
                 override fun onFailure(call: Call<T>, t: Throwable) {

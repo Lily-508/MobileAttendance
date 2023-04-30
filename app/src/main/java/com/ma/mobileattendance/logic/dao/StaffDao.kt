@@ -10,14 +10,15 @@ import com.ma.mobileattendance.logic.model.Staff
 @Dao
 interface StaffDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertStaff(staff: Staff)
+    suspend fun insertStaff(staff: Staff)
 
     @Update
-    fun updateStaff(staff: Staff)
+    suspend fun updateStaff(staff: Staff)
 
     @Delete
-    fun deleteStaff(staff: Staff)
+    suspend fun deleteStaff(staff: Staff)
 
+    //如果在Room中方法返回值得类型定义为 LiveData 时，那么，该方法则默认是 异步 的
     @Query("select * from `staff` where s_id = :sId")
     fun selectBySId(sId: Int):LiveData<Staff>
 

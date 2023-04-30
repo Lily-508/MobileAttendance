@@ -13,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 
 object Repository {
     private val appDatabase: AppDatabase = AppDatabase.getDatabase(MyApplication.context)
-
+    private val staffDao= appDatabase.staffDao()
     /**
      * 获取验证码
      */
@@ -47,10 +47,10 @@ object Repository {
     /**
      * 用户数据存储
      */
-    fun insertStaff(staff: Staff) = appDatabase.staffDao().insertStaff(staff)
-    fun selectStaffBySId(sId: Int) = appDatabase.staffDao().selectBySId(sId)
-    fun updateStaff(staff: Staff)= appDatabase.staffDao().updateStaff(staff)
-    fun deleteStaff(staff: Staff)= appDatabase.staffDao().deleteStaff(staff)
+    suspend fun insertStaff(staff: Staff) = staffDao.insertStaff(staff)
+    suspend fun selectStaffBySId(sId: Int) = staffDao.selectBySId(sId)
+    suspend fun updateStaff(staff: Staff)= staffDao.updateStaff(staff)
+    suspend fun deleteStaff(staff: Staff)= staffDao.deleteStaff(staff)
 
     /**
      * sharedPreferences存储token相关

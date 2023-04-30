@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.ma.mobileattendance.logic.dao.StaffDao
 import com.ma.mobileattendance.logic.model.Staff
 
-@Database(version = 1, entities = [Staff::class])
+@Database(version = 1, entities = [Staff::class],exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun staffDao(): StaffDao
 

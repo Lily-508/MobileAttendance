@@ -11,4 +11,6 @@
     <string name="psw_login_code_edit">请输入验证码</string>
     <string name="psw_login_btn">登陆</string>
     <string name="change_login_type">切换登陆方式</string>
+
+    <string name="default_log_text">log</string>
 </resources>

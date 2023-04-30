@@ -5,6 +5,8 @@ import android.content.Context
 import com.baidu.mapapi.CoordType
 import com.baidu.mapapi.SDKInitializer
 import com.baidu.mapapi.common.BaiduMapSDKException
+import com.ma.mobileattendance.logic.CrashHandler
+
 class MyApplication : Application() {
     companion object{
         @SuppressWarnings("StaticFieldLeak")
@@ -13,6 +15,7 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        CrashHandler.getInstance(this)
         context=applicationContext
         SDKInitializer.setAgreePrivacy(applicationContext,true);
         try {
