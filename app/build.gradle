@@ -58,13 +58,15 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
     implementation "androidx.room:room-runtime:2.1.0"
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     kapt "androidx.room:room-compiler:2.1.0"
     // optional - Kotlin Extensions and Coroutines support for Room 协程操作库
     implementation "androidx.room:room-ktx:2.1.0"
     implementation "androidx.work:work-runtime:2.2.0"
     implementation 'com.squareup.okhttp3:okhttp:3.14.9'
     implementation 'com.guolindev.permissionx:permissionx:1.6.0'
-    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.1'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.3.1'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'

@@ -13,4 +13,8 @@
     <string name="change_login_type">切换登陆方式</string>
 
     <string name="default_log_text">log</string>
+    <string name="nav_home_title">主页</string>
+    <string name="nav_punch_title">签到</string>
+    <string name="nav_user_title">我的</string>
+
 </resources>
