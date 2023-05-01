@@ -14,7 +14,12 @@
 
     <string name="default_log_text">log</string>
     <string name="nav_home_title">主页</string>
-    <string name="nav_punch_title">签到</string>
+    <string name="nav_punch_title">考勤</string>
+    <string name="nav_punch_normal_button">正常考勤</string>
+    <string name="nav_punch_outside_button">外派考勤</string>
+    <string name="nav_punch_visit_button">拜访考勤</string>
     <string name="nav_user_title">我的</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

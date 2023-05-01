@@ -15,11 +15,7 @@ class HomeActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        initToolBar()
         initView()
-
-    }
-    private fun initToolBar(){
 
     }
     private fun initView() {

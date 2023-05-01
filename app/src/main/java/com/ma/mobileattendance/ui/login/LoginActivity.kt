@@ -12,6 +12,7 @@ import com.ma.mobileattendance.databinding.ActivityLoginBinding
 import com.ma.mobileattendance.logic.Repository
 import com.ma.mobileattendance.logic.model.Captcha
 import com.ma.mobileattendance.logic.model.LoginData
+import com.ma.mobileattendance.ui.home.HomeActivity
 import com.ma.mobileattendance.util.DigestUtil
 import com.ma.mobileattendance.util.showToast
 
@@ -68,13 +69,14 @@ class LoginActivity : BaseActivity() {
                         viewModel.insertStaff(loginResponse.responseData)
                         Log.d("ActivityBase", "登陆成功$loginResponse")
                         "登陆成功".showToast(this, Toast.LENGTH_LONG)
-                        val intent = Intent(this, MainActivity::class.java)
+                        val intent = Intent(this, HomeActivity::class.java)
                         startActivity(intent)
                     } else if (loginException!=null) {
                         loginException.message?.showToast(this, Toast.LENGTH_SHORT)
                         loginException.printStackTrace()
                         Log.d("ActivityBase", "认证失败$loginException")
                     } else {
+                        "登陆失败,请稍后重试".showToast(this, Toast.LENGTH_LONG)
                         Log.d("ActivityBase", "登陆失败$loginData")
                     }
                 }

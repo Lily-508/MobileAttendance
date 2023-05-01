@@ -7,17 +7,45 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.ma.mobileattendance.ui.fragment.FragmentHome"
+        android:name="com.ma.mobileattendance.ui.fragment.NavHomeFragment"
         android:label="@string/nav_home_title"
         tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/nav_punch"
-        android:name="com.ma.mobileattendance.ui.fragment.FragmentPunch"
+        android:name="com.ma.mobileattendance.ui.fragment.NavPunchFragment"
         android:label="@string/nav_punch_title"
-        tools:layout="@layout/fragment_punch" />
+        tools:layout="@layout/fragment_punch" >
+        <action
+            android:id="@+id/action_nav_punch_to_normalAttendanceFragment"
+            app:destination="@id/normalAttendanceFragment" />
+    </fragment>
     <fragment
         android:id="@+id/nav_user"
-        android:name="com.ma.mobileattendance.ui.fragment.FragmentUser"
+        android:name="com.ma.mobileattendance.ui.fragment.NavUserFragment"
         android:label="@string/nav_user_title"
         tools:layout="@layout/fragment_user" />
+    <activity
+        android:id="@+id/loginActivity"
+        android:name="com.ma.mobileattendance.ui.login.LoginActivity"
+        android:label="activity_login"
+        tools:layout="@layout/activity_login" />
+    <fragment
+        android:id="@+id/normalAttendanceFragment"
+        android:name="com.ma.mobileattendance.ui.fragment.NormalAttendanceFragment"
+        android:label="fragment_normal_attendance"
+        tools:layout="@layout/fragment_normal_attendance" >
+        <action
+            android:id="@+id/action_normalAttendanceFragment_to_punchMapFragment"
+            app:destination="@id/punchMapFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/punchMapFragment"
+        android:name="com.ma.mobileattendance.ui.fragment.PunchMapFragment"
+        android:label="fragment_punch_map"
+        tools:layout="@layout/fragment_punch_map" >
+        <argument
+            android:name="punchType"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
 </navigation>
