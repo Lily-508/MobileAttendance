@@ -12,7 +12,7 @@
         android:id="@+id/normal_attendance"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/nav_punch_normal_button"
+        android:text="@string/nav_punch_normal"
         app:layout_constraintBottom_toTopOf="@+id/outside_attendance"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -20,7 +20,7 @@
         android:id="@+id/outside_attendance"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/nav_punch_outside_button"
+        android:text="@string/nav_punch_outside"
         app:layout_constraintBottom_toTopOf="@+id/visit_attendance"
         app:layout_constraintTop_toBottomOf="@+id/normal_attendance" />
 
@@ -28,7 +28,7 @@
         android:id="@+id/visit_attendance"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/nav_punch_visit_button"
+        android:text="@string/nav_punch_visit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/outside_attendance" />
 

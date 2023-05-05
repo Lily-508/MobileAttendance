@@ -64,7 +64,6 @@ object ServiceCreator {
                     .newBuilder()
                     .addHeader("Content-Type", "application/json;charset=UTF-8")
                     .addHeader("User-Agent", "android")
-                    .addHeader("token", "")
                     .build()
                 it.proceed(request)
             }

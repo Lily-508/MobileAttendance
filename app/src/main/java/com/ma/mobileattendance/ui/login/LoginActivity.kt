@@ -6,7 +6,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProviders
 import com.ma.mobileattendance.BaseActivity
-import com.ma.mobileattendance.MainActivity
 import com.ma.mobileattendance.R
 import com.ma.mobileattendance.databinding.ActivityLoginBinding
 import com.ma.mobileattendance.logic.Repository
@@ -62,20 +61,21 @@ class LoginActivity : BaseActivity() {
                 val loginData = LoginData(captcha!!.uuid, loginType, userId, pswLoginCode, userEncryptedPsw)
                 Repository.login(loginData).observe(this) { result ->
                     val loginResponse = result.getOrNull()
-                    val loginException=result.exceptionOrNull()
-                    if (loginResponse != null && loginResponse.code == 200) {
+                    if (loginResponse?.code == 200) {
                         //存储JWT和Staff
-                        viewModel.saveToken(loginResponse.token)
+                        viewModel.saveTokenAndSId(loginResponse.token,loginResponse.responseData.sId)
                         viewModel.insertStaff(loginResponse.responseData)
                         Log.d("ActivityBase", "登陆成功$loginResponse")
                         "登陆成功".showToast(this, Toast.LENGTH_LONG)
                         val intent = Intent(this, HomeActivity::class.java)
                         startActivity(intent)
-                    } else if (loginException!=null) {
-                        loginException.message?.showToast(this, Toast.LENGTH_SHORT)
-                        loginException.printStackTrace()
-                        Log.d("ActivityBase", "认证失败$loginException")
+                        finish()
+                    } else if (loginResponse?.code != 200) {
+                        loginResponse!!.msg.showToast(this, Toast.LENGTH_SHORT)
+                        Log.d("ActivityBase", "认证失败$loginResponse")
                     } else {
+                        val loginException=result.exceptionOrNull()
+                        loginException?.printStackTrace()
                         "登陆失败,请稍后重试".showToast(this, Toast.LENGTH_LONG)
                         Log.d("ActivityBase", "登陆失败$loginData")
                     }

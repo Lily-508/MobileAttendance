@@ -9,11 +9,8 @@ import androidx.navigation.Navigation
 import com.ma.mobileattendance.R
 import com.ma.mobileattendance.databinding.FragmentNormalAttendanceBinding
 import com.ma.mobileattendance.databinding.FragmentPunchBinding
+import com.ma.mobileattendance.logic.model.EnumNoun
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
@@ -26,9 +23,10 @@ class NormalAttendanceFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.normalPunchBtn.setOnClickListener {
-            //将数据放在Bundle中
+            //将数据放在Bundle中,
             val bundle = Bundle()
-            bundle.putInt("punchType", 0)
+            bundle.putString("rCategory", EnumNoun.NORMAL_PUNCH)
+            bundle.putInt("recordRuleId", EnumNoun.NORMAL_PUNCH_RULE)
             val controller= Navigation.findNavController(it)
             controller.navigate(R.id.action_normalAttendanceFragment_to_punchMapFragment,bundle)
         }
@@ -46,24 +44,5 @@ class NormalAttendanceFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         _binding=null
-    }
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment NormalAttendanceFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            NormalAttendanceFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
     }
 }

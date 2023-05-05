@@ -1,9 +1,6 @@
 package com.ma.mobileattendance.logic.network
 
-import com.ma.mobileattendance.logic.model.Captcha
-import com.ma.mobileattendance.logic.model.JwtResult
-import com.ma.mobileattendance.logic.model.LoginData
-import com.ma.mobileattendance.logic.model.Staff
+import com.ma.mobileattendance.logic.model.*
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
@@ -17,4 +14,7 @@ interface LoginService {
 
     @POST("/login")
     fun login(@Body loginData: LoginData): Call<JwtResult<Staff>>
+
+    @GET("/staffs/check-token")
+    fun checkToken(@Header("token")token:String):Call<BaseResponse>
 }

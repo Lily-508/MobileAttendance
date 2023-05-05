@@ -22,7 +22,7 @@ class LoginViewModel :ViewModel() {
             Repository.insertStaff(staff)
         }
     }
-    fun saveToken(token:String){
-        Repository.saveToken(token)
+    fun saveTokenAndSId(token:String, sId: Int){
+        Repository.saveTokenAndSId(token,sId)
     }
 }

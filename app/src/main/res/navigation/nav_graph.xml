@@ -9,7 +9,11 @@
         android:id="@+id/nav_home"
         android:name="com.ma.mobileattendance.ui.fragment.NavHomeFragment"
         android:label="@string/nav_home_title"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_nav_home_to_noticeListFragment"
+            app:destination="@id/noticeListFragment" />
+    </fragment>
     <fragment
         android:id="@+id/nav_punch"
         android:name="com.ma.mobileattendance.ui.fragment.NavPunchFragment"
@@ -24,16 +28,11 @@
         android:name="com.ma.mobileattendance.ui.fragment.NavUserFragment"
         android:label="@string/nav_user_title"
         tools:layout="@layout/fragment_user" />
-    <activity
-        android:id="@+id/loginActivity"
-        android:name="com.ma.mobileattendance.ui.login.LoginActivity"
-        android:label="activity_login"
-        tools:layout="@layout/activity_login" />
     <fragment
         android:id="@+id/normalAttendanceFragment"
         android:name="com.ma.mobileattendance.ui.fragment.NormalAttendanceFragment"
-        android:label="fragment_normal_attendance"
-        tools:layout="@layout/fragment_normal_attendance" >
+        android:label="@string/nav_punch_normal"
+        tools:layout="@layout/fragment_normal_attendance">
         <action
             android:id="@+id/action_normalAttendanceFragment_to_punchMapFragment"
             app:destination="@id/punchMapFragment" />
@@ -41,11 +40,20 @@
     <fragment
         android:id="@+id/punchMapFragment"
         android:name="com.ma.mobileattendance.ui.fragment.PunchMapFragment"
-        android:label="fragment_punch_map"
+        android:label="@string/nav_punch_title"
         tools:layout="@layout/fragment_punch_map" >
         <argument
-            android:name="punchType"
+            android:name="recordRuleId"
             app:argType="integer"
             android:defaultValue="0" />
+        <argument
+            android:name="rCategory"
+            app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/noticeListFragment"
+        android:name="com.ma.mobileattendance.ui.notice.NoticeListFragment"
+        android:label="公告列表"
+        tools:layout="@layout/fragment_notice_list"/>
+
 </navigation>

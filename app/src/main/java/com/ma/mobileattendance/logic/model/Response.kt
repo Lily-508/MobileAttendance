@@ -2,9 +2,11 @@ package com.ma.mobileattendance.logic.model
 
 
 import android.graphics.Bitmap
+import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import retrofit2.HttpException
 
-data class BaseResponse(
+ data class BaseResponse(
     val code: Int,
     val msg: String
 )
@@ -25,6 +27,11 @@ data class PageResponse<T>(
     val total:Int,
     @SerializedName("data") val responseData: IPage<T>
 )
+class ErrorResponseException(message:String) :Exception(message){
+    fun getResponse():BaseResponse{
+        return Gson().fromJson(message,BaseResponse::class.java)
+    }
+}
 data class IPage<T>(
     val countId: Any?,
     val current: Int,

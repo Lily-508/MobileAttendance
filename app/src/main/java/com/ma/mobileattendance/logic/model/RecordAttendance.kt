@@ -8,8 +8,8 @@ data class RecordAttendance (
     val punchInPlace: String
 ){
     var rId: Int? =null
-    var rCategory: String="正常考勤"
+    var rCategory: String=EnumNoun.NORMAL_PUNCH
     var punchOutPlace: String?=null
     var rPunchOut: String?=null
-    var rResult: String="考勤中"
+    var rResult: String=EnumNoun.PUNCH_ON_RESULT
 }

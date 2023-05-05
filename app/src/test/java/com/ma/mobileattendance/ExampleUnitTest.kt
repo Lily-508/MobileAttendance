@@ -1,5 +1,7 @@
 package com.ma.mobileattendance
 
+import com.google.gson.Gson
+import com.ma.mobileattendance.logic.model.Company
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -12,6 +14,8 @@ import org.junit.Assert.*
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+        val json="{\"cContent\"=\"null\",\"cId\"=111}"
+        val company= Gson().fromJson(json, Company::class.java)
+        print(company)
     }
 }
