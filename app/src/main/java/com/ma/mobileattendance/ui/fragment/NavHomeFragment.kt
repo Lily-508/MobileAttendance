@@ -30,6 +30,10 @@ class NavHomeFragment : Fragment() {
             val controller= Navigation.findNavController(it)
             controller.navigate(R.id.action_nav_home_to_noticeListFragment)
         }
+        binding.addAffairBtn.setOnClickListener {
+            val controller= Navigation.findNavController(it)
+            controller.navigate(R.id.action_nav_home_to_addAffairFragment)
+        }
     }
 
     override fun onCreateView(

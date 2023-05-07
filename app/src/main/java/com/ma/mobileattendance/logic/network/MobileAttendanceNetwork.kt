@@ -17,6 +17,7 @@ object MobileAttendanceNetwork {
     private val attendanceRuleService = ServiceCreator.create<AttendanceRuleService>()
     private val visitService = ServiceCreator.create<VisitService>()
     private val noticeService = ServiceCreator.create<NoticeService>()
+    private val affairService = ServiceCreator.create<AffairService>()
 
     /**
      *获取验证码
@@ -87,12 +88,13 @@ object MobileAttendanceNetwork {
      * 拜访签退
      */
     suspend fun visitPunchOut(token: String, visit: Visit) = visitService.visitPunchOut(token, visit).await()
-
     /**
      * 获取公告分页列表
      */
     suspend fun getNoticePage(token: String, pageCur: Int, pageSize: Int) =
         noticeService.getNoticePage(token, pageCur, pageSize).await()
+
+    suspend fun setWorkOutside(token: String, affair: Affair) = affairService.setWorkOutside(token, affair).await()
 
 
     private suspend fun <T> Call<T>.await(): T {

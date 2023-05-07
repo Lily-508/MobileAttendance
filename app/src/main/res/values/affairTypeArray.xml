@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="affair_type_array">
+        <item>请休假</item>
+        <item>加班</item>
+        <item>外派</item>
+        <item>补卡</item>
+    </string-array>
+</resources>

@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_nav_home_to_noticeListFragment"
             app:destination="@id/noticeListFragment" />
+        <action
+            android:id="@+id/action_nav_home_to_addAffairFragment"
+            app:destination="@id/addAffairFragment" />
     </fragment>
     <fragment
         android:id="@+id/nav_punch"
@@ -22,6 +25,9 @@
         <action
             android:id="@+id/action_nav_punch_to_normalAttendanceFragment"
             app:destination="@id/normalAttendanceFragment" />
+        <action
+            android:id="@+id/action_nav_punch_to_workOutsidePunchFragment"
+            app:destination="@id/workOutsidePunchFragment" />
     </fragment>
     <fragment
         android:id="@+id/nav_user"
@@ -55,5 +61,15 @@
         android:name="com.ma.mobileattendance.ui.notice.NoticeListFragment"
         android:label="公告列表"
         tools:layout="@layout/fragment_notice_list"/>
+    <fragment
+        android:id="@+id/addAffairFragment"
+        android:name="com.ma.mobileattendance.ui.affair.AddAffairFragment"
+        android:label="申请事务"
+        tools:layout="@layout/fragment_add_affair" />
+    <fragment
+        android:id="@+id/workOutsidePunchFragment"
+        android:name="com.ma.mobileattendance.ui.affair.workoutside.WorkOutsidePunchFragment"
+        android:label="外派列表"
+        tools:layout="@layout/fragment_work_outside_punch" />
 
 </navigation>

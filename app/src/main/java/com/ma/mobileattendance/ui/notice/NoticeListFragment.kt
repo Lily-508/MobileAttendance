@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.ma.mobileattendance.R
 import com.ma.mobileattendance.databinding.FragmentNormalAttendanceBinding
 import com.ma.mobileattendance.databinding.FragmentNoticeListBinding
@@ -48,6 +49,16 @@ class NoticeListFragment : Fragment() {
                 }
             }
         }
+        binding.noticeListRecycleView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(rv, dx, dy)
+                if(rv.computeVerticalScrollExtent() + rv.computeVerticalScrollOffset() >= rv.computeVerticalScrollRange()){
+                    //滑动到底部了
+                    Toast.makeText(context,"滑动底部,加载下一页",Toast.LENGTH_SHORT).show()
+                    viewModel.getNextNoticeList()
+                }
+            }
+        })
     }
 
     override fun onCreateView(

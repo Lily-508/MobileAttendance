@@ -13,7 +13,7 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
 
 object ServiceCreator {
-    private const val BASE_URL = "https://192.168.1.107:8433"
+    private const val BASE_URL = "https://192.168.1.108:8433"
     private val client = getHttpsClient()
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)

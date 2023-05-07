@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.affair.AddAffairFragment">
+
+    <EditText
+        android:id="@+id/contentEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="@android:drawable/edit_text"
+        android:gravity="top"
+        android:hint="请输入详细申请原因"
+        android:inputType="textMultiLine"
+        android:maxLines="5"
+        android:minLines="5"
+        android:scrollbars="vertical"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/affairCommit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/content" />
+
+    <TextView
+        android:id="@+id/staffId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="申请人id"
+        app:layout_constraintBottom_toTopOf="@+id/staffName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/staffName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="申请人姓名"
+        app:layout_constraintBottom_toTopOf="@+id/startTime"
+        app:layout_constraintStart_toStartOf="@+id/staffId"
+        app:layout_constraintTop_toBottomOf="@+id/staffId" />
+
+    <TextView
+        android:id="@+id/affairType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="事务类别"
+        app:layout_constraintBottom_toTopOf="@+id/vocationId"
+        app:layout_constraintStart_toStartOf="@+id/staffId"
+        app:layout_constraintTop_toBottomOf="@+id/reviewerName"
+
+        />
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="申请内容"
+        app:layout_constraintBottom_toTopOf="@+id/contentEditText"
+        app:layout_constraintStart_toStartOf="@+id/staffId"
+        app:layout_constraintTop_toBottomOf="@+id/recordAttendanceId"
+        tools:layout_editor_absoluteX="16dp" />
+
+    <TextView
+        android:id="@+id/total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="总计(分钟)"
+        app:layout_constraintBottom_toBottomOf="@id/content"
+        app:layout_constraintEnd_toStartOf="@id/totalText"
+        app:layout_constraintStart_toEndOf="@id/content"
+        app:layout_constraintTop_toTopOf="@+id/content" />
+
+    <TextView
+        android:id="@+id/totalText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="总共时间"
+        app:layout_constraintBottom_toBottomOf="@+id/total"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/total"
+        app:layout_constraintTop_toTopOf="@+id/total" />
+
+    <TextView
+        android:id="@+id/recordAttendanceId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="考勤记录id"
+        app:layout_constraintBottom_toTopOf="@+id/content"
+        app:layout_constraintStart_toStartOf="@+id/staffId"
+        app:layout_constraintTop_toBottomOf="@+id/attendanceRuleId"
+
+        tools:layout_editor_absoluteX="16dp" />
+
+    <TextView
+        android:id="@+id/startTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始时间"
+        app:layout_constraintBottom_toTopOf="@+id/endTime"
+        app:layout_constraintStart_toStartOf="@+id/staffId"
+        app:layout_constraintTop_toBottomOf="@+id/staffName"
+        tools:layout_editor_absoluteX="10dp" />
+
+    <Button
+        android:id="@+id/affairCommit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="提交"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/contentEditText" />
+
+    <TextView
+        android:id="@+id/vocationId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="假期id"
+        app:layout_constraintBottom_toTopOf="@+id/attendanceRuleId"
+        app:layout_constraintStart_toStartOf="@+id/staffId"
+        app:layout_constraintTop_toBottomOf="@+id/affairType"
+
+        />
+
+    <TextView
+        android:id="@+id/attendanceRuleId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="考勤规则id"
+        app:layout_constraintBottom_toTopOf="@+id/recordAttendanceId"
+        app:layout_constraintStart_toStartOf="@+id/staffId"
+        app:layout_constraintTop_toBottomOf="@+id/vocationId"
+
+        />
+
+    <TextView
+        android:id="@+id/endTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="结束时间"
+        app:layout_constraintBottom_toTopOf="@+id/reviewerId"
+        app:layout_constraintStart_toStartOf="@+id/staffId"
+        app:layout_constraintTop_toBottomOf="@+id/startTime"
+        tools:layout_editor_absoluteX="11dp" />
+
+    <EditText
+        android:id="@+id/reviewerIdEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:hint="请输入审核人id"
+        android:inputType="text"
+        android:maxLines="1"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/reviewerId"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/reviewerId"
+        app:layout_constraintTop_toTopOf="@+id/reviewerId" />
+
+    <Spinner
+        android:id="@+id/affairTypeSpinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="#E5E5E5"
+        android:dropDownVerticalOffset="45dp"
+        android:entries="@array/affair_type_array"
+        android:spinnerMode="dropdown"
+        app:layout_constraintBottom_toBottomOf="@+id/affairType"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/affairType"
+        app:layout_constraintTop_toTopOf="@+id/affairType" />
+
+    <EditText
+        android:id="@+id/recordAttendanceIdEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:hint="事务类别为补卡填写"
+        android:enabled="false"
+        android:inputType="text"
+        android:maxLines="1"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/recordAttendanceId"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/recordAttendanceId"
+        app:layout_constraintTop_toTopOf="@+id/recordAttendanceId" />
+
+    <EditText
+        android:id="@+id/vocationIdEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:enabled="false"
+        android:hint="事务类别为请休假填写"
+        android:inputType="text"
+        android:maxLines="1"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/vocationId"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/vocationId"
+        app:layout_constraintTop_toTopOf="@+id/vocationId" />
+
+    <EditText
+        android:id="@+id/attendanceRuleIdEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:hint="事务类别为外派填写"
+        android:enabled="false"
+        android:inputType="text"
+        android:maxLines="1"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/attendanceRuleId"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/attendanceRuleId"
+        app:layout_constraintTop_toTopOf="@+id/attendanceRuleId" />
+
+    <EditText
+        android:id="@+id/reviewerNameEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:hint="请输入审核人姓名"
+        android:inputType="text"
+        android:maxLines="1"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/reviewerName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/reviewerName"
+        app:layout_constraintTop_toTopOf="@+id/reviewerName" />
+
+    <TextView
+        android:id="@+id/reviewerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="审核人姓名"
+        app:layout_constraintBottom_toTopOf="@+id/affairType"
+        app:layout_constraintStart_toStartOf="@+id/staffId"
+
+        app:layout_constraintTop_toBottomOf="@+id/reviewerId" />
+
+    <TextView
+        android:id="@+id/staffIdText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:text="申请人id显示"
+        app:layout_constraintBottom_toBottomOf="@+id/staffId"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/staffId"
+        app:layout_constraintTop_toTopOf="@+id/staffId" />
+
+    <TextView
+        android:id="@+id/startTimeText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:text="点击选择时间"
+        app:layout_constraintBottom_toBottomOf="@+id/startTime"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/startTime"
+        app:layout_constraintTop_toTopOf="@+id/startTime" />
+
+    <TextView
+        android:id="@+id/endTimeText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:text="点击选择时间"
+        app:layout_constraintBottom_toBottomOf="@+id/endTime"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/endTime"
+        app:layout_constraintTop_toTopOf="@+id/endTime" />
+
+    <TextView
+        android:id="@+id/staffNameText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:text="申请人姓名显示"
+        app:layout_constraintBottom_toBottomOf="@+id/staffName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/staffName"
+        app:layout_constraintTop_toTopOf="@+id/staffName" />
+
+    <TextView
+        android:id="@+id/reviewerId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="审核人id"
+        app:layout_constraintBottom_toTopOf="@+id/reviewerName"
+        app:layout_constraintStart_toStartOf="@+id/staffId"
+        app:layout_constraintTop_toBottomOf="@+id/endTime"
+        tools:layout_editor_absoluteX="10dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

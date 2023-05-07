@@ -207,4 +207,21 @@ object Repository {
         }
         emit(result)
     }
+
+    /**
+     * 新建外派事务
+     */
+    fun setWorkOutside(affair: Affair,token: String? = this.token)= liveData(Dispatchers.IO) {
+        val result = try {
+            if (token == null) {
+                Result.failure(Exception("token不存在"))
+            } else {
+                val recordAttendanceResponse = MobileAttendanceNetwork.setWorkOutside(token, affair)
+                Result.success(recordAttendanceResponse)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+        emit(result)
+    }
 }
