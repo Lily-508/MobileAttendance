@@ -144,8 +144,8 @@ object Repository {
             if (token == null) {
                 Result.failure(Exception("token不存在"))
             } else{
-                val companyResponse=MobileAttendanceNetwork.getVisitByDId(token,dId)
-                Result.success(companyResponse)
+                val dataResponse=MobileAttendanceNetwork.getVisitByDId(token,dId)
+                Result.success(dataResponse)
             }
         }catch (e:Exception){
             Result.failure(e)
@@ -157,8 +157,8 @@ object Repository {
             if (token == null) {
                 Result.failure(Exception("token不存在"))
             } else {
-                val recordAttendanceResponse = MobileAttendanceNetwork.setVisit(token, visit)
-                Result.success(recordAttendanceResponse)
+                val baseResponse = MobileAttendanceNetwork.setVisit(token, visit)
+                Result.success(baseResponse)
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -170,8 +170,8 @@ object Repository {
             if (token == null) {
                 Result.failure(Exception("token不存在"))
             } else {
-                val recordAttendanceResponse = MobileAttendanceNetwork.visitPunchIn(token, visit)
-                Result.success(recordAttendanceResponse)
+                val baseResponse = MobileAttendanceNetwork.visitPunchIn(token, visit)
+                Result.success(baseResponse)
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -183,8 +183,8 @@ object Repository {
             if (token == null) {
                 Result.failure(Exception("token不存在"))
             } else {
-                val recordAttendanceResponse = MobileAttendanceNetwork.visitPunchOut(token, visit)
-                Result.success(recordAttendanceResponse)
+                val baseResponse = MobileAttendanceNetwork.visitPunchOut(token, visit)
+                Result.success(baseResponse)
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -199,8 +199,8 @@ object Repository {
             if (token == null) {
                 Result.failure(Exception("token不存在"))
             } else {
-                val recordAttendanceResponse = MobileAttendanceNetwork.getNoticePage(token, pageCur,pageSize)
-                Result.success(recordAttendanceResponse.responseData.records)
+                val pageResponse = MobileAttendanceNetwork.getNoticePage(token, pageCur,pageSize)
+                Result.success(pageResponse.responseData.records)
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -216,8 +216,25 @@ object Repository {
             if (token == null) {
                 Result.failure(Exception("token不存在"))
             } else {
-                val recordAttendanceResponse = MobileAttendanceNetwork.setWorkOutside(token, affair)
-                Result.success(recordAttendanceResponse)
+                val baseResponse = MobileAttendanceNetwork.setWorkOutside(token, affair)
+                Result.success(baseResponse)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+        emit(result)
+    }
+
+    /**
+     * 获取拜访列表
+     */
+    fun getWorkOutsideList(sId: Int,token: String? = this.token)= liveData(Dispatchers.IO) {
+        val result = try {
+            if (token == null) {
+                Result.failure(Exception("token不存在"))
+            } else {
+                val dataResponse = MobileAttendanceNetwork.getWorkOutsideList(token, sId)
+                Result.success(dataResponse.responseData)
             }
         } catch (e: Exception) {
             Result.failure(e)

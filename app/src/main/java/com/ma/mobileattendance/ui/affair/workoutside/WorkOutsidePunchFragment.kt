@@ -1,60 +1,73 @@
 package com.ma.mobileattendance.ui.affair.workoutside
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.ma.mobileattendance.R
+import com.ma.mobileattendance.databinding.FragmentNoticeListBinding
+import com.ma.mobileattendance.databinding.FragmentWorkOutsidePunchBinding
+import com.ma.mobileattendance.logic.Repository
+import com.ma.mobileattendance.logic.model.ErrorResponseException
+import com.ma.mobileattendance.ui.notice.NoticeListAdapter
+import com.ma.mobileattendance.ui.notice.NoticeViewModel
+import com.ma.mobileattendance.ui.notice.NoticeViewModelFactory
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [WorkOutsidePunchFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class WorkOutsidePunchFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    private  var _binding: FragmentWorkOutsidePunchBinding?=null
+    private lateinit var adapter: WorkOutsidePunchAdapter
+    private val binding get() = _binding!!
+    private val viewModel by lazy { ViewModelProviders.of(this).get(WorkOutsidePunchViewModel::class.java) }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.workOutsidePunchRecyclerView.layoutManager=LinearLayoutManager(activity)
+        adapter= WorkOutsidePunchAdapter(viewModel.workOutsideList)
+        binding.workOutsidePunchRecyclerView.adapter=adapter
+        getWorkOutsideList()
+        viewModel.sIdLiveData.observe(viewLifecycleOwner){result->
+            Log.d("WorkOutsideActivity","响应体$result")
+            val workOutsideList=result.getOrNull()
+            if(workOutsideList!=null){
+                viewModel.workOutsideList.clear()
+                viewModel.workOutsideList.addAll(workOutsideList)
+                adapter.notifyDataSetChanged()
+            }else{
+                val exception = result.exceptionOrNull()
+                if (exception is ErrorResponseException) {
+                    val response = exception.getResponse()
+                    Toast.makeText(activity, response.msg, Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(activity, "获取外派事务失败,请重试", Toast.LENGTH_LONG).show()
+                    Log.d("ActivityPunch", "获取外派事务失败$exception")
+                    exception?.printStackTrace()
+                }
+            }
         }
     }
-
+    private fun getWorkOutsideList(){
+        val sId=Repository.getSId()
+        if(sId!=0){
+            viewModel.getWorkOutsideList(sId)
+        }else{
+            Toast.makeText(activity, "获取失败,请登录!", Toast.LENGTH_LONG).show()
+        }
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_work_outside_punch, container, false)
+        _binding= FragmentWorkOutsidePunchBinding.inflate(inflater,container,false)
+        return binding.root
     }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment WorkOutsidePunchFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            WorkOutsidePunchFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding=null
     }
 }

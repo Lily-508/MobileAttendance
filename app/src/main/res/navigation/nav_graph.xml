@@ -70,6 +70,10 @@
         android:id="@+id/workOutsidePunchFragment"
         android:name="com.ma.mobileattendance.ui.affair.workoutside.WorkOutsidePunchFragment"
         android:label="外派列表"
-        tools:layout="@layout/fragment_work_outside_punch" />
+        tools:layout="@layout/fragment_work_outside_punch" >
+        <action
+            android:id="@+id/action_workOutsidePunchFragment_to_punchMapFragment"
+            app:destination="@id/punchMapFragment" />
+    </fragment>
 
 </navigation>

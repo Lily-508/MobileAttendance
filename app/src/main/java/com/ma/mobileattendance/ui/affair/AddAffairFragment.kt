@@ -37,7 +37,7 @@ class AddAffairFragment : Fragment() {
             initDateTimePicker(it as TextView)
         }
         viewModel.totalLiveData.observe(viewLifecycleOwner) {
-            binding.totalText.text = it.toString()
+            binding.affairTotalText.text = it.toString()
             if (it <= 0) {
                 Toast.makeText(activity, "结束时间不能小于开始时间", Toast.LENGTH_LONG).show()
             }
@@ -187,7 +187,7 @@ class AddAffairFragment : Fragment() {
             val content = binding.contentEditText.text.toString()
             val startTime = binding.startTimeText.text.toString()
             val endTime = binding.endTimeText.text.toString()
-            val total = binding.totalText.text.toString().toLong()
+            val total = binding.affairTotalText.text.toString().toLong()
             if (sId == 0 || reviewer == 0 || total <= 0) return null
             return Affair(sId, reviewer, vId, rId, aId, content, startTime, endTime, total)
         } catch (e: NumberFormatException) {

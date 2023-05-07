@@ -23,7 +23,7 @@
         app:layout_constraintBottom_toTopOf="@+id/affairCommit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/content" />
+        app:layout_constraintTop_toBottomOf="@+id/affairContent" />
 
     <TextView
         android:id="@+id/staffId"
@@ -40,7 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="申请人姓名"
-        app:layout_constraintBottom_toTopOf="@+id/startTime"
+        app:layout_constraintBottom_toTopOf="@+id/affairStartTime"
         app:layout_constraintStart_toStartOf="@+id/staffId"
         app:layout_constraintTop_toBottomOf="@+id/staffId" />
 
@@ -56,7 +56,7 @@
         />
 
     <TextView
-        android:id="@+id/content"
+        android:id="@+id/affairContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="申请内容"
@@ -66,42 +66,42 @@
         tools:layout_editor_absoluteX="16dp" />
 
     <TextView
-        android:id="@+id/total"
+        android:id="@+id/affairTotal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="总计(分钟)"
-        app:layout_constraintBottom_toBottomOf="@id/content"
-        app:layout_constraintEnd_toStartOf="@id/totalText"
-        app:layout_constraintStart_toEndOf="@id/content"
-        app:layout_constraintTop_toTopOf="@+id/content" />
+        app:layout_constraintBottom_toBottomOf="@id/affairContent"
+        app:layout_constraintEnd_toStartOf="@id/affairTotalText"
+        app:layout_constraintStart_toEndOf="@id/affairContent"
+        app:layout_constraintTop_toTopOf="@+id/affairContent" />
 
     <TextView
-        android:id="@+id/totalText"
+        android:id="@+id/affairTotalText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="总共时间"
-        app:layout_constraintBottom_toBottomOf="@+id/total"
+        app:layout_constraintBottom_toBottomOf="@+id/affairTotal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/total"
-        app:layout_constraintTop_toTopOf="@+id/total" />
+        app:layout_constraintStart_toEndOf="@id/affairTotal"
+        app:layout_constraintTop_toTopOf="@+id/affairTotal" />
 
     <TextView
         android:id="@+id/recordAttendanceId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="考勤记录id"
-        app:layout_constraintBottom_toTopOf="@+id/content"
+        app:layout_constraintBottom_toTopOf="@+id/affairContent"
         app:layout_constraintStart_toStartOf="@+id/staffId"
-        app:layout_constraintTop_toBottomOf="@+id/attendanceRuleId"
+        app:layout_constraintTop_toBottomOf="@+id/affairRule"
 
         tools:layout_editor_absoluteX="16dp" />
 
     <TextView
-        android:id="@+id/startTime"
+        android:id="@+id/affairStartTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="开始时间"
-        app:layout_constraintBottom_toTopOf="@+id/endTime"
+        app:layout_constraintBottom_toTopOf="@+id/affairEndTime"
         app:layout_constraintStart_toStartOf="@+id/staffId"
         app:layout_constraintTop_toBottomOf="@+id/staffName"
         tools:layout_editor_absoluteX="10dp" />
@@ -121,14 +121,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="假期id"
-        app:layout_constraintBottom_toTopOf="@+id/attendanceRuleId"
+        app:layout_constraintBottom_toTopOf="@+id/affairRule"
         app:layout_constraintStart_toStartOf="@+id/staffId"
         app:layout_constraintTop_toBottomOf="@+id/affairType"
 
         />
 
     <TextView
-        android:id="@+id/attendanceRuleId"
+        android:id="@+id/affairRule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="考勤规则id"
@@ -139,13 +139,13 @@
         />
 
     <TextView
-        android:id="@+id/endTime"
+        android:id="@+id/affairEndTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="结束时间"
         app:layout_constraintBottom_toTopOf="@+id/reviewerId"
         app:layout_constraintStart_toStartOf="@+id/staffId"
-        app:layout_constraintTop_toBottomOf="@+id/startTime"
+        app:layout_constraintTop_toBottomOf="@+id/affairStartTime"
         tools:layout_editor_absoluteX="11dp" />
 
     <EditText
@@ -221,10 +221,10 @@
         android:inputType="text"
         android:maxLines="1"
         android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="@+id/attendanceRuleId"
+        app:layout_constraintBottom_toBottomOf="@+id/affairRule"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/attendanceRuleId"
-        app:layout_constraintTop_toTopOf="@+id/attendanceRuleId" />
+        app:layout_constraintStart_toEndOf="@+id/affairRule"
+        app:layout_constraintTop_toTopOf="@+id/affairRule" />
 
     <EditText
         android:id="@+id/reviewerNameEditText"
@@ -270,10 +270,10 @@
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:text="点击选择时间"
-        app:layout_constraintBottom_toBottomOf="@+id/startTime"
+        app:layout_constraintBottom_toBottomOf="@+id/affairStartTime"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/startTime"
-        app:layout_constraintTop_toTopOf="@+id/startTime" />
+        app:layout_constraintStart_toEndOf="@+id/affairStartTime"
+        app:layout_constraintTop_toTopOf="@+id/affairStartTime" />
 
     <TextView
         android:id="@+id/endTimeText"
@@ -282,10 +282,10 @@
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:text="点击选择时间"
-        app:layout_constraintBottom_toBottomOf="@+id/endTime"
+        app:layout_constraintBottom_toBottomOf="@+id/affairEndTime"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/endTime"
-        app:layout_constraintTop_toTopOf="@+id/endTime" />
+        app:layout_constraintStart_toEndOf="@+id/affairEndTime"
+        app:layout_constraintTop_toTopOf="@+id/affairEndTime" />
 
     <TextView
         android:id="@+id/staffNameText"
@@ -306,7 +306,7 @@
         android:text="审核人id"
         app:layout_constraintBottom_toTopOf="@+id/reviewerName"
         app:layout_constraintStart_toStartOf="@+id/staffId"
-        app:layout_constraintTop_toBottomOf="@+id/endTime"
+        app:layout_constraintTop_toBottomOf="@+id/affairEndTime"
         tools:layout_editor_absoluteX="10dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

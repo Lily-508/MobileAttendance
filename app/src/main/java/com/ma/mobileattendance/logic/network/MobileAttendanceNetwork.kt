@@ -95,6 +95,7 @@ object MobileAttendanceNetwork {
         noticeService.getNoticePage(token, pageCur, pageSize).await()
 
     suspend fun setWorkOutside(token: String, affair: Affair) = affairService.setWorkOutside(token, affair).await()
+    suspend fun getWorkOutsideList(token: String, sId: Int) = affairService.getWorkOutsideList(token, sId).await()
 
 
     private suspend fun <T> Call<T>.await(): T {

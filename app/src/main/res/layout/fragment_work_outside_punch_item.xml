@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#FAF9DE">
+
+    <TextView
+        android:id="@+id/woEndtime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="结束时间"
+        app:layout_constraintEnd_toStartOf="@+id/woEndTImeText"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/woStartTime" />
+
+    <TextView
+        android:id="@+id/woTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="事务标题"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/woContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="内容"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/woTitle" />
+
+    <TextView
+        android:id="@+id/woStartTimeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始时间"
+        app:layout_constraintBottom_toBottomOf="@+id/woStartTime"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/woStartTime"
+        app:layout_constraintTop_toTopOf="@+id/woStartTime" />
+
+    <TextView
+        android:id="@+id/woEndTImeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="结束时间"
+        app:layout_constraintBottom_toBottomOf="@+id/woEndtime"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/woEndtime"
+        app:layout_constraintTop_toTopOf="@+id/woEndtime" />
+
+    <TextView
+        android:id="@+id/woStartTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="开始时间"
+        app:layout_constraintEnd_toStartOf="@+id/woStartTimeText"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/woContent" />
+
+    <TextView
+        android:id="@+id/woTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="总计(分钟)"
+        app:layout_constraintEnd_toStartOf="@+id/woTotalText"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/woEndtime" />
+
+    <TextView
+        android:id="@+id/woTotalText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="总计时间"
+        app:layout_constraintBottom_toBottomOf="@+id/woTotal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/woTotal"
+        app:layout_constraintTop_toTopOf="@+id/woTotal" />
+
+    <Button
+        android:id="@+id/woEditBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="编辑"
+        app:layout_constraintEnd_toStartOf="@+id/woPunchBtn"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/woRule" />
+
+    <Button
+        android:id="@+id/woPunchBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="考勤"
+        app:layout_constraintBottom_toBottomOf="@+id/woEditBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/woEditBtn"
+        app:layout_constraintTop_toTopOf="@+id/woEditBtn" />
+
+    <TextView
+        android:id="@+id/woRule"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="考勤规则Id"
+        app:layout_constraintEnd_toStartOf="@+id/woRuleText"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/woTotal" />
+
+    <TextView
+        android:id="@+id/woRuleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Id号"
+        app:layout_constraintBottom_toBottomOf="@+id/woRule"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/woRule"
+        app:layout_constraintTop_toTopOf="@+id/woRule" />
+</androidx.constraintlayout.widget.ConstraintLayout>

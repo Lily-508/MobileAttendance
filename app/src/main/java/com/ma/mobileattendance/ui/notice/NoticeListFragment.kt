@@ -23,7 +23,7 @@ class NoticeListFragment : Fragment() {
     private  var _binding:FragmentNoticeListBinding?=null
     private lateinit var adapter: NoticeListAdapter
     private val binding get() = _binding!!
-    private var pageSize=20
+    private var pageSize=1
     private val viewModel by lazy { ViewModelProviders.of(this,NoticeViewModelFactory(pageSize)).get(NoticeViewModel::class.java) }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
