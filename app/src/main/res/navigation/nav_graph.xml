@@ -31,7 +31,7 @@
     </fragment>
     <fragment
         android:id="@+id/nav_user"
-        android:name="com.ma.mobileattendance.ui.fragment.NavUserFragment"
+        android:name="com.ma.mobileattendance.ui.user.NavUserFragment"
         android:label="@string/nav_user_title"
         tools:layout="@layout/fragment_user" />
     <fragment

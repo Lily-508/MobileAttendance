@@ -14,7 +14,8 @@ interface LoginService {
 
     @POST("/login")
     fun login(@Body loginData: LoginData): Call<JwtResult<Staff>>
-
+    @POST("/logout")
+    fun logout(@Header("token")token:String):Call<BaseResponse>
     @GET("/staffs/check-token")
     fun checkToken(@Header("token")token:String):Call<BaseResponse>
 }

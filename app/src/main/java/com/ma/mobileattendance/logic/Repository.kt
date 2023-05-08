@@ -37,6 +37,22 @@ object Repository {
         }
         emit(result)
     }
+    /**
+     * 用户注销
+     */
+    fun logout(token: String?=this.token) = liveData(Dispatchers.IO) {
+        val result = try {
+            if (token == null) {
+                Result.failure(Exception("token不存在"))
+            } else {
+                val loginResponse = MobileAttendanceNetwork.logout(token)
+                Result.success(loginResponse)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+        emit(result)
+    }
 
     /**
      * 检测token有效性
@@ -60,8 +76,8 @@ object Repository {
      */
     suspend fun insertStaff(staff: Staff) = staffDao.insertStaff(staff)
     fun selectStaffBySId(sId: Int) = staffDao.selectBySId(sId)
-    suspend fun updateStaff(staff: Staff) = staffDao.updateStaff(staff)
-    suspend fun deleteStaff(staff: Staff) = staffDao.deleteStaff(staff)
+    suspend fun updateStaffByRoom(staff: Staff) = staffDao.updateStaff(staff)
+    suspend fun deleteStaffByRoom(staff: Staff) = staffDao.deleteStaff(staff)
 
     /**
      * sharedPreferences存储相关
@@ -70,6 +86,7 @@ object Repository {
     fun saveRecordAttendance(recordAttendance: RecordAttendance) =
         SharedPreferencesDao.saveRecordAttendance(recordAttendance)
     fun removeRecordAttendance()=SharedPreferencesDao.removeRecordAttendance()
+    fun removeTokenAndSId()=SharedPreferencesDao.removeTokenAndSId()
     fun isTokenSaved() = SharedPreferencesDao.isTokenSaved()
     fun isSIdSaved() = SharedPreferencesDao.isSIdSaved()
     fun getSId() = SharedPreferencesDao.getSavedSId()
@@ -241,4 +258,22 @@ object Repository {
         }
         emit(result)
     }
+    /**
+     * 更新用户信息
+     */
+    fun updateStaff(staff: Staff,token: String? = this.token)= liveData(Dispatchers.IO) {
+        val result = try {
+            if (token == null) {
+                Result.failure(Exception("token不存在"))
+            } else {
+                val baseResponse = MobileAttendanceNetwork.updateStaff(token, staff)
+                Result.success(baseResponse)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+        emit(result)
+    }
+
+
 }

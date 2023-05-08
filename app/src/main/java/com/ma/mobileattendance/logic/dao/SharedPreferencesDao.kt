@@ -30,6 +30,12 @@ object SharedPreferencesDao {
         }
 
     }
+    fun removeTokenAndSId(){
+        sharedPreferences().edit {
+            remove("token")
+            remove("sId")
+        }
+    }
     fun isSIdSaved()= sharedPreferences().contains("sId")
     fun isTokenSaved() = sharedPreferences().contains("token")
 

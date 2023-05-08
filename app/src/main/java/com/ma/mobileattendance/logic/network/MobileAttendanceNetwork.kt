@@ -18,6 +18,7 @@ object MobileAttendanceNetwork {
     private val visitService = ServiceCreator.create<VisitService>()
     private val noticeService = ServiceCreator.create<NoticeService>()
     private val affairService = ServiceCreator.create<AffairService>()
+    private val staffService = ServiceCreator.create<StaffService>()
 
     /**
      *获取验证码
@@ -47,6 +48,7 @@ object MobileAttendanceNetwork {
      * 登陆
      */
     suspend fun login(loginData: LoginData) = loginService.login(loginData).await()
+    suspend fun logout(token: String)= loginService.logout(token).await()
     suspend fun checkToken(token: String) = loginService.checkToken(token).await()
 
     /**
@@ -94,9 +96,16 @@ object MobileAttendanceNetwork {
     suspend fun getNoticePage(token: String, pageCur: Int, pageSize: Int) =
         noticeService.getNoticePage(token, pageCur, pageSize).await()
 
+    /**
+     * 外派考勤
+     */
     suspend fun setWorkOutside(token: String, affair: Affair) = affairService.setWorkOutside(token, affair).await()
     suspend fun getWorkOutsideList(token: String, sId: Int) = affairService.getWorkOutsideList(token, sId).await()
 
+    /**
+     * 用户信息
+     */
+    suspend fun updateStaff(token: String,staff:Staff)= staffService.updateStaff(token,staff).await()
 
     private suspend fun <T> Call<T>.await(): T {
         return suspendCoroutine { continuation ->

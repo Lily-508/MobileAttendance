@@ -1,5 +1,6 @@
 package com.ma.mobileattendance.ui.login
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -13,13 +14,16 @@ import com.ma.mobileattendance.logic.model.Captcha
 import com.ma.mobileattendance.logic.model.LoginData
 import com.ma.mobileattendance.ui.home.HomeActivity
 import com.ma.mobileattendance.util.DigestUtil
+import com.ma.mobileattendance.util.ImeiUtil
 import com.ma.mobileattendance.util.showToast
+import com.permissionx.guolindev.PermissionX
 
 class LoginActivity : BaseActivity() {
     private lateinit var binding: ActivityLoginBinding
 
     //验证码
     private var captcha: Captcha? = null
+    private var imei: String? = null
 
     //0用户名密码 1手机验证码
     private var loginType: Int = 0
@@ -30,6 +34,38 @@ class LoginActivity : BaseActivity() {
         setContentView(binding.root)
         binding.toolbar.title = resources.getString(R.string.activity_login)
         setSupportActionBar(binding.toolbar)
+        initPermissionX()
+
+    }
+
+    private fun initPermissionX() {
+        PermissionX.init(this)
+            .permissions(
+                Manifest.permission.READ_PHONE_STATE,
+            )
+            .explainReasonBeforeRequest()
+            .onExplainRequestReason { scope, deniedList ->
+                val message = "PermissionX需要您同意以下权限才能正常使用"
+                scope.showRequestReasonDialog(deniedList, message, "确定", "取消")
+            }
+            .onForwardToSettings { scope, deniedList ->
+                scope.showForwardToSettingsDialog(deniedList, "您需要去应用程序设置当中手动开启权限", "我已明白", "取消")
+            }
+            .request { allGranted, grantedList, deniedList ->
+                if (allGranted) {
+                    //所有权限都已经成功获取
+                    imei = ImeiUtil.getIMEIDeviceId(this)
+                    Log.d("LoginActivity", "imei:$imei")
+                    initView()
+                    Toast.makeText(this, "所有申请的权限都已通过", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "您拒绝了如下权限：$deniedList", Toast.LENGTH_SHORT).show()
+                }
+
+            }
+    }
+
+    private fun initView() {
         updateCaptcha()
         binding.captcha.setOnClickListener {
             updateCaptcha()
@@ -58,12 +94,12 @@ class LoginActivity : BaseActivity() {
                 "用户ID或密码长度错误".showToast(this)
             } else {
                 val userEncryptedPsw = DigestUtil.md5(binding.userPsw.text.toString())
-                val loginData = LoginData(captcha!!.uuid, loginType, userId, pswLoginCode, userEncryptedPsw)
+                val loginData = LoginData(captcha!!.uuid, loginType, userId, pswLoginCode, userEncryptedPsw, imei)
                 Repository.login(loginData).observe(this) { result ->
                     val loginResponse = result.getOrNull()
                     if (loginResponse?.code == 200) {
                         //存储JWT和Staff
-                        viewModel.saveTokenAndSId(loginResponse.token,loginResponse.responseData.sId)
+                        viewModel.saveTokenAndSId(loginResponse.token, loginResponse.responseData.sId)
                         viewModel.insertStaff(loginResponse.responseData)
                         Log.d("ActivityBase", "登陆成功$loginResponse")
                         "登陆成功".showToast(this, Toast.LENGTH_LONG)
@@ -74,7 +110,7 @@ class LoginActivity : BaseActivity() {
                         loginResponse!!.msg.showToast(this, Toast.LENGTH_SHORT)
                         Log.d("ActivityBase", "认证失败$loginResponse")
                     } else {
-                        val loginException=result.exceptionOrNull()
+                        val loginException = result.exceptionOrNull()
                         loginException?.printStackTrace()
                         "登陆失败,请稍后重试".showToast(this, Toast.LENGTH_LONG)
                         Log.d("ActivityBase", "登陆失败$loginData")

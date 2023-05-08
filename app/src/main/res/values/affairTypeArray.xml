@@ -6,4 +6,8 @@
         <item>外派</item>
         <item>补卡</item>
     </string-array>
+    <string-array name="sex_type_array">
+        <item>男</item>
+        <item>女</item>
+    </string-array>
 </resources>

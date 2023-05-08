@@ -1,14 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragment.NavUserFragment">
+    tools:context=".ui.user.NavUserFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <ImageView
+        android:id="@+id/avatar"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/user"
+        app:layout_constraintBottom_toTopOf="@id/sName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="这是 user fragment" />
+        android:id="@+id/sName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="John Doe"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/avatar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/sId" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/sId"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="员工号"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/sName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/dId" />
+
+    <TextView
+        android:id="@+id/dId"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="部门号"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/sId"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/sSex" />
+
+    <TextView
+        android:id="@+id/sSexText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="性别:"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@id/sSex"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/sSex" />
+
+    <Spinner
+        android:id="@+id/sSex"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:entries="@array/sex_type_array"
+        android:spinnerMode="dropdown"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@id/sEmail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/sSexText"
+        app:layout_constraintTop_toBottomOf="@id/dId" />
+
+    <EditText
+        android:id="@+id/sEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:inputType="textEmailAddress"
+        android:hint="邮箱"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/sSex"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/sImei"/>
+    <TextView
+        android:id="@+id/sImei"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="imei号"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/sEmail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/sPhone"/>
+    <EditText
+        android:id="@+id/sPhone"
+        android:layout_width="0dp"
+        android:inputType="phone"
+        android:layout_height="wrap_content"
+        android:hint="手机号"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/sImei"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/sBirthday"/>
+    <TextView
+        android:id="@+id/sBirthday"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="生日"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/sPhone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/sRight"/>
+    <TextView
+        android:id="@+id/sRight"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="权限"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/sBirthday"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/sStatus"/>
+    <TextView
+        android:id="@+id/sStatus"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="状态"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/sRight"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/sHiredate"/>
+    <TextView
+        android:id="@+id/sHiredate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="雇用日期"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/sStatus"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/editOverBtn"/>
+    <Button
+        android:id="@+id/editOverBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="编辑完成"
+        app:layout_constraintTop_toBottomOf="@id/sHiredate"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/loginOutBtn"/>
+
+    <Button
+        android:id="@+id/loginOutBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="登出"
+        android:background="@drawable/setbar_bg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/editOverBtn" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="1dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

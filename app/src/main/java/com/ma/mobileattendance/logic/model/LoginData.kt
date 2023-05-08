@@ -8,7 +8,8 @@ data class LoginData(
     val username: String,
     /**验证码 */
     val code: String,
-    val password: String
+    val password: String,
+    val imei:String?
 ) {
     /**登陆平台 */
     var loginPlatform: String = "android"
