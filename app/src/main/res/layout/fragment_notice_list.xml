@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:minHeight="1px"
     tools:context=".ui.notice.NoticeListFragment">
 
     <androidx.recyclerview.widget.RecyclerView

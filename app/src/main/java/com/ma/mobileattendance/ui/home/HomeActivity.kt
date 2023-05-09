@@ -11,6 +11,7 @@ import com.ma.mobileattendance.BaseActivity
 import com.ma.mobileattendance.R
 import com.ma.mobileattendance.databinding.ActivityHomeBinding
 import com.ma.mobileattendance.logic.Repository
+import com.ma.mobileattendance.logic.model.ErrorResponseException
 import com.ma.mobileattendance.ui.login.LoginActivity
 import com.ma.mobileattendance.util.showToast
 
@@ -35,17 +36,19 @@ class HomeActivity : BaseActivity() {
         if (Repository.isSIdSaved() && Repository.isTokenSaved()) {
             Repository.checkToken().observe(this) { result ->
                 val response = result.getOrNull()
-                if (response?.code == 200) {
+                if (response!=null) {
                     "token校验成功".showToast(this)
-                } else if (response?.code == 401) {
-                    response.msg.showToast(this)
-                    val intent = Intent(this, LoginActivity::class.java)
-                    startActivity(intent)
-                } else {
-                    val exception = result.exceptionOrNull()
-                    Log.d("HomeActivity", "token校验出现异常$exception")
-                    "token校验异常,请登录".showToast(this)
-                    exception?.printStackTrace()
+                } else{
+                    val exception=result.exceptionOrNull()
+                    if (exception is ErrorResponseException) {
+                        exception.getResponse().msg.showToast(this)
+                        val intent = Intent(this, LoginActivity::class.java)
+                        startActivity(intent)
+                    } else {
+                        Log.d("HomeActivity", "token校验出现异常$exception")
+                        "token校验异常,请登录".showToast(this)
+                        exception?.printStackTrace()
+                    }
                 }
             }
         } else {

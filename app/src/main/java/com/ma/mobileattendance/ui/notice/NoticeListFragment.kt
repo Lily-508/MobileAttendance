@@ -35,8 +35,10 @@ class NoticeListFragment : Fragment() {
             val noticeList=result.getOrNull()
             Log.d("NoticeActivity","响应体$result")
             if(noticeList!=null){
+                val oldLen=adapter.itemCount -1
                 viewModel.noticeList.addAll(noticeList)
                 adapter.notifyDataSetChanged()
+                binding.noticeListRecycleView.scrollToPosition(oldLen)
             }else{
                 val exception = result.exceptionOrNull()
                 if (exception is ErrorResponseException) {
@@ -50,12 +52,30 @@ class NoticeListFragment : Fragment() {
             }
         }
         binding.noticeListRecycleView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
-            override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(rv, dx, dy)
-                if(rv.computeVerticalScrollExtent() + rv.computeVerticalScrollOffset() >= rv.computeVerticalScrollRange()){
-                    //滑动到底部了
-                    Toast.makeText(context,"滑动底部,加载下一页",Toast.LENGTH_SHORT).show()
-                    viewModel.getNextNoticeList()
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if(newState==RecyclerView.SCROLL_STATE_IDLE){
+                    //当前状态为停止滑动
+                    if(!recyclerView.canScrollVertically(1)){
+                        //达到底部
+                        viewModel.getNextNoticeList()
+                        Toast.makeText(activity,"滑动到底部,加载下一页",Toast.LENGTH_SHORT).show()
+                    }else if(!recyclerView.canScrollVertically(-1)){
+                        Toast.makeText(activity,"滑动到顶部",Toast.LENGTH_SHORT).show()
+
+                    }else{
+                        Toast.makeText(activity,"滑动到哪里",Toast.LENGTH_SHORT).show()
+
+                    }
+                }
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy < 0) {
+                    // 当前处于上滑状态
+                } else if (dy > 0) {
+                    // 当前处于下滑状态
                 }
             }
         })

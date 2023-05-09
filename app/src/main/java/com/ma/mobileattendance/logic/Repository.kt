@@ -10,8 +10,14 @@ import kotlinx.coroutines.Dispatchers
 object Repository {
     private val appDatabase: AppDatabase = AppDatabase.getDatabase(MyApplication.context)
     private val staffDao = appDatabase.staffDao()
-    private var token: String? = SharedPreferencesDao.getSavedToken()
-
+    private var _token:String ?=null
+    private val token get()= getTokenHeader()
+    private fun getTokenHeader():String?{
+        if(_token==null){
+            _token=SharedPreferencesDao.getSavedToken()
+        }
+        return _token
+    }
     /**
      * 获取验证码
      */
