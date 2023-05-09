@@ -40,7 +40,14 @@ public class StaffController extends BaseController {
     @Autowired
     private DepartmentServiceImpl departmentService;
 
-
+    @RequestMapping("/check-token")
+    @ApiOperation("检查token有效性")
+    @ApiResponses({@ApiResponse(code = 200, message = "token有效", response = BaseResult.class),
+            @ApiResponse(code = 401, message = "token无效", response = BaseResult.class)})
+    public ResponseEntity<BaseResult> checkTokenValid(){
+        BaseResult result=new BaseResult(200,"token有效");
+        return ResponseEntity.ok(result);
+    }
     @GetMapping("/page")
     @ApiOperation("分页查询对应部门员工")
     @ApiImplicitParams({@ApiImplicitParam(name = "dId", value = "部门id", dataTypeClass = Integer.class),
@@ -61,7 +68,7 @@ public class StaffController extends BaseController {
     @PostMapping("/excel")
     @ApiOperation("excel员工表导入数据库")
     @ApiImplicitParam(name = "file", value = "excel文件", dataTypeClass = MultipartFile.class)
-    @ApiResponses({@ApiResponse(code = 200, message = "导入成功"),@ApiResponse(code = 500, message = "导入成功")})
+    @ApiResponses({@ApiResponse(code = 200, message = "导入成功"), @ApiResponse(code = 500, message = "导入成功")})
     public ResponseEntity<BaseResult> importStaffExcel(MultipartFile file) throws IOException {
         boolean success = staffService.importStaffExcel(file);
         BaseResult result = new BaseResult();
@@ -161,11 +168,11 @@ public class StaffController extends BaseController {
     private boolean isExistedPhoneOrEmail(Staff staff) {
         String phone = staff.getSPhone();
         String email = staff.getSEmail();
-        if(phone==null&&email==null){
+        if (phone == null && email == null) {
             return false;
         }
         LambdaQueryWrapper<Staff> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Staff::getSEmail, email).or().eq(Staff::getSPhone, phone);
+        queryWrapper.ne(Staff::getSId,staff.getSId()).and(i->i.eq(Staff::getSEmail, email).or().eq(Staff::getSPhone, phone));
         return staffService.getOne(queryWrapper) != null;
     }
 

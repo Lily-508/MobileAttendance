@@ -42,18 +42,28 @@ public class CompanyController extends BaseController {
     private WorkOutsideServiceImpl workOutsideService;
     @Autowired
     private VisitServiceImpl visitService;
-    @GetMapping
+
+    @GetMapping("/list")
     @ApiOperation("查询公司,查询条件:关键词")
     @ApiImplicitParam(name = "key", value = "关键词", dataTypeClass = String.class)
     @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class),
             @ApiResponse(code = 500, message = "查询失败", response = DataResult.class)})
-    public ResponseEntity<DataResult<List<Company>>> getCompanyByCompanyName(
-            @RequestParam(required = false) String key) {
+    public ResponseEntity<DataResult<List<Company>>> getCompanyByCompanyName(@RequestParam(required = false) String key) {
         key = URLDecoder.decode(key, StandardCharsets.UTF_8);
         LambdaQueryWrapper<Company> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(Company::getCName, key).or().like(Company::getCContent, key);
         List<Company> list = companyService.list(queryWrapper);
         DataResult<List<Company>> result = super.getModel(list);
+        return ResponseEntity.status(result.getCode()).body(result);
+    }
+    @GetMapping
+    @ApiOperation("查询公司,查询条件:公司id")
+    @ApiImplicitParam(name = "cId", value = "公司id", dataTypeClass = String.class)
+    @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class),
+            @ApiResponse(code = 500, message = "查询失败", response = DataResult.class)})
+    public ResponseEntity<DataResult<Company>> getCompanyByCompanyId(@RequestParam(required = false) Integer cId) {
+        Company company=companyService.getById(cId);
+        DataResult<Company> result = super.getModel(company);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
@@ -93,10 +103,10 @@ public class CompanyController extends BaseController {
         LambdaQueryWrapper<Visit> queryWrapper2 = new LambdaQueryWrapper<>();
         queryWrapper2.eq(Visit::getCId, cId);
         AttendanceRule attendanceRule = attendanceRuleService.getOne(queryWrapper);
-        Visit visit=visitService.getOne(queryWrapper2);
-        if(attendanceRule==null&&visit==null){
+        Visit visit = visitService.getOne(queryWrapper2);
+        if (attendanceRule == null && visit == null) {
             result = super.deleteModel(companyService.removeById(cId));
-        }else {
+        } else {
             result.setCode(400).setMsg("删除失败,被外键依赖");
         }
         return ResponseEntity.status(result.getCode()).body(result);

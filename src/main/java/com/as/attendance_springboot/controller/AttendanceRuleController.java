@@ -41,24 +41,29 @@ public class AttendanceRuleController extends BaseController {
     @Autowired
     private WorkOutsideServiceImpl workOutsideService;
 
-    @GetMapping
-    @ApiOperation("查询考勤规则,查询条件:考勤规则id,公司id")
-    @ApiImplicitParams({@ApiImplicitParam(name = "aId", value = "考勤规则id", dataTypeClass = Integer.class),
-            @ApiImplicitParam(name = "cId", value = "公司id", dataTypeClass = Integer.class)})
+    @GetMapping("/list")
+    @ApiOperation("查询列表考勤规则,查询条件:公司id")
+    @ApiImplicitParam(name = "cId", value = "公司id", dataTypeClass = Integer.class)
     @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class),
             @ApiResponse(code = 500, message = "查询失败", response = DataResult.class)})
-    public ResponseEntity<DataResult<List<AttendanceRule>>> getAttendanceRuleById(
-            @RequestParam(required = false) Integer aId,
-            @RequestParam(required = false) Integer cId) {
+    public ResponseEntity<DataResult<List<AttendanceRule>>> getAttendanceRuleByCid(@RequestParam(required = false) Integer cId) {
         LambdaQueryWrapper<AttendanceRule> queryWrapper = new LambdaQueryWrapper<>();
-        if (aId != null) {
-            queryWrapper.eq(AttendanceRule::getAId, aId);
-        }
         if (cId != null) {
             queryWrapper.eq(AttendanceRule::getCId, cId);
         }
         List<AttendanceRule> list = attendanceRuleService.list(queryWrapper);
         DataResult<List<AttendanceRule>> result = super.getModel(list);
+        return ResponseEntity.status(result.getCode()).body(result);
+    }
+
+    @GetMapping
+    @ApiOperation("查询单个考勤规则,查询条件:考勤规则id")
+    @ApiImplicitParam(name = "aId", value = "考勤规则id", dataTypeClass = Integer.class)
+    @ApiResponses({@ApiResponse(code = 200, message = "查询成功", response = DataResult.class),
+            @ApiResponse(code = 500, message = "查询失败", response = DataResult.class)})
+    public ResponseEntity<DataResult<AttendanceRule>> getAttendanceRuleByAid(@RequestParam(required = false) Integer aId) {
+        AttendanceRule attendanceRule = attendanceRuleService.getById(aId);
+        DataResult<AttendanceRule> result = super.getModel(attendanceRule);
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
@@ -109,7 +114,7 @@ public class AttendanceRuleController extends BaseController {
                 new LambdaQueryWrapper<RecordAttendance>().eq(RecordAttendance::getAId, aId));
         WorkOutside workOutside = workOutsideService.getOne(
                 new LambdaQueryWrapper<WorkOutside>().eq(WorkOutside::getAId, aId));
-        if (recordAttendance != null||workOutside!=null) {
+        if (recordAttendance != null || workOutside != null) {
             result.setCode(400).setMsg("已被外键依赖");
         } else {
             super.deleteModel(attendanceRuleService.removeById(aId));

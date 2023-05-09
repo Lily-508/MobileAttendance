@@ -80,6 +80,7 @@ public class BaseController {
     public <M> PaginationResult<IPage<M>> getModelPage(IPage<M> modelPage) {
         PaginationResult<IPage<M>> result = new PaginationResult<>();
         result.setCode(200).setMsg("查询成功").setData(modelPage).setTotal(modelPage.getTotal());
+
         return result;
     }
 
@@ -211,7 +212,7 @@ public class BaseController {
         LocalDateTime start = model.getStartTime();
         LocalDateTime end = model.getEndTime();
         if (start.isBefore(end)) {
-            int total = (int) ChronoUnit.MINUTES.between(start, end);
+            long total =ChronoUnit.MINUTES.between(start, end);
             if (model.getTotal() == null) {
                 model.setTotal(total);
             } else {

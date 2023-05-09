@@ -101,7 +101,8 @@ public class RecordAttendanceController extends BaseController {
         } else {
             LambdaQueryWrapper<RecordAttendance> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(RecordAttendance::getSId, recordAttendance.getSId())
-                        .eq(RecordAttendance::getRDate, LocalDate.now());
+                        .eq(RecordAttendance::getRDate, LocalDate.now())
+                        .eq(RecordAttendance::getRCategory, recordAttendance.getRCategory());
             RecordAttendance record = recordAttendanceService.getOne(queryWrapper);
             if (record != null) {
                 result.setCode(400).setMsg("签到操作只能进行一次");
@@ -137,12 +138,13 @@ public class RecordAttendanceController extends BaseController {
                 result.setCode(400).setMsg("请先签到");
             } else if (record.getPunchOutPlace() != null) {
                 result.setCode(400).setMsg("签退操作只能进行一次");
-            } else if (recordAttendance.getRResult() == null) {
-                decideRecordResultByTime(recordAttendance);
-            } else if (recordAttendanceService.saveOrUpdate(recordAttendance)) {
-                result.setCode(200).setMsg("签到成功").setData(recordAttendance);
             } else {
-                result.setCode(500).setMsg("签到失败");
+                decideRecordResultByTime(recordAttendance);
+                if (recordAttendanceService.saveOrUpdate(recordAttendance)) {
+                    result.setCode(200).setMsg("签退成功").setData(recordAttendance);
+                } else {
+                    result.setCode(500).setMsg("签退失败");
+                }
             }
         }
         return ResponseEntity.status(result.getCode()).body(result);
@@ -161,22 +163,14 @@ public class RecordAttendanceController extends BaseController {
     }
 
     private boolean isCorrectWorkOutside(RecordAttendance recordAttendance) {
-        boolean correct = false;
+        boolean correct;
         if (recordAttendance.getRCategory() == RecordCategoryType.OUTSIDE) {
             LambdaQueryWrapper<WorkOutside> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(WorkOutside::getAId, recordAttendance.getAId())
                         .eq(WorkOutside::getSId, recordAttendance.getSId());
             log.info("检查是否有对应外派事务");
             List<WorkOutside> workOutsideList = workOutsideService.list(queryWrapper);
-            LocalDate recordDate = recordAttendance.getRDate();
-            for (WorkOutside workOutside : workOutsideList) {
-                LocalDate start = workOutside.getStartTime().toLocalDate();
-                LocalDate end = workOutside.getEndTime().toLocalDate();
-                if (recordDate.isAfter(start) && recordDate.isBefore(end)) {
-                    correct = true;
-                    break;
-                }
-            }
+            correct=workOutsideList.size()>0;
         } else {
             correct = true;
         }
@@ -184,23 +178,28 @@ public class RecordAttendanceController extends BaseController {
     }
 
     private void decideRecordResultByTime(RecordAttendance recordAttendance) {
-        AttendanceRule attendanceRule = attendanceRuleService.getById(recordAttendance.getAId());
-        LocalTime punchIn = recordAttendance.getRPunchIn().toLocalTime();
-        LocalTime punchOut = recordAttendance.getRPunchOut().toLocalTime();
-        LocalTime start = attendanceRule.getAStart();
-        LocalTime end = attendanceRule.getAEnd();
-        int exceptionRange = attendanceRule.getExceptionRange();
-        int neglectRange = attendanceRule.getNeglectRange();
-        Duration punchInDuration = Duration.between(start, punchIn);
-        Duration punchOutDuration = Duration.between(punchOut, end);
-        log.info("考勤结果判断,签到时差{},签退时差{}", punchInDuration.toMinutes(), punchOutDuration.toMinutes());
-        if (punchInDuration.toMinutes() < exceptionRange && punchOutDuration.toMinutes() < exceptionRange) {
-            recordAttendance.setRResult(RecordResultType.SUCCESS);
-        } else if (punchInDuration.toMinutes() > neglectRange || punchOutDuration.toMinutes() > neglectRange) {
-            recordAttendance.setRResult(RecordResultType.NEGLECT);
-        } else {
-            recordAttendance.setRResult(RecordResultType.EXCEPTION);
+        //签到判断地点是否在范围内
+        if (recordAttendance.getRResult() == null || recordAttendance.getRResult() == RecordResultType.ON ||
+                recordAttendance.getRResult() == RecordResultType.SUCCESS) {
+            AttendanceRule attendanceRule = attendanceRuleService.getById(recordAttendance.getAId());
+            LocalTime punchIn = recordAttendance.getRPunchIn().toLocalTime();
+            LocalTime punchOut = recordAttendance.getRPunchOut().toLocalTime();
+            LocalTime start = attendanceRule.getAStart();
+            LocalTime end = attendanceRule.getAEnd();
+            int exceptionRange = attendanceRule.getExceptionRange();
+            int neglectRange = attendanceRule.getNeglectRange();
+            Duration punchInDuration = Duration.between(start, punchIn);
+            Duration punchOutDuration = Duration.between(punchOut, end);
+            log.info("考勤结果时间判断,签到时差{},签退时差{}", punchInDuration.toMinutes(),
+                     punchOutDuration.toMinutes());
+            if (punchInDuration.toMinutes() < exceptionRange && punchOutDuration.toMinutes() < exceptionRange &&
+                    recordAttendance.getRResult() == RecordResultType.SUCCESS) {
+                recordAttendance.setRResult(RecordResultType.SUCCESS);
+            } else if (punchInDuration.toMinutes() > neglectRange || punchOutDuration.toMinutes() > neglectRange) {
+                recordAttendance.setRResult(RecordResultType.NEGLECT);
+            } else {
+                recordAttendance.setRResult(RecordResultType.EXCEPTION);
+            }
         }
-        //打卡地点是否在范围判断,打算交给前端
     }
 }

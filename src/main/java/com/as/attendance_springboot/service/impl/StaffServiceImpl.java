@@ -90,22 +90,22 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
         boolean success;
         try {
             //事假20天
-            vocation.setVId(VocationType.PERSONAL).setVDuration(20 * 24 * 60);
+            vocation.setVId(VocationType.PERSONAL).setVDuration((long) (20 * 24 * 60));
             vocationQuotaMapper.insert(vocation);
 //        婚假10天
-            vocation.setVId(VocationType.MARRIAGE).setVDuration(10*24*60);
+            vocation.setVId(VocationType.MARRIAGE).setVDuration((long) (10*24*60));
             vocationQuotaMapper.insert(vocation);
 //        调休初始为0
-            vocation.setVId(VocationType.COMPENSATORY).setVDuration(0);
+            vocation.setVId(VocationType.COMPENSATORY).setVDuration(0L);
             vocationQuotaMapper.insert(vocation);
 //        年假5天
-            vocation.setVId(VocationType.ANNUAL).setVDuration(5*24*60);
+            vocation.setVId(VocationType.ANNUAL).setVDuration((long) (5*24*60));
             vocationQuotaMapper.insert(vocation);
 //        病假3个月
-            vocation.setVId(VocationType.SICK).setVDuration(3*30*24*60);
+            vocation.setVId(VocationType.SICK).setVDuration((long) (3*30*24*60));
             vocationQuotaMapper.insert(vocation);
 //        产假98天
-            vocation.setVId(VocationType.PREGNANCY).setVDuration(98*24*60);
+            vocation.setVId(VocationType.PREGNANCY).setVDuration((long) (98*24*60));
             vocationQuotaMapper.insert(vocation);
             success=true;
         }catch (Exception e){

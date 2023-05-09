@@ -36,9 +36,9 @@ public class NoticeController extends BaseController {
     public ResponseEntity<PaginationResult<IPage<Notice>>> getAllNoticeByPage(@RequestParam int pageCur,
                                                                               @RequestParam int pageSize) {
         log.info("传入参数当前页数={},页面大小={}", pageCur, pageSize);
-        IPage<Notice> noticeList = noticeService.page(new Page(pageCur, pageSize), null);
-        long total = noticeList.getTotal();
+        IPage<Notice> noticeList = noticeService.page(new Page(pageCur, pageSize));
         PaginationResult<IPage<Notice>> result = super.getModelPage(noticeList);
+        log.info(noticeList.toString());
         return ResponseEntity.ok(result);
     }
 

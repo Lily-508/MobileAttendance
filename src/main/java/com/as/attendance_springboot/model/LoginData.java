@@ -16,6 +16,7 @@ public class LoginData {
     private String username;
     private String password;
     private String phone;
+    private String imei;
     /**验证码*/
     private String code;
     /** 第三方平台类型 */

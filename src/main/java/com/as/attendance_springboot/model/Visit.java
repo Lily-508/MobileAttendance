@@ -41,10 +41,12 @@ public class Visit {
     @JsonProperty(value = "vContent")
     private String vContent;
     @JsonProperty(value = "vStart")
+    @NotNull(message = "vStart不为null")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime vStart;
     @JsonProperty(value = "vEnd")
+    @NotNull(message = "vEnd不为null")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime vEnd;

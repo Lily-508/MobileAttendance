@@ -41,7 +41,7 @@ public class Affair {
     @NotNull(message = "结束时间不为null")
     private LocalDateTime endTime;
     @JsonProperty(value = "total")
-    private Integer total;
+    private Long total;
     @NotNull(message = "审核人Id不为空")
     @JsonProperty(value = "reviewer")
     private Integer reviewer;

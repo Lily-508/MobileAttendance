@@ -144,7 +144,7 @@ public class VisitController extends BaseController {
             } else if (v.getVPunchIn() == null || v.getPunchInPlace() == null) {
                 result.setCode(400).setMsg("请先签到");
             } else if (v.getVPunchOut() != null) {
-
+                result.setCode(400).setMsg("签退操作只能进行一次");
             } else if (visitService.updateById(visit)) {
                 result.setCode(200).setMsg("签退成功");
             } else {

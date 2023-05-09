@@ -35,17 +35,22 @@ public class AttendanceRule {
     @NotNull(message = "cId不为null")
     private Integer cId;
     @JsonProperty(value = "aStart")
+    @NotNull(message = "aStart不为null")
     @DateTimeFormat(pattern = "HH:mm:ss")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "GMT+8")
     private LocalTime aStart;
     @JsonProperty(value = "aEnd")
+    @NotNull(message = "aEnd不为null")
     @DateTimeFormat(pattern = "HH:mm:ss")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "GMT+8")
     private LocalTime aEnd;
+    @NotNull(message = "locationRange不为null")
     @JsonProperty(value = "locationRange")
     private Integer locationRange;
+    @NotNull(message = "exceptionRange不为null")
     @JsonProperty(value = "exceptionRange")
     private Integer exceptionRange;
+    @NotNull(message = "neglectRange不为null")
     @JsonProperty(value = "neglectRange")
     private Integer neglectRange;
     @TableField(select = false)

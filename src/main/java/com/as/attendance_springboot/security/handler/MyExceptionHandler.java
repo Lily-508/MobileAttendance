@@ -40,12 +40,12 @@ public class MyExceptionHandler implements AuthenticationEntryPoint, AccessDenie
     public void handle(HttpServletRequest request, HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException, ServletException {
         response.setContentType("application/json;charset=utf-8");
-        response.setStatus(403);
-        PrintWriter out = response.getWriter();
         String errorMsg=(String)request.getAttribute("errorMsg");
+        PrintWriter out = response.getWriter();
         if(errorMsg != null){
-            out.write(setExceptionMsg(403, "授权异常: " + errorMsg));
+            out.write(setExceptionMsg(401, "token异常: " + errorMsg));
         }else{
+            response.setStatus(403);
             out.write(setExceptionMsg(403, "授权异常: " + accessDeniedException.getMessage()));
         }
         out.flush();
@@ -64,12 +64,12 @@ public class MyExceptionHandler implements AuthenticationEntryPoint, AccessDenie
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
         response.setContentType("application/json;charset=utf-8");
-        response.setStatus(403);
         PrintWriter out = response.getWriter();
         String errorMsg=(String)request.getAttribute("errorMsg");
         if(errorMsg != null){
-            out.write(setExceptionMsg(403, "未进行认证: " + errorMsg));
+            out.write(setExceptionMsg(401, "未进行token认证: " + errorMsg));
         }else{
+            response.setStatus(403);
             out.write(setExceptionMsg(403, "未进行认证: " + authException.getMessage()));
         }
         out.flush();

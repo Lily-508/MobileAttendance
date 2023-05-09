@@ -64,21 +64,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         //解决跨域问题。cors 预检请求放行,让Spring security 放行所有preflight request（cors 预检请求）
         http.authorizeRequests().requestMatchers(CorsUtils::isPreFlightRequest).permitAll();
         //测试接口允许所有请求
-        http.authorizeRequests().anyRequest().permitAll().and().csrf().disable();
+//        http.authorizeRequests().anyRequest().permitAll().and().csrf().disable();
         // 角色控制访问
-//        http.authorizeRequests()
-//                .antMatchers("/login","/captcha")
-//                .permitAll()
-//                .antMatchers("/**")
-//                .hasAnyAuthority("normal", "leader", "admin")
-//                .anyRequest()
-//                .authenticated()
-//                .and()
-//                .logout()
-//                .logoutSuccessHandler(myLogoutSuccessHandler)
-//                .and()
-//                .csrf()
-//                .disable();
+        http.authorizeRequests()
+                .antMatchers("/login","/captcha")
+                .permitAll()
+                .antMatchers("/**")
+                .hasAnyAuthority("normal", "leader", "admin")
+                .anyRequest()
+                .authenticated()
+                .and()
+                .logout()
+                .logoutSuccessHandler(myLogoutSuccessHandler)
+                .and()
+                .csrf()
+                .disable();
         http.exceptionHandling().authenticationEntryPoint(myExceptionHandler).accessDeniedHandler(myExceptionHandler);
     }
 

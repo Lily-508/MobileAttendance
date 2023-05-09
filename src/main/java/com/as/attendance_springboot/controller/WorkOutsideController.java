@@ -82,6 +82,7 @@ public class WorkOutsideController extends BaseController {
     public ResponseEntity<BaseResult> setWorkOutside(@NotNull @Valid @RequestBody WorkOutside workOutside,
                                                      BindingResult bindingResult) {
         BaseResult result = new BaseResult();
+        log.info(workOutside.toString());
         if (isErrorForeignId(workOutside)) {
             result.setCode(400).setMsg("错误的外键id");
         } else if (super.isErrorTime(workOutside)) {

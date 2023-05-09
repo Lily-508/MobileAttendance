@@ -38,7 +38,7 @@ public class VocationQuota {
     @TableField(value = "v_id")
     private VocationType vId;
     @JsonProperty(value = "vDuration")
-    private Integer vDuration;
+    private Long vDuration;
     @TableField(select = false)
     private Integer deleted;
 }

@@ -7,8 +7,6 @@ import com.as.attendance_springboot.util.JwtUtil;
 import com.as.attendance_springboot.util.RedisUtil;
 import com.nimbusds.jose.JOSEException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -46,11 +44,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         StaffServiceImpl staffServiceImpl=getBean(StaffServiceImpl.class,request);
         try {
             if (!StringUtils.hasText(jwtToken)) {
-                throw new BadCredentialsException("JWT为空");
+                throw new JOSEException("JWT为空");
             }
             payloadDto = JwtUtil.verifyTokenByHmac(jwtToken);
             if (redisUtils.hasKey(payloadDto.getJti())) {
-                throw new BadCredentialsException("已注销的JWT,请重新登陆");
+                throw new JOSEException("已注销的JWT,请重新登陆");
             }
             String userId = payloadDto.getUserId();
             String username = payloadDto.getUsername();
@@ -60,8 +58,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             MyAuthenticationToken myAuthenticationToken = new MyAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(myAuthenticationToken);
             filterChain.doFilter(request, response);
-        } catch (JOSEException | ParseException | AuthenticationException e) {
-            request.setAttribute("errorMsg",e.getMessage());
+        } catch (JOSEException | ParseException e) {
+            if(e instanceof JOSEException){
+                response.setStatus(401);
+                request.setAttribute("errorMsg",e.getMessage());
+            }
             filterChain.doFilter(request, response);
         }
     }
