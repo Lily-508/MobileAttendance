@@ -43,6 +43,7 @@ public class CaptchaController {
         redisUtil.set(uuid, code, 15 * 60);
         httpServletResponse.setContentType("image/png");
         httpServletResponse.setHeader("uuid", uuid);
+        httpServletResponse.addHeader("Access-Control-Expose-Headers","uuid");
         httpServletResponse.setStatus(200);
         ServletOutputStream responseOutputStream = httpServletResponse.getOutputStream();
         lineCaptcha.write(responseOutputStream);

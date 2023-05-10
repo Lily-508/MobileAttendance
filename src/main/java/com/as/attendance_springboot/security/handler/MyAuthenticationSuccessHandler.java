@@ -33,6 +33,8 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
                                         HttpServletResponse httpServletResponse, Authentication authentication) throws IOException {
         httpServletResponse.setContentType("application/json;charset=utf-8");
         httpServletResponse.setStatus(200);
+        // 让浏览器能访问到其它响应头
+        httpServletResponse.addHeader("Access-Control-Expose-Headers","token");
         PrintWriter out = httpServletResponse.getWriter();
         Staff userDetails = (Staff) authentication.getPrincipal();
         MyAuthenticationToken myAuthenticationToken = (MyAuthenticationToken) authentication;

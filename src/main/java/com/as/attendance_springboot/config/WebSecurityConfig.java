@@ -20,7 +20,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsUtils;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 /**
  * @author xulili
@@ -62,6 +65,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // 替换原有认证入口 filter
         http.addFilterAt(myAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
         //解决跨域问题。cors 预检请求放行,让Spring security 放行所有preflight request（cors 预检请求）
+        http.cors();
         http.authorizeRequests().requestMatchers(CorsUtils::isPreFlightRequest).permitAll();
         //测试接口允许所有请求
 //        http.authorizeRequests().anyRequest().permitAll().and().csrf().disable();
@@ -87,7 +91,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         PasswordEncoder encoder = new BCryptPasswordEncoder();
         auth.userDetailsService(staffServiceImpl).passwordEncoder(encoder);
     }
-
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        //允许所有域名进行跨域调用
+        config.addAllowedOriginPattern("*");
+        //允许跨越发送cookie
+        config.setAllowCredentials(true);
+        //放行全部原始头信息
+        config.addAllowedHeader("*");
+        //允许所有请求方法跨域调用
+        config.addAllowedMethod("*");
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
     @Bean
     MyAuthenticationProcessingFilter myAuthenticationProcessingFilter() throws Exception {
 
