@@ -4,10 +4,10 @@ import router from "./router"
 import Element from "element-ui"
 import "element-ui/lib/theme-chalk/index.css"
 import { Message } from "element-ui"
-import astrict from "./utils/astrict"
+// import astrict from "./utils/astrict"
 Vue.config.productionTip = false
 Vue.use(Element)
-Vue.use(astrict)
+// Vue.use(astrict)
 // 封装axios方法
 import axios from "axios"
 axios.defaults.baseURL = "https://localhost:8433"
@@ -38,18 +38,10 @@ Vue.prototype.$axiosNoToken = (options) => {
         }
       } else if (err.request) {
         // 没有响应
-        if (options.error) {
-          options.error(err.request)
-        } else {
-          Message.error({ message: "请求错误", offset: 150 })
-        }
+        Message.error({ message: "请求错误", offset: 150 })
       } else {
         // 发送出现问题
-        if (options.error) {
-          options.error(err)
-        } else {
-          Message.error({ message: "发送错误", offset: 150 })
-        }
+        Message.error({ message: "发送错误", offset: 150 })
       }
     })
 }

@@ -31,6 +31,7 @@
               v-model="loginForm.code"
               prefix-icon="el-icon-circle-check"
               placeholder="验证码"
+              @keyup.enter="submitForm('loginForm')"
             ></el-input>
           </el-col>
           <el-col :span="11">
@@ -93,7 +94,11 @@ export default {
               console.log(response)
               if (response.data.code == 200) {
                 window.sessionStorage.setItem("token", response.data.token)
-                window.sessionStorage.setItem("staff", response.data.data)
+                window.sessionStorage.setItem(
+                  "staff",
+                  JSON.stringify(response.data.data)
+                )
+                this.$router.push("/user/status")
                 this.$message({
                   message: response.data.msg,
                   type: "success",

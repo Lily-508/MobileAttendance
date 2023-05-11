@@ -10,8 +10,28 @@ const routes = [
   {
     path: "/login",
     name: "login",
-    component: () => import("../components/pages/LoginMenu.vue"),
+    component: () => import("../components/LoginMenu.vue"),
     meta: { isAuth: false },
+  },
+  {
+    path: "/user",
+    name: "user",
+    component: () => import("../components/UserMenu.vue"),
+    meta: { isAuth: true },
+    children: [
+      {
+        path: "status",
+        component: () => import("../components/pages/UserStatus.vue"),
+      },
+      {
+        path: "staff",
+        component: () => import("../components/pages/StaffManage.vue"),
+      },
+      {
+        path: "record",
+        component: () => import("../components/pages/StaffManage.vue"),
+      },
+    ],
   },
 ]
 
@@ -20,21 +40,20 @@ const router = new VueRouter({
   routes,
 })
 router.beforeEach((to, from, next) => {
-  // console.log('beforeEach', to, from);
   if (to.meta.isAuth) {
     let token = window.sessionStorage.getItem("token")
     if (token) {
       Vue.prototype.$axiosJwt({
-        url: "/staff/check-token",
+        url: "/staffs/check-token",
         method: "get",
         params: {},
         success(response) {
-          if (!response.data.code === 200) {
+          if (response.data.code === 200) {
             next()
           }
         },
         error(err) {
-          alert(err.message)
+          alert(err.msg)
           window.location.href = "/login"
         },
       })
