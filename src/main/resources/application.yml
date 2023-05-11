@@ -25,6 +25,7 @@ mybatis-plus:
     map-underscore-to-camel-case: true
   global-config:
     db-config:
+      update-strategy: not_empty
       logic-delete-value: 1
       logic-not-delete-value: 0
       logic-delete-field: deleted

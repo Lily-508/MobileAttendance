@@ -57,7 +57,6 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
     @Override
     public boolean importStaffExcel(MultipartFile file) throws IOException {
         ExcelReader reader= ExcelUtil.getReader(file.getInputStream());
-        reader.addHeaderAlias("员工id","sId");
         reader.addHeaderAlias("部门id","dId");
         reader.addHeaderAlias("员工姓名","sName");
         reader.addHeaderAlias("员工性别","sSex");
@@ -128,12 +127,12 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
                 i->!"s_pwd".equals(i.getColumn())&&!"s_right".equals(i.getColumn())&&!"deleted".equals(i.getColumn()));
         List<Map<String,Object>>staffList=staffMapper.selectMaps(queryWrapper);
         for(Map<String,Object>map :staffList){
-            if(StaffSex.MAN.getCode().equals((Integer)map.get("s_sex"))){
+            if(StaffSex.MAN.getCode().equals(map.get("s_sex"))){
                 map.put("s_sex",StaffSex.MAN.getRemark());
             }else {
                 map.put("s_sex",StaffSex.WOMAN.getRemark());
             }
-            if(StaffStatus.ON.getCode().equals((Integer)map.get("s_status"))){
+            if(StaffStatus.ON.getCode().equals(map.get("s_status"))){
                 map.put("s_status",StaffStatus.ON.getRemark());
             }else {
                 map.put("s_status",StaffStatus.OFF.getRemark());

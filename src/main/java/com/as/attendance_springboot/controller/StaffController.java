@@ -54,12 +54,15 @@ public class StaffController extends BaseController {
             @ApiImplicitParam(name = "pageCur", value = "当前页数", dataTypeClass = Integer.class),
             @ApiImplicitParam(name = "pageSize", value = "页面大小", dataTypeClass = Integer.class)})
     @ApiResponse(code = 200, message = "查询成功", response = PaginationResult.class)
-    public ResponseEntity<PaginationResult<IPage<Staff>>> getStaffPageByDepartmentId(@RequestParam int dId,
+    public ResponseEntity<PaginationResult<IPage<Staff>>> getStaffPageByDepartmentId(@RequestParam(required = false) Integer dId,
                                                                                      @RequestParam int pageCur,
                                                                                      @RequestParam int pageSize) {
         log.info("传入参数部门id={},当前页数={},页面大小={}", dId, pageCur, pageSize);
         LambdaQueryWrapper<Staff> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(Staff::getDId, dId);
+        if(dId!=null) {
+            lambdaQueryWrapper.eq(Staff::getDId, dId);
+        }
+        lambdaQueryWrapper.select(Staff.class,i->!"s_pwd".equals(i.getColumn()));
         IPage<Staff> page = staffService.page(new Page(pageCur, pageSize), lambdaQueryWrapper);
         PaginationResult<IPage<Staff>> result = super.getModelPage(page);
         return ResponseEntity.ok(result);
@@ -91,6 +94,7 @@ public class StaffController extends BaseController {
             response.setHeader("Content-Disposition",
                                "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
             response.setStatus(200);
+            response.addHeader("Access-Control-Expose-Headers","Content-Disposition");
             staffService.exportStaffExcel(response.getOutputStream());
         } catch (Exception e) {
             e.printStackTrace();
@@ -128,6 +132,8 @@ public class StaffController extends BaseController {
             result.setCode(400).setMsg("手机号或邮箱不唯一");
         } else if (isErrorDepartmentId(staff)) {
             result.setCode(400).setMsg("错误的部门号");
+        }else if(staff.getSPwd()==null||staff.getSPwd().isEmpty()||staff.getSPwd().length()<6){
+            result.setCode(400).setMsg("密码长度至少6位");
         } else {
             staff.setSPwd(DigestUtil.md5Hex(staff.getSPwd()));
             result = super.setModel(staffService, staff, bindingResult);
@@ -149,7 +155,9 @@ public class StaffController extends BaseController {
         } else if (isErrorDepartmentId(staff)) {
             result.setCode(400).setMsg("错误的部门号");
         } else {
-            staff.setSPwd(DigestUtil.md5Hex(staff.getSPwd()));
+            if(staff.getSPwd()!=null&&!staff.getSPwd().isEmpty()){
+                staff.setSPwd(DigestUtil.md5Hex(staff.getSPwd()));
+            }
             result = super.updateModelBySingle(staff.getSId(), staffService, staff, bindingResult);
         }
         return ResponseEntity.status(result.getCode()).body(result);

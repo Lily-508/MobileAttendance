@@ -11,8 +11,11 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import java.util.stream.Collectors;
 
 /**
  * @author xulili
@@ -47,6 +50,15 @@ public class MyAuthenticationTokenProvider implements AuthenticationProvider {
             log.info("尝试以 {} 方式登陆", LoginType.USERNAME_CODE.getRemark());
             this.checkUsernameCode(loginData.getUuid(), loginData.getCode());
             userDetails = myUserDetailService.loadUserByUsername(loginData.getUsername());
+            if("web".equals(loginData.getLoginPlatform())){
+                String right=userDetails.getAuthorities()
+                                        .stream()
+                                        .map(GrantedAuthority::getAuthority)
+                                        .collect(Collectors.joining(","));
+                if(!right.contains("leader")&&!right.contains("admin")){
+                    throw new AuthenticationServiceException("后台管理系统普通员工没有权限登陆!");
+                }
+            }
         } else if (LoginType.PHONE_CODE.getCode().equals(loginType)) {
             // 手机号验证码登陆
             log.info("尝试以 {} 方式登陆", LoginType.PHONE_CODE.getRemark());
@@ -100,7 +112,7 @@ public class MyAuthenticationTokenProvider implements AuthenticationProvider {
             String redisCode = (String) redisUtil.get(uuid);
             log.info(redisCode);
             if (redisCode == null || !redisCode.equalsIgnoreCase(code)) {
-                throw new AuthenticationServiceException("验证码为空或验证码错误");
+                throw new AuthenticationServiceException("验证码错误或验证码已过期");
             }
             //确保验证码的一次性
             redisUtil.remove(uuid);

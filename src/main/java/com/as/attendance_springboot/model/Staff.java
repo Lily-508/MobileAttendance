@@ -55,7 +55,6 @@ public class Staff implements UserDetails {
     @JsonProperty(value = "sSex")
     private StaffSex sSex;
     @JsonProperty(value = "sPwd")
-    @Length(min = 6, message = "密码长度至少6位")
     private String sPwd;
     @JsonProperty(value = "sPhone")
     @Pattern(regexp = "1[3|4|5|7|8][0-9]{9}$", message = "手机号不合法")

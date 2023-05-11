@@ -24,7 +24,7 @@ public class MyAuthenticationProcessingFilter extends UsernamePasswordAuthentica
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        log.info("MyAuthenticationProcessingFilter:进入认证入口。{}",request);
+        log.info("MyAuthenticationProcessingFilter:进入认证入口");
         // 校验请求方法、请求体格式
         if (!request.getMethod().equals(HttpMethod.POST.name())) {
             throw new AuthenticationServiceException(

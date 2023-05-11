@@ -58,6 +58,7 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
         } catch (JOSEException e) {
             throw new IOException("生成JWToken失败 "+e.getMessage());
         }
+        userDetails.setSPwd("");
         result.setCode(200).setMsg("登陆成功").setData(userDetails).setToken(token);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
