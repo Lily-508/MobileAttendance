@@ -1,5 +1,29 @@
 <template>
   <div>
+    <el-row>
+      <el-col :span="8">
+        <el-button type="primary" @click="openDialog(), (isUpdate = false)"
+          >新增员工</el-button
+        >
+      </el-col>
+      <el-col :span="8">
+        <el-upload
+          action
+          :http-request="uploadFile"
+          :limit="fileLimit"
+          :file-list="fileList"
+          :before-upload="beforeUpload"
+          :on-exceed="handleExceed"
+        >
+          <el-button type="primary">excel导入员工</el-button>
+        </el-upload>
+      </el-col>
+      <el-col :span="8">
+        <el-button type="primary" @click="downloadFile"
+          >excel导出员工</el-button
+        >
+      </el-col>
+    </el-row>
     <el-table :data="tableData" border height="650">
       <el-table-column prop="sId" label="员工id"></el-table-column>
       <el-table-column prop="dId" label="部门id"></el-table-column>
@@ -19,7 +43,7 @@
       <el-table-column label="操作" fixed="right">
         <template slot-scope="scope">
           <el-button
-            @click="handleEdit(scope.row), (showEdit = !showEdit)"
+            @click="openDialog(scope.row), (isUpdate = true)"
             type="primary"
             >编辑</el-button
           >
@@ -49,6 +73,12 @@
         ref="dialogData"
         label-width="100px"
       >
+        <el-form-item label="员工密码" v-show="!isUpdate" prop="sPwd">
+          <el-input
+            v-model="dialogData.sPwd"
+            placeholder="请输入新的密码"
+          ></el-input>
+        </el-form-item>
         <el-form-item label="部门id" prop="dId">
           <el-input
             v-model="dialogData.dId"
@@ -61,7 +91,7 @@
             placeholder="请输入新的员工名"
           ></el-input>
         </el-form-item>
-        <el-form-item label="性别">
+        <el-form-item label="性别" prop="sSex">
           <el-radio-group v-model="dialogData.sSex">
             <el-radio label="男">男</el-radio>
             <el-radio label="女">女</el-radio>
@@ -79,13 +109,13 @@
             placeholder="请输入新的邮箱"
           ></el-input>
         </el-form-item>
-        <el-form-item label="在职状态">
+        <el-form-item label="在职状态" prop="sStatus">
           <el-radio-group v-model="dialogData.sStatus">
             <el-radio label="在职">在职</el-radio>
             <el-radio label="离职">离职</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="权限类别">
+        <el-form-item label="权限类别" prop="sRight">
           <el-radio-group v-model="dialogData.sRight">
             <el-radio :label="0">普通员工</el-radio>
             <el-radio :label="1">领导</el-radio>
@@ -115,9 +145,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="showEdit = false">取 消</el-button>
-        <el-button type="primary" @click="comfirmEndit(dialogData)"
-          >确 定
-        </el-button>
+        <el-button type="primary" @click="comfirmEndit">确 定 </el-button>
       </span>
     </el-dialog>
   </div>
@@ -146,6 +174,13 @@ export default {
       rules: {
         dId: [{ required: true, message: "部门id不为空", trigger: "blur" }],
         sName: [{ required: true, message: "员工名不为空", trigger: "blur" }],
+        sSex: [{ required: true, message: "性别不为空", trigger: "blur" }],
+        sStatus: [
+          { required: true, message: "在职状态不为空", trigger: "blur" },
+        ],
+        sRight: [
+          { required: true, message: "权限类别不为空", trigger: "blur" },
+        ],
         sEmail: [
           { required: true, message: "员工邮箱不为空", trigger: "blur" },
           { validator: checkmail, trigger: "blur" },
@@ -153,6 +188,14 @@ export default {
         sPhone: [
           { required: true, message: "员工手机号不为空", trigger: "blur" },
           { validator: checkPhone, trigger: "blur" },
+        ],
+        sPwd: [
+          {
+            required: !this.isUpdate,
+            message: "请输入密码",
+            trigger: "blur",
+          },
+          { min: 6, message: "密码长度最少为6位", trigger: "blur" },
         ],
       },
       dialogData: {},
@@ -162,6 +205,7 @@ export default {
           dId: "王小虎",
           sName: "上海市普陀区金沙江路 1518 弄",
           sSex: "2016-05-02",
+          sPwd: "",
           sPhone: "待审核",
           sEmail: "否",
           sImei: "0",
@@ -171,16 +215,31 @@ export default {
           sHiredate: "是",
         },
       ],
+      isUpdate: true,
       showEdit: false,
+      //分页相关
       currentPage: 1,
       pageSize: 5,
       total: 0,
+      //上传后的文件列表
+      fileList: [],
+      // 允许的文件类型
+      fileType: ["xls", "xlsx"],
+      // 运行上传文件大小，单位 M
+      fileSize: 50,
+      // 附件数量限制
+      fileLimit: 1,
     }
   },
-  created() {
-    this.updateTable(this.currentPage, this.pageSize)
-  },
+
   methods: {
+    openDialog(row) {
+      this.showEdit = !this.showEdit
+      this.$nextTick(() => {
+        this.$refs["dialogData"].resetFields()
+        this.dialogData = row ? Object.assign({}, row) : {}
+      })
+    },
     handleSizeChange(size) {
       this.currentPage = 1
       this.pageSize = size
@@ -199,28 +258,53 @@ export default {
           return "管理员"
       }
     },
-    handleEdit(row) {
-      this.dialogData = row
-    },
-    comfirmEndit(row) {
-      console.log(row)
-      this.showEdit = !this.showEdit
-      this.$axiosJwt({
-        url: "/staffs",
-        method: "put",
-        data: row,
-        success: (response) => {
-          this.$message({
-            message: response.data.msg,
-            type: "success",
-          })
-        },
-        error: (err) => {
-          this.$message({
-            message: err.msg,
-            type: "error",
-          })
-        },
+
+    comfirmEndit() {
+      this.$refs["dialogData"].validate((vaild) => {
+        if (vaild) {
+          console.log(this.dialogData)
+          if (!this.isUpdate) {
+            this.$axiosJwt({
+              url: "/staffs",
+              method: "post",
+              data: this.dialogData,
+              success: (response) => {
+                this.showEdit = !this.showEdit
+                this.$message({
+                  message: response.data.msg,
+                  type: "success",
+                })
+              },
+              error: (err) => {
+                this.$message({
+                  message: err.msg,
+                  type: "error",
+                })
+              },
+            })
+          } else {
+            this.$axiosJwt({
+              url: "/staffs",
+              method: "put",
+              data: this.dialogData,
+              success: (response) => {
+                this.showEdit = !this.showEdit
+                this.$message({
+                  message: response.data.msg,
+                  type: "success",
+                })
+              },
+              error: (err) => {
+                this.$message({
+                  message: err.msg,
+                  type: "error",
+                })
+              },
+            })
+          }
+        } else {
+          return false
+        }
       })
     },
     handleDelete(index, row) {
@@ -237,7 +321,6 @@ export default {
             message: response.data.msg,
             type: "success",
           })
-          // this.gettableData()
         },
       })
     },
@@ -258,16 +341,82 @@ export default {
         },
       })
     },
-    gettableData() {
-      if (this.tableData.length < this.currentPage * this.pageSize) {
-        this.javaPageCur += 1
-        this.updateTable(this.javaPageCur, this.pageSize)
-      }
-      return this.tableData.slice(
-        (this.currentPage - 1) * this.pageSize,
-        this.currentPage * this.pageSize
-      )
+    //超出文件个数的回调
+    handleExceed() {
+      this.$message({
+        type: "warning",
+        message: "超出最大上传文件数量的限制！",
+      })
+      return
     },
+    beforeUpload(file) {
+      if (file.type != "" || file.type != null || file.type != undefined) {
+        //截取文件的后缀，判断文件类型
+        const FileExt = file.name.replace(/.+\./, "").toLowerCase()
+        //计算文件的大小
+        const isLt5M = file.size / 1024 / 1024 < 50 //这里做文件大小限制
+        //如果大于50M
+        if (!isLt5M) {
+          this.$message.error("上传文件大小不能超过 50MB!")
+          return false
+        }
+        //如果文件类型不在允许上传的范围内
+        if (this.fileType.includes(FileExt)) {
+          return true
+        } else {
+          this.$message.error("上传文件格式不正确!")
+          return false
+        }
+      }
+    },
+    uploadFile(item) {
+      this.$message.info("文件上传中......")
+      let FormDatas = new FormData()
+      FormDatas.append("file", item.file)
+      this.$axiosJwt({
+        url: "/staffs/excel",
+        method: "post",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        data: FormDatas,
+        success: (response) => {
+          this.$message.success(response.data.msg)
+        },
+      })
+    },
+    downloadFile() {
+      this.$axiosJwt({
+        url: "/staffs/excel",
+        method: "get",
+        responseType: "blob",
+        success: (response) => {
+          console.log(response)
+          this.$message.success("下载成功!")
+          let content = response.headers["content-disposition"]
+          let name = content.slice(content.indexOf("=") + 1, content.length)
+          name = decodeURIComponent(name)
+          const link = document.createElement("a")
+          const blob = new Blob([response.data], {
+            type: "application/vnd.ms-excel",
+          })
+          link.style.display = "none"
+          link.href = URL.createObjectURL(blob)
+          link.setAttribute("download", name)
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        },
+      })
+    },
+  },
+  created() {
+    this.updateTable(this.currentPage, this.pageSize)
   },
 }
 </script>
+<style scoped>
+.el-table {
+  margin-top: 10px;
+}
+</style>
