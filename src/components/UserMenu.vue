@@ -35,6 +35,38 @@
           <i class="el-icon-s-management"></i>
           <span slot="title">员工管理</span>
         </el-menu-item>
+        <el-submenu index="1">
+          <template slot="title">
+            <i class="el-icon-s-grid"></i>
+            <span slot="title">事务管理</span></template
+          >
+          <el-menu-item index="/user/attendance/rule">
+            <i class="el-icon-edit"></i>
+            <span slot="title">事务申请</span>
+          </el-menu-item>
+          <el-submenu index="1-1">
+            <template slot="title">
+              <i class="el-icon-s-grid"></i>
+              <span slot="title">事务审批</span></template
+            >
+            <el-menu-item index="/user/affair/work-outside">
+              <i class="el-icon-edit"></i>
+              <span slot="title">外派事务</span>
+            </el-menu-item>
+            <el-menu-item index="/user/affair/work-outside2">
+              <i class="el-icon-edit"></i>
+              <span slot="title">请休假事务</span>
+            </el-menu-item>
+            <el-menu-item index="/user/affair/work-outside2">
+              <i class="el-icon-edit"></i>
+              <span slot="title">加班事务</span>
+            </el-menu-item>
+            <el-menu-item index="/user/affair/work-outside2">
+              <i class="el-icon-edit"></i>
+              <span slot="title">补卡事务</span>
+            </el-menu-item>
+          </el-submenu>
+        </el-submenu>
         <el-submenu index="/user/attendance">
           <template slot="title">
             <i class="el-icon-s-grid"></i>
@@ -83,20 +115,6 @@
           <el-menu-item index="/user/attendance/record">
             <i class="el-icon-edit"></i>
             <span slot="title">拜访计划发布</span>
-          </el-menu-item>
-        </el-submenu>
-        <el-submenu index="/user/status">
-          <template slot="title">
-            <i class="el-icon-s-grid"></i>
-            <span slot="title">事务管理</span></template
-          >
-          <el-menu-item index="/user/attendance/rule">
-            <i class="el-icon-edit"></i>
-            <span slot="title">事务申请</span>
-          </el-menu-item>
-          <el-menu-item index="/user/attendance/rule">
-            <i class="el-icon-edit"></i>
-            <span slot="title">事务审批</span>
           </el-menu-item>
         </el-submenu>
       </el-menu>

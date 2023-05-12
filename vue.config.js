@@ -1,19 +1,19 @@
-const { defineConfig } = require('@vue/cli-service')
-const fs=require('fs');
-const path=require('path');
+const { defineConfig } = require("@vue/cli-service")
+const fs = require("fs")
+const path = require("path")
 module.exports = defineConfig({
   transpileDependencies: true,
   configureWebpack: {
-    devtool: 'source-map'
+    devtool: "source-map",
   },
   devServer: {
-    open: false,
+    open: true,
     https: {
-      cert: fs.readFileSync(path.join(__dirname, 'ssl/file.crt')),
-      key: fs.readFileSync(path.join(__dirname, 'ssl/private.pem'))
+      cert: fs.readFileSync(path.join(__dirname, "ssl/file.crt")),
+      key: fs.readFileSync(path.join(__dirname, "ssl/private.pem")),
     },
-    host:'0.0.0.0',
-    port:8080,
+    host: "0.0.0.0",
+    port: 8080,
     hot: true,
-  }
+  },
 })

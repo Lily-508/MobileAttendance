@@ -20,7 +20,7 @@ Vue.prototype.$axiosNoToken = (options) => {
     url: options.url,
     method: options.method || "post",
     data: options.data || {},
-    timeout: options.timeout || 1000,
+    timeout: options.timeout || 5 * 60 * 1000,
     params: options.params || {},
     headers: options.headers || defaultHeaders,
     responseType: options.responseType || "json",

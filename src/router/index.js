@@ -28,8 +28,8 @@ const routes = [
         component: () => import("../components/pages/StaffManage.vue"),
       },
       {
-        path: "record",
-        component: () => import("../components/pages/StaffManage.vue"),
+        path: "affair/work-outside",
+        component: () => import("../components/pages/WorkOutsideManage.vue"),
       },
     ],
   },

@@ -73,7 +73,12 @@
         ref="dialogData"
         label-width="100px"
       >
-        <el-form-item label="员工密码" v-show="!isUpdate" prop="sPwd">
+        <el-form-item
+          label="员工密码"
+          v-show="!isUpdate"
+          prop="sPwd"
+          :rules="isUpdate ? [{ required: false }] : rules.sPwd"
+        >
           <el-input
             v-model="dialogData.sPwd"
             placeholder="请输入新的密码"
@@ -191,7 +196,7 @@ export default {
         ],
         sPwd: [
           {
-            required: !this.isUpdate,
+            required: true,
             message: "请输入密码",
             trigger: "blur",
           },
