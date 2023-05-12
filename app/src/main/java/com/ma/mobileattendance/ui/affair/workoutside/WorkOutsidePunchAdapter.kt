@@ -21,6 +21,7 @@ class WorkOutsidePunchAdapter(private val workOutsideList:List<Affair>):Recycler
         val woEndTIme: TextView = view.findViewById(R.id.woEndTImeText)
         val woTotalText: TextView = view.findViewById(R.id.woTotalText)
         val woRuleText: TextView = view.findViewById(R.id.woRuleText)
+        val woResult: TextView = view.findViewById(R.id.woResult)
         val woEditBtn: Button = view.findViewById(R.id.woEditBtn)
         val woPunchBtn: Button = view.findViewById(R.id.woPunchBtn)
 
@@ -34,11 +35,15 @@ class WorkOutsidePunchAdapter(private val workOutsideList:List<Affair>):Recycler
         viewHolder.woPunchBtn.setOnClickListener {
             val position=viewHolder.adapterPosition
             val workOutside=workOutsideList[position]
-            val controller=Navigation.findNavController(it)
-            val bundle=Bundle()
-            bundle.putString("rCategory", EnumNoun.OUTSIDE_PUNCH)
-            bundle.putInt("recordRuleId", workOutside.aId?:0)
-            controller.navigate(R.id.action_workOutsidePunchFragment_to_punchMapFragment,bundle)
+            if(workOutside.result == EnumNoun.AUDIT_AGREE_RESULT){
+                val controller=Navigation.findNavController(it)
+                val bundle=Bundle()
+                bundle.putString("rCategory", EnumNoun.OUTSIDE_PUNCH)
+                bundle.putInt("recordRuleId", workOutside.aId?:0)
+                controller.navigate(R.id.action_workOutsidePunchFragment_to_punchMapFragment,bundle)
+            }else{
+                Toast.makeText(parent.context,"审核通过后才能考勤!",Toast.LENGTH_SHORT).show()
+            }
         }
         return viewHolder
     }
@@ -52,7 +57,7 @@ class WorkOutsidePunchAdapter(private val workOutsideList:List<Affair>):Recycler
             holder.woEndTIme.text=workOutside.endTime
             holder.woTotalText.text= workOutside.total.toString()
             holder.woRuleText.text=workOutside.aId.toString()
-
+            holder.woResult.text=workOutside.result
         }
     }
     override fun getItemCount(): Int {

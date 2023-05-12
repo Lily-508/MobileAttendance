@@ -91,29 +91,6 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/woTotal"
         app:layout_constraintTop_toTopOf="@+id/woTotal" />
-
-    <Button
-        android:id="@+id/woEditBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:text="编辑"
-        app:layout_constraintEnd_toStartOf="@+id/woPunchBtn"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/woRule" />
-
-    <Button
-        android:id="@+id/woPunchBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="考勤"
-        app:layout_constraintBottom_toBottomOf="@+id/woEditBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/woEditBtn"
-        app:layout_constraintTop_toTopOf="@+id/woEditBtn" />
-
     <TextView
         android:id="@+id/woRule"
         android:layout_width="wrap_content"
@@ -135,4 +112,39 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/woRule"
         app:layout_constraintTop_toTopOf="@+id/woRule" />
+
+    <TextView
+        android:id="@+id/woResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="审核结果"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/woRule"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+         />
+
+    <Button
+        android:id="@+id/woEditBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="编辑"
+        app:layout_constraintEnd_toStartOf="@+id/woPunchBtn"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/woResult" />
+
+    <Button
+        android:id="@+id/woPunchBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="考勤"
+        app:layout_constraintBottom_toBottomOf="@+id/woEditBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/woEditBtn"
+        app:layout_constraintTop_toTopOf="@+id/woEditBtn" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

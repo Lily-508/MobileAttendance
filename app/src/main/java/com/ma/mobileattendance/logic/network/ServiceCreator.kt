@@ -14,9 +14,10 @@ import javax.net.ssl.TrustManagerFactory
 
 object ServiceCreator {
     private const val BASE_URL = "https://192.168.1.108:8433"
+    private const val FRPC_URL="https://frp-bag.top:33576"
     private val client = getHttpsClient()
     private val retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(FRPC_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .client(client)
         .build()
@@ -57,8 +58,8 @@ object ServiceCreator {
             e.printStackTrace()
         }
         return okhttpClient
-            .readTimeout(7676, TimeUnit.MILLISECONDS)
-            .connectTimeout(7676, TimeUnit.MILLISECONDS)
+            .readTimeout(5*60*1000, TimeUnit.MILLISECONDS)
+            .connectTimeout(5*60*1000, TimeUnit.MILLISECONDS)
             .addInterceptor {
                 val request = it.request()
                     .newBuilder()
